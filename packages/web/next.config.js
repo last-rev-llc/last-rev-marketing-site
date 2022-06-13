@@ -1,8 +1,11 @@
 require('dotenv').config();
 const path = require('path');
 const withPlugins = require('next-compose-plugins');
-const withTM = require('next-transpile-modules')(['@last-rev-marketing-site/components', '@last-rev/component-library']);
-const { withSentryConfig } = require('@sentry/nextjs');
+const withTM = require('next-transpile-modules')([
+  '@last-rev-marketing-site/components',
+  '@last-rev/component-library'
+]);
+// const { withSentryConfig } = require('@sentry/nextjs');
 
 // Allow bundle analysis via ANALYZE_BUNDLE env variable
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
@@ -49,4 +52,4 @@ const nextConfig = {
   }
 };
 
-module.exports = withPlugins([[withTM], withBundleAnalyzer, [withSentryConfig]], nextConfig);
+module.exports = withPlugins([[withTM], withBundleAnalyzer /*, [withSentryConfig]*/], nextConfig);
