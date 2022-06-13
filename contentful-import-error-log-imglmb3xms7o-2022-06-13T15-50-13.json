@@ -1,0 +1,551 @@
+[
+  {
+    "ts": "2022-06-13T19:51:48.766Z",
+    "level": "error",
+    "error": {
+      "name": "UnresolvedLinks",
+      "entity": {
+        "metadata": {
+          "tags": [
+          ]
+        },
+        "sys": {
+          "space": {
+            "sys": {
+              "type": "Link",
+              "linkType": "Space",
+              "id": "imglmb3xms7o"
+            }
+          },
+          "id": "2Jwec3v3WAQyRszbUd2ndY",
+          "type": "Entry",
+          "createdAt": "2022-06-13T19:52:11.134Z",
+          "updatedAt": "2022-06-13T19:52:11.134Z",
+          "environment": {
+            "sys": {
+              "id": "last-rev-mktg-site-06-13-22",
+              "type": "Link",
+              "linkType": "Environment"
+            }
+          },
+          "createdBy": {
+            "sys": {
+              "type": "Link",
+              "linkType": "User",
+              "id": "31aEEI4MKM7eijUIBSSDOT"
+            }
+          },
+          "updatedBy": {
+            "sys": {
+              "type": "Link",
+              "linkType": "User",
+              "id": "31aEEI4MKM7eijUIBSSDOT"
+            }
+          },
+          "publishedCounter": 0,
+          "version": 1,
+          "contentType": {
+            "sys": {
+              "type": "Link",
+              "linkType": "ContentType",
+              "id": "collection"
+            }
+          }
+        },
+        "fields": {
+          "internalTitle": {
+            "en-US": "Header - Navigation bar"
+          },
+          "items": {
+            "en-US": [
+              {
+                "sys": {
+                  "type": "Link",
+                  "linkType": "Entry",
+                  "id": "7eiIyiI1vT4rr4sbaDQFqt"
+                }
+              },
+              {
+                "sys": {
+                  "type": "Link",
+                  "linkType": "Entry",
+                  "id": "6xqXWKj4nrJJUKvIppYk1n"
+                }
+              },
+              {
+                "sys": {
+                  "type": "Link",
+                  "linkType": "Entry",
+                  "id": "36E6TQCwE9QNOkT7YkLgdy"
+                }
+              },
+              {
+                "sys": {
+                  "type": "Link",
+                  "linkType": "Entry",
+                  "id": "1WjBs4nEV9fvcta4gVrzpv"
+                }
+              }
+            ]
+          },
+          "variant": {
+            "en-US": "navigation-bar"
+          }
+        }
+      },
+      "data": {
+        "status": 422,
+        "statusText": "Unprocessable Entity",
+        "message": "Validation error",
+        "details": {
+          "errors": [
+            {
+              "name": "notResolvable",
+              "link": {
+                "type": "Link",
+                "linkType": "Entry",
+                "id": "7eiIyiI1vT4rr4sbaDQFqt"
+              },
+              "path": [
+                "fields",
+                "items",
+                "en-US",
+                0
+              ]
+            }
+          ]
+        },
+        "request": {
+          "url": "/spaces/imglmb3xms7o/environments/last-rev-mktg-site-06-13-22/entries/2Jwec3v3WAQyRszbUd2ndY/published",
+          "headers": {
+            "Accept": "application/json, text/plain, */*",
+            "Content-Type": "application/vnd.contentful.management.v1+json",
+            "X-Contentful-User-Agent": "app contentful.import/8.3.2; feature library-import; sdk contentful-management.js/7.54.2; platform node.js/v14.17.6; os macOS/v14.17.6;",
+            "CF-Sequence": "33c0c04e-733a-4670-98c1-7579d1641b38",
+            "Authorization": "Bearer ...FUNKU",
+            "user-agent": "node.js/v14.17.6",
+            "Accept-Encoding": "gzip",
+            "X-Contentful-Version": 1
+          },
+          "method": "put",
+          "payloadData": null
+        },
+        "requestId": "c42b0309-ca8a-4e08-8f2b-05aa269e4963"
+      }
+    }
+  },
+  {
+    "ts": "2022-06-13T19:51:51.023Z",
+    "level": "error",
+    "error": {
+      "name": "UnresolvedLinks",
+      "entity": {
+        "metadata": {
+          "tags": [
+          ]
+        },
+        "sys": {
+          "space": {
+            "sys": {
+              "type": "Link",
+              "linkType": "Space",
+              "id": "imglmb3xms7o"
+            }
+          },
+          "id": "6xqXWKj4nrJJUKvIppYk1n",
+          "type": "Entry",
+          "createdAt": "2022-06-13T19:52:12.067Z",
+          "updatedAt": "2022-06-13T19:52:12.067Z",
+          "environment": {
+            "sys": {
+              "id": "last-rev-mktg-site-06-13-22",
+              "type": "Link",
+              "linkType": "Environment"
+            }
+          },
+          "createdBy": {
+            "sys": {
+              "type": "Link",
+              "linkType": "User",
+              "id": "31aEEI4MKM7eijUIBSSDOT"
+            }
+          },
+          "updatedBy": {
+            "sys": {
+              "type": "Link",
+              "linkType": "User",
+              "id": "31aEEI4MKM7eijUIBSSDOT"
+            }
+          },
+          "publishedCounter": 0,
+          "version": 1,
+          "contentType": {
+            "sys": {
+              "type": "Link",
+              "linkType": "ContentType",
+              "id": "page"
+            }
+          }
+        },
+        "fields": {
+          "internalTitle": {
+            "en-US": "Collections"
+          },
+          "title": {
+            "en-US": "Collections"
+          },
+          "slug": {
+            "en-US": "/collections"
+          },
+          "hero": {
+            "en-US": {
+              "sys": {
+                "type": "Link",
+                "linkType": "Entry",
+                "id": "5P86raS26UOYTEAcPf5vMb"
+              }
+            }
+          },
+          "contents": {
+            "en-US": [
+              {
+                "sys": {
+                  "type": "Link",
+                  "linkType": "Entry",
+                  "id": "4T4LkYIDrvDoH9Wcc8tvst"
+                }
+              }
+            ]
+          },
+          "seo": {
+            "en-US": {
+              "title": {
+                "name": "title",
+                "value": "Collections"
+              }
+            }
+          },
+          "colorScheme": {
+            "en-US": "default"
+          }
+        }
+      },
+      "data": {
+        "status": 422,
+        "statusText": "Unprocessable Entity",
+        "message": "Validation error",
+        "details": {
+          "errors": [
+            {
+              "name": "notResolvable",
+              "link": {
+                "type": "Link",
+                "linkType": "Entry",
+                "id": "4T4LkYIDrvDoH9Wcc8tvst"
+              },
+              "path": [
+                "fields",
+                "contents",
+                "en-US",
+                0
+              ]
+            }
+          ]
+        },
+        "request": {
+          "url": "/spaces/imglmb3xms7o/environments/last-rev-mktg-site-06-13-22/entries/6xqXWKj4nrJJUKvIppYk1n/published",
+          "headers": {
+            "Accept": "application/json, text/plain, */*",
+            "Content-Type": "application/vnd.contentful.management.v1+json",
+            "X-Contentful-User-Agent": "app contentful.import/8.3.2; feature library-import; sdk contentful-management.js/7.54.2; platform node.js/v14.17.6; os macOS/v14.17.6;",
+            "CF-Sequence": "33c0c04e-733a-4670-98c1-7579d1641b38",
+            "Authorization": "Bearer ...FUNKU",
+            "user-agent": "node.js/v14.17.6",
+            "Accept-Encoding": "gzip",
+            "X-Contentful-Version": 1
+          },
+          "method": "put",
+          "payloadData": null
+        },
+        "requestId": "d6ee02d4-210e-4356-8401-46c67a18d996"
+      }
+    }
+  },
+  {
+    "ts": "2022-06-13T19:51:51.591Z",
+    "level": "error",
+    "error": {
+      "name": "UnresolvedLinks",
+      "entity": {
+        "metadata": {
+          "tags": [
+          ]
+        },
+        "sys": {
+          "space": {
+            "sys": {
+              "type": "Link",
+              "linkType": "Space",
+              "id": "imglmb3xms7o"
+            }
+          },
+          "id": "2Jwec3v3WAQyRszbUd2ndY",
+          "type": "Entry",
+          "createdAt": "2022-06-13T19:52:11.134Z",
+          "updatedAt": "2022-06-13T19:52:11.134Z",
+          "environment": {
+            "sys": {
+              "id": "last-rev-mktg-site-06-13-22",
+              "type": "Link",
+              "linkType": "Environment"
+            }
+          },
+          "createdBy": {
+            "sys": {
+              "type": "Link",
+              "linkType": "User",
+              "id": "31aEEI4MKM7eijUIBSSDOT"
+            }
+          },
+          "updatedBy": {
+            "sys": {
+              "type": "Link",
+              "linkType": "User",
+              "id": "31aEEI4MKM7eijUIBSSDOT"
+            }
+          },
+          "publishedCounter": 0,
+          "version": 1,
+          "contentType": {
+            "sys": {
+              "type": "Link",
+              "linkType": "ContentType",
+              "id": "collection"
+            }
+          }
+        },
+        "fields": {
+          "internalTitle": {
+            "en-US": "Header - Navigation bar"
+          },
+          "items": {
+            "en-US": [
+              {
+                "sys": {
+                  "type": "Link",
+                  "linkType": "Entry",
+                  "id": "7eiIyiI1vT4rr4sbaDQFqt"
+                }
+              },
+              {
+                "sys": {
+                  "type": "Link",
+                  "linkType": "Entry",
+                  "id": "6xqXWKj4nrJJUKvIppYk1n"
+                }
+              },
+              {
+                "sys": {
+                  "type": "Link",
+                  "linkType": "Entry",
+                  "id": "36E6TQCwE9QNOkT7YkLgdy"
+                }
+              },
+              {
+                "sys": {
+                  "type": "Link",
+                  "linkType": "Entry",
+                  "id": "1WjBs4nEV9fvcta4gVrzpv"
+                }
+              }
+            ]
+          },
+          "variant": {
+            "en-US": "navigation-bar"
+          }
+        }
+      },
+      "data": {
+        "status": 422,
+        "statusText": "Unprocessable Entity",
+        "message": "Validation error",
+        "details": {
+          "errors": [
+            {
+              "name": "notResolvable",
+              "link": {
+                "type": "Link",
+                "linkType": "Entry",
+                "id": "7eiIyiI1vT4rr4sbaDQFqt"
+              },
+              "path": [
+                "fields",
+                "items",
+                "en-US",
+                0
+              ]
+            }
+          ]
+        },
+        "request": {
+          "url": "/spaces/imglmb3xms7o/environments/last-rev-mktg-site-06-13-22/entries/2Jwec3v3WAQyRszbUd2ndY/published",
+          "headers": {
+            "Accept": "application/json, text/plain, */*",
+            "Content-Type": "application/vnd.contentful.management.v1+json",
+            "X-Contentful-User-Agent": "app contentful.import/8.3.2; feature library-import; sdk contentful-management.js/7.54.2; platform node.js/v14.17.6; os macOS/v14.17.6;",
+            "CF-Sequence": "33c0c04e-733a-4670-98c1-7579d1641b38",
+            "Authorization": "Bearer ...FUNKU",
+            "user-agent": "node.js/v14.17.6",
+            "Accept-Encoding": "gzip",
+            "X-Contentful-Version": 1
+          },
+          "method": "put",
+          "payloadData": null
+        },
+        "requestId": "8eab0fd9-bcc6-4d3d-950f-5b4389a6fd0a"
+      }
+    }
+  },
+  {
+    "ts": "2022-06-13T19:51:51.831Z",
+    "level": "error",
+    "error": {
+      "name": "UnresolvedLinks",
+      "entity": {
+        "metadata": {
+          "tags": [
+          ]
+        },
+        "sys": {
+          "space": {
+            "sys": {
+              "type": "Link",
+              "linkType": "Space",
+              "id": "imglmb3xms7o"
+            }
+          },
+          "id": "6xqXWKj4nrJJUKvIppYk1n",
+          "type": "Entry",
+          "createdAt": "2022-06-13T19:52:12.067Z",
+          "updatedAt": "2022-06-13T19:52:12.067Z",
+          "environment": {
+            "sys": {
+              "id": "last-rev-mktg-site-06-13-22",
+              "type": "Link",
+              "linkType": "Environment"
+            }
+          },
+          "createdBy": {
+            "sys": {
+              "type": "Link",
+              "linkType": "User",
+              "id": "31aEEI4MKM7eijUIBSSDOT"
+            }
+          },
+          "updatedBy": {
+            "sys": {
+              "type": "Link",
+              "linkType": "User",
+              "id": "31aEEI4MKM7eijUIBSSDOT"
+            }
+          },
+          "publishedCounter": 0,
+          "version": 1,
+          "contentType": {
+            "sys": {
+              "type": "Link",
+              "linkType": "ContentType",
+              "id": "page"
+            }
+          }
+        },
+        "fields": {
+          "internalTitle": {
+            "en-US": "Collections"
+          },
+          "title": {
+            "en-US": "Collections"
+          },
+          "slug": {
+            "en-US": "/collections"
+          },
+          "hero": {
+            "en-US": {
+              "sys": {
+                "type": "Link",
+                "linkType": "Entry",
+                "id": "5P86raS26UOYTEAcPf5vMb"
+              }
+            }
+          },
+          "contents": {
+            "en-US": [
+              {
+                "sys": {
+                  "type": "Link",
+                  "linkType": "Entry",
+                  "id": "4T4LkYIDrvDoH9Wcc8tvst"
+                }
+              }
+            ]
+          },
+          "seo": {
+            "en-US": {
+              "title": {
+                "name": "title",
+                "value": "Collections"
+              }
+            }
+          },
+          "colorScheme": {
+            "en-US": "default"
+          }
+        }
+      },
+      "data": {
+        "status": 422,
+        "statusText": "Unprocessable Entity",
+        "message": "Validation error",
+        "details": {
+          "errors": [
+            {
+              "name": "notResolvable",
+              "link": {
+                "type": "Link",
+                "linkType": "Entry",
+                "id": "4T4LkYIDrvDoH9Wcc8tvst"
+              },
+              "path": [
+                "fields",
+                "contents",
+                "en-US",
+                0
+              ]
+            }
+          ]
+        },
+        "request": {
+          "url": "/spaces/imglmb3xms7o/environments/last-rev-mktg-site-06-13-22/entries/6xqXWKj4nrJJUKvIppYk1n/published",
+          "headers": {
+            "Accept": "application/json, text/plain, */*",
+            "Content-Type": "application/vnd.contentful.management.v1+json",
+            "X-Contentful-User-Agent": "app contentful.import/8.3.2; feature library-import; sdk contentful-management.js/7.54.2; platform node.js/v14.17.6; os macOS/v14.17.6;",
+            "CF-Sequence": "33c0c04e-733a-4670-98c1-7579d1641b38",
+            "Authorization": "Bearer ...FUNKU",
+            "user-agent": "node.js/v14.17.6",
+            "Accept-Encoding": "gzip",
+            "X-Contentful-Version": 1
+          },
+          "method": "put",
+          "payloadData": null
+        },
+        "requestId": "3cff5807-b846-4377-82da-85853b26c16f"
+      }
+    }
+  },
+  {
+    "ts": "2022-06-13T19:51:51.832Z",
+    "level": "error",
+    "error": "Could not publish the following entities: 2Jwec3v3WAQyRszbUd2ndY, Collections (6xqXWKj4nrJJUKvIppYk1n)"
+  }
+]

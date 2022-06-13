@@ -1,0 +1,15 @@
+{
+  "name": "@last-rev-marketing-site/functions",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {},
+  "dependencies": {
+    "@last-rev/app-config": "^0.1.4",
+    "@last-rev/contentful-webhook-handler": "^0.1.3",
+    "@last-rev/graphql-algolia-integration": "^0.1.3",
+    "@last-rev/graphql-contentful-core": "^0.1.33",
+    "@last-rev-marketing-site/graphql-extensions": "^0.1.0",
+    "dotenv": "^10.0.0"
+  },
+  "devDependencies": {}
+}

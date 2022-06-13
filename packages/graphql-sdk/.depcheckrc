@@ -1,0 +1,1 @@
+ignores: ["@graphql-codegen/*", "@last-rev-marketing-site/graphql-runner", "@last-rev-marketing-site/graphql-extensions", "rollup"]

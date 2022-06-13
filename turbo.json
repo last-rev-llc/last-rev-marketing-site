@@ -1,0 +1,86 @@
+{
+  "$schema": "https://turborepo.org/schema.json",
+  "baseBranch": "origin/main",
+  "globalDependencies": [".env", "**/.env", "$TURBO_CACHE_KEY"],
+  "pipeline": {
+    "dev": {
+      "dependsOn": ["^build"],
+      "cache": false
+    },
+    "storybook": {
+      "dependsOn": ["^build"],
+      "cache": false
+    },
+    "lint": {
+      "outputs": []
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**"]
+    },
+    "test:e2e": {
+      "dependsOn": ["^build", "$PERCY_TOKEN"],
+      "outputs": ["coverage/**"]
+    },
+    "test:watch": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "outputs": []
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".next/**"]
+    },
+    "build-storybook": {
+      "dependsOn": ["^build"],
+      "outputs": ["storybook-static/**"]
+    },
+    "sync:cms": {
+      "cache": false,
+      "dependsOn": ["@last-rev-marketing-site/graphql-extensions#build"]
+    },
+    "start": {
+      "cache": false,
+      "dependsOn": ["build"],
+      "outputs": []
+    },
+    "gql:healthcheck": {
+      "cache": false,
+      "dependsOn": [],
+      "outputs": []
+    },
+    "@last-rev-marketing-site/graphql-runner#dev": {
+      "cache": false,
+      "dependsOn": ["@last-rev-marketing-site/graphql-extensions#build"],
+      "outputs": []
+    },
+    "@last-rev-marketing-site/graphql-runner#start": {
+      "cache": false,
+      "dependsOn": ["@last-rev-marketing-site/graphql-extensions#build"],
+      "outputs": []
+    },
+    "@last-rev-marketing-site/utils#dev": {
+      "cache": false,
+      "dependsOn": ["@last-rev-marketing-site/graphql-sdk#build"],
+      "outputs": []
+    },
+    "@last-rev-marketing-site/graphql-sdk#dev": {
+      "cache": false,
+      "dependsOn": ["@last-rev-marketing-site/graphql-sdk#gql:healthcheck"],
+      "outputs": []
+    },
+    "@last-rev-marketing-site/graphql-sdk#build": {
+      "dependsOn": ["@last-rev-marketing-site/graphql-sdk#gql:healthcheck", "^build"],
+      "outputs": ["dist/**", "schema.graphql"]
+    },
+    "@last-rev-marketing-site/web#dev": {
+      "cache": false,
+      "dependsOn": ["@last-rev-marketing-site/graphql-runner#dev", "^build"],
+      "outputs": ["out/**", ".next/**"]
+    },
+    "@last-rev-marketing-site/web#build": {
+      "dependsOn": ["@last-rev-marketing-site/graphql-runner#start", "^build"],
+      "outputs": ["out/**", ".next/**"]
+    }
+  }
+}

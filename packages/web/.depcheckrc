@@ -1,0 +1,2 @@
+# "@last-rev-marketing-site/graphql-extensions", "@last-rev-marketing-site/graphql-runner" needed for lerna build order when running "yarn dev"
+ignores: ['@last-rev-marketing-site/graphql-extensions', '@last-rev-marketing-site/graphql-runner']
