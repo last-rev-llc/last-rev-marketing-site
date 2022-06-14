@@ -1,33 +1,19 @@
 import React from 'react';
-import Box from '@mui/material/Box';
-import Media from './Media';
-import { mediaMock, mediaVideoMock, responsiveMediaMock, SVGMediaMock, ExternalSVGMediaMock } from './Media.mock';
+import { Box } from '@mui/material';
+import Media from '@last-rev/component-library/dist/components/Media/Media';
+import MediaProps from '@last-rev/component-library/dist/components/Media/Media';
+import { mediaVideoMock } from './Media.mock';
 
 export default {
-  title: '1. LR Components / Media',
+  title: 'Modules / Media',
   component: Media,
-
-  argTypes: {
-    file: { name: 'File URL' },
-    title: { name: 'Title' },
-    description: { name: 'Description' },
-    __typename: { table: { disable: true } },
-    sidekickLookup: { table: { disable: true } }
-  }
+  decorators: [
+    (storyFn: () => boolean | React.ReactChild | React.ReactFragment | React.ReactPortal) => (
+      <Box m={5}>{storyFn()}</Box>
+    )
+  ]
 };
 
-const Template = (args: JSX.IntrinsicAttributes) => <Media {...args} />;
+const Template = (args: typeof MediaProps) => <Media {...args} />;
 export const Default = Template.bind({});
-Default.args = { ...mediaMock() };
-
-export const InlineSVG = Template.bind({});
-InlineSVG.args = { ...SVGMediaMock };
-
-export const SVG = Template.bind({});
-SVG.args = { ...ExternalSVGMediaMock };
-
-export const Responsive = Template.bind({});
-Responsive.args = { ...responsiveMediaMock };
-
-export const Video = Template.bind({});
-Video.args = { ...mediaVideoMock() };
+Default.args = { ...mediaVideoMock };

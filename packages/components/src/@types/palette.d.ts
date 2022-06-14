@@ -8,14 +8,12 @@ declare module '@mui/material/styles' {
   }
 
   interface Palette {
-    'tertiary'?: MuiPalette['primary'];
-    'quartiary'?: MuiPalette['primary'];
     'gradient-primary'?: MuiPalette['primary'];
+    'backgroundOption'?: MuiPalette['primary'];
   }
 
   interface PaletteOptions {
-    'tertiary'?: PaletteOptions['primary'];
-    'quartiary'?: PaletteOptions['primary'];
     'gradient-primary'?: PaletteOptions['primary'];
+    'backgroundOption'?: PaletteOptions['primary'];
   }
 }

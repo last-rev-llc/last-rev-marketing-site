@@ -11,16 +11,15 @@ export const mediaMock = (): MediaProps => ({
   description: lorem.sentence()
 });
 
-export const mediaVideoMock = () => ({
+export const mediaVideoMock = {
+  __typename: 'Media',
+  variant: 'embed',
+  title: 'Netlify Vimeo video',
   file: {
-    url: './LastRev.mp4',
-    width: '1280',
-    height: '720'
+    url: 'https://player.vimeo.com/video/677844564'
   },
-  variant: 'video',
-  title: lorem.sentence(),
   controls: true
-});
+};
 
 export const assetMock = () => ({
   file: {
