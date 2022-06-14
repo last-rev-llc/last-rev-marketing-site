@@ -209,15 +209,7 @@ const createSchemeTheme = (schemeKey?: string) => {
                   paddingRight: baseSchemeTheme.spacing(10)
                 },
                 'height': 80,
-                '& .MuiLink-root': {
-                  'display': 'flex',
-                  'alignItems': 'center',
-                  'padding': 10,
-                  'color': 'white',
-                  '&.MuiLink-selected': {
-                    fontWeight: 400
-                  }
-                },
+
                 '& svg[class*="Header-logo"]': {
                   maxHeight: 36
                 },
@@ -227,6 +219,21 @@ const createSchemeTheme = (schemeKey?: string) => {
                 },
                 '& a': {
                   textDecoration: 'none'
+                }
+              }
+            }
+          },
+          NavigationBar: {
+            styleOverrides: {
+              root: {
+                '& .MuiLink-root': {
+                  'display': 'flex',
+                  'alignItems': 'center',
+                  'padding': 10,
+                  'color': 'white',
+                  '&.MuiLink-selected': {
+                    fontWeight: 400
+                  }
                 }
               }
             }
