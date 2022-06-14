@@ -195,7 +195,6 @@ const createSchemeTheme = (schemeKey?: string) => {
               contentContainer: {
                 'backgroundColor': 'black',
                 'width': '100%',
-                // Match the styles from MuiContainer below
                 'maxWidth': baseSchemeTheme.breakpoints.values.xl,
                 'margin': 'auto',
                 'paddingLeft': baseSchemeTheme.spacing(4),
@@ -209,7 +208,6 @@ const createSchemeTheme = (schemeKey?: string) => {
                   paddingRight: baseSchemeTheme.spacing(10)
                 },
                 'height': 80,
-
                 '& svg[class*="Header-logo"]': {
                   maxHeight: 36
                 },
@@ -218,7 +216,14 @@ const createSchemeTheme = (schemeKey?: string) => {
                   width: 'auto'
                 },
                 '& a': {
-                  textDecoration: 'none'
+                  textDecoration: 'none',
+                  [baseSchemeTheme.breakpoints.down('md')]: {
+                    display: 'flex',
+                    justifyContent: 'center'
+                  }
+                },
+                '& .MuiSvgIcon-root': {
+                  color: 'white'
                 }
               }
             }
@@ -233,128 +238,15 @@ const createSchemeTheme = (schemeKey?: string) => {
                   'color': 'white',
                   '&.MuiLink-selected': {
                     fontWeight: 400
+                  },
+                  [baseSchemeTheme.breakpoints.down('md')]: {
+                    color: 'black',
+                    textAlign: 'center'
                   }
                 }
               }
             }
           },
-          // Header: {
-          //   styleOverrides: {
-          //     contentContainer: {
-          //       backgroundColor: 'black',
-          //       fontWeight: 400
-          //     },
-          //     root: {
-          //       'paddingLeft': baseSchemeTheme.spacing(5),
-          //       'paddingRight': baseSchemeTheme.spacing(5),
-          //       '& .MuiLink-root': {
-          //         'color': 'white',
-          //         'display': 'flex',
-          //         'textDecoration': 'none',
-          //         'whiteSpace': 'nowrap',
-          //         '&.MuiLink-selected': {
-          //           fontWeight: 400
-          //         }
-          //       }
-          //     }
-          //   }
-          // },
-          // Header: {
-          //   height: 80,
-          //   mobileMenuBreakpoint: 'md',
-          //   styleOverrides: {
-          //     contentContainer: {
-          //       height: 80,
-          //       paddingLeft: baseSchemeTheme.spacing(20),
-          //       paddingRight: baseSchemeTheme.spacing(20),
-          //       [baseSchemeTheme.breakpoints.up('xl')]: {
-          //         paddingLeft: baseSchemeTheme.spacing(5),
-          //         paddingRight: baseSchemeTheme.spacing(5)
-          //       },
-          //       [baseSchemeTheme.breakpoints.up('xl')]: {
-          //         '> .MuiLink-root + .MuiBox-root': {
-          //           flex: 'unset'
-          //         }
-          //       }
-          //     },
-          //     root: {
-          //       'backgroundColor': 'cyan',
-
-          //       // NOTE: Framework override
-          //       '&:before': {
-          //         backgroundColor: 'transparent'
-          //       },
-
-          //       '& .MuiButton-contained': {
-          //         whiteSpace: 'nowrap',
-          //         padding: baseSchemeTheme.spacing(1.25, 2),
-          //         fontSize: 15,
-          //         lineHeight: 1.2,
-
-          //         [baseSchemeTheme.breakpoints.up('md')]: {
-          //           marginLeft: baseSchemeTheme.spacing(1)
-          //         }
-          //       },
-
-          //       '.MuiLink-root': {
-          //         'color': 'white',
-          //         'display': 'flex',
-          //         'textDecoration': 'none',
-          //         'whiteSpace': 'nowrap',
-          //         '&.MuiLink-selected': {
-          //           fontWeight: 400
-          //         }
-          //       },
-
-          //       '[class*="Header-logoWrap"] div': {
-          //         display: 'flex'
-          //       },
-
-          //       [baseSchemeTheme.breakpoints.up('md')]: {
-          //         // NOTE: Framework override
-          //         // Contact Us CTA
-          //         '& .MuiButton-root': {
-          //           marginLeft: baseSchemeTheme.spacing(2),
-          //           whiteSpace: 'nowrap'
-          //         },
-
-          //         // NOTE: Framework override
-          //         '& [class*="NavigationItem-root"]': {
-          //           'display': 'flex',
-          //           'alignItems': 'center',
-          //           'padding': baseSchemeTheme.spacing(2),
-
-          //           '&:hover': {
-          //             backgroundColor: 'transparent'
-          //           }
-          //         },
-
-          //         // NOTE: Framework override
-          //         '& .MuiLink-root': {
-          //           textDecoration: 'none',
-          //           textDecorationColor: 'unset'
-          //         },
-
-          //         // NOTE: Framework override
-          //         '& [class*="Collection-root"]': {
-          //           'marginRight': 0,
-          //           'display': 'flex',
-          //           'justifyContent': 'end',
-
-          //           '& [class*="Section-gridContainer"]': {
-          //             display: 'flex',
-          //             alignItems: 'center',
-          //             flexWrap: 'nowrap',
-          //             marginLeft: 'auto'
-          //           }
-          //         },
-          //         '& [class*="Collection-root"] [class*="Section-gridItem"]': {
-          //           height: 'auto'
-          //         }
-          //       }
-          //     }
-          //   }
-          // },
           Footer: {
             // to do: find out why was this declared here
             //   mobileMenuBreakpoint: 'md',
