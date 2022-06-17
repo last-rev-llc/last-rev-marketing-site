@@ -1,86 +1,62 @@
-import { lorem } from 'faker';
-import { capitalize } from 'lodash';
-import { HeroProps } from './Hero';
 import mockLink from '../Link/Link.mock';
-import mockTheme from '../../theme';
 
-export default (): HeroProps => ({
-  id: 'hero',
+const heroBase = {
   __typename: 'Hero',
-  variant: 'default',
-  overline: capitalize(lorem.words(3)),
-  title: capitalize(lorem.words(3)),
-  subtitle: 'Salutantibus vitae elit libero, a pharetra augue. Contra legem facit qui id facit quod lex prohibet.',
-  image: {
-    file: {
-      url: 'https://images.ctfassets.net/m1b67l45sk9z/4Oj0gAEf0wFiPfg0R3QHqG/b1f835f3e380670cd6484e486c9816b1/it-gets-better.png?h=800'
-    },
-    title: 'Morbi fringilla convallis sapien, id pulvinar odio volutpat.'
-  },
+  title: 'Building the Modern Web',
+  subtitle: null,
+  image: null,
+  contentWidth: 'xl',
+  contentHeight: 'lg',
+  actions: [{ ...mockLink }],
+  background: null,
+  backgroundColor: 'primary.main',
   body: {
-    // __typename: 'Text',
+    id: null,
+    __typename: 'RichText',
     json: {
-      nodeType: 'document',
       data: {},
       content: [
         {
-          nodeType: 'ordered-list',
           data: {},
           content: [
             {
               data: {},
-              content: [
-                {
-                  data: {},
-                  content: [
-                    {
-                      data: {},
-                      marks: [],
-                      value: 'Item One',
-                      nodeType: 'text'
-                    }
-                  ],
-                  nodeType: 'paragraph'
-                }
-              ],
-              nodeType: 'list-item'
-            },
-            {
-              data: {},
-              content: [
-                {
-                  data: {},
-                  content: [
-                    {
-                      data: {},
-                      marks: [],
-                      value: 'Item One',
-                      nodeType: 'text'
-                    }
-                  ],
-                  nodeType: 'paragraph'
-                }
-              ],
-              nodeType: 'list-item'
+              marks: [],
+              value:
+                'We build custom no-code solutions that enable non-technical users to take action on more connected data by quickly launching products and campaigns on more devices.',
+              nodeType: 'text'
             }
-          ]
+          ],
+          nodeType: 'paragraph'
         }
-      ]
-    },
-    links: {
-      entries: [],
-      assets: []
+      ],
+      nodeType: 'document'
     }
-  },
-  actions: [{ ...mockLink(), text: 'Hero CTA' }],
+  }
+};
+
+export const heroMock = {
+  ...heroBase,
+  variant: 'centered',
   background: {
+    __typename: 'Media',
     file: {
-      url: 'https://i.picsum.photos/id/327/2800/800.jpg?hmac=lqhEpkLvfvBfoZSxszEf8pOTbitkmHpJmZsoQYcrWkI'
+      url: './MockImage.jpg'
     },
-    title: lorem.sentence()
-  },
-  backgroundColor: 'white',
-  contentHeight: 'sm',
-  contentWidth: 'xl',
-  theme: [mockTheme]
-});
+    alt: 'Hero background'
+  }
+};
+
+export const featuredImageMock = {
+  ...heroBase,
+  variant: 'featured-image',
+  image: {
+    __typename: 'Media',
+    file: {
+      url: 'https://images.ctfassets.net/imglmb3xms7o/1LJc7yiUjwgrHh9i52XnV7/266b378620624792e5c4b4d11e5ebf84/Asset_1.svg'
+    },
+    alt: 'Featured image'
+  }
+};
+
+export default heroMock;

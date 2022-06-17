@@ -24,14 +24,45 @@ export const styleOverrides: ComponentsOverrides<Theme>['Hero'] = {
 // https://mui.com/customization/theme-components/#adding-new-component-variants
 const createVariants = (_theme: Theme): ComponentsVariants['Hero'] => [
   // Use prop matching to set variant styles
-  // {
-  //   props: {
-  //     variant: 'example'
-  //   },
-  //   style: {
-  //     backgroundColor: theme.palette.primary.main
-  //   }
-  // }
+  {
+    props: {
+      variant: 'centered'
+    },
+    style: {
+      '& .MuiGrid-container': {
+        'justifyContent': 'center',
+
+        '& > .MuiGrid-item': {
+          margin: '0 auto'
+        }
+      },
+
+      '& .MuiTypography-root': {
+        textAlign: 'center'
+      },
+
+      '& [class*="Hero-actionsRoot"]': {
+        justifyContent: 'center'
+      }
+    }
+  },
+  {
+    props: {
+      variant: 'featured-image'
+    },
+    style: {
+      '& .MuiGrid-item:nth-child(2)': {
+        display: 'flex',
+        justifyContent: 'flex-end'
+      },
+      '& img': {
+        maxWidth: 600
+      },
+      [_theme.breakpoints.up('md')]: {
+        padding: _theme.spacing(8, 0)
+      }
+    }
+  }
   // Other props are also valid
   // {
   //   props: {

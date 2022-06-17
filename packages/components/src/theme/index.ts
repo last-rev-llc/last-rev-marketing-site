@@ -29,68 +29,74 @@ const baseTheme: ThemeOptions = {
     }
   },
   typography: {
-    // Customize add and/or remove as necesary
-    body1: {
-      fontFamily: 'Open Sans',
-      fontWeight: 400,
+    fontSize: 16,
+    // fontFamily: "'Open Sans', 'sans-serif'",
+    // fontStyle: 'normal',
+    // fontWeight: {
+    //   regular: 400,
+    //   medium: 500,
+    //   semibold: 600
+    // },
+    h1: {
+      fontSize: '3rem',
+      fontWeight: 600,
+      lineHeight: 1.25
+    },
+    h2: {
+      fontSize: '2.25rem',
+      fontWeight: 600,
+      lineHeight: 1.25
+    },
+    h3: {
+      fontSize: '1.25rem',
+      fontWeight: 600,
+      lineHeight: 1.5
+    },
+    h4: {
+      fontSize: '1.5rem',
+      fontWeight: 600,
+      lineHeight: 1.5
+    },
+    h5: {
+      fontSize: '1.25rem',
+      fontWeight: 600,
+      lineHeight: 1.5
+    },
+    h6: {
       fontSize: '1.125rem',
+      fontWeight: 600,
+      lineHeight: 1.5555
+    },
+    body1: {
+      fontSize: '1rem',
+      fontWeight: 400,
       lineHeight: 1.5
     },
     body2: {
-      fontFamily: 'Open Sans',
+      fontSize: '1rem',
       fontWeight: 400,
-      fontSize: '1.125rem',
       lineHeight: 1.5
     },
-    h1: {
-      fontFamily: 'Open Sans',
-      fontSize: '4rem',
-      lineHeight: 1.25,
+    body3: {
+      fontSize: '0.875rem',
       fontWeight: 400,
-      fontStyle: 'normal'
+      lineHeight: '21px'
     },
-    h2: {
-      fontFamily: 'Open Sans',
-      fontSize: '3rem',
-      lineHeight: 1.25,
-      fontWeight: 400,
-      fontStyle: 'normal'
+    body: {
+      fontFamily: "'Open Sans', 'sans-serif'",
+      fontWeight: 400
     },
-    h3: {
-      fontFamily: 'Open Sans',
-      fontSize: '2rem',
-      lineHeight: 1.375,
-      fontWeight: 400,
-      fontStyle: 'normal'
-    },
-    h4: {
-      fontFamily: 'Open Sans',
-      fontSize: '1.5rem',
-      lineHeight: 1.5,
-      fontWeight: 400,
-      fontStyle: 'normal'
-    },
-    h5: {
-      fontFamily: 'Open Sans',
-      fontSize: '1.25rem',
-      lineHeight: 1.2,
-      fontWeight: 400,
-      fontStyle: 'normal'
-    },
-    h6: {
-      fontFamily: 'Open Sans',
-      fontSize: '1.125rem',
-      lineHeight: 1.3333,
-      fontWeight: 600,
-      fontStyle: 'normal'
+    heading: {
+      fontFamily: "'Open Sans', 'sans-serif'",
+      fontWeight: 700
     }
   },
   palette: {
     mode: 'light',
     primary: {
       main: '#9146ff',
-      light: '#9146ff',
-      dark: '#9146ff',
+      light: '#a76aff',
+      dark: '#6530b2',
       contrastText: 'white'
     },
     secondary: {
@@ -100,7 +106,7 @@ const baseTheme: ThemeOptions = {
       contrastText: 'white'
     },
     text: {
-      primary: '#00030B',
+      primary: '#170262',
       secondary: '#E5E5E5',
       disabled: 'rgba(0, 0, 0, 0.38)'
     },
@@ -134,7 +140,8 @@ const baseTheme: ThemeOptions = {
     },
     backgroundOption: {
       main: '#FFF',
-      light: '#F7F7F7'
+      light: '#F7F7F7',
+      dark: '#000'
     }
   }
 };
@@ -190,6 +197,9 @@ const createSchemeTheme = (schemeKey?: string) => {
                 '& img': {
                   width: 180,
                   height: 'auto'
+                },
+                '&::before': {
+                  backgroundColor: 'black'
                 }
               },
               contentContainer: {
@@ -231,6 +241,10 @@ const createSchemeTheme = (schemeKey?: string) => {
           NavigationBar: {
             styleOverrides: {
               root: {
+                '& .MuiButton-contained': {
+                  textTransform: 'capitalize',
+                  fontSize: 17
+                },
                 '& .MuiLink-root': {
                   'display': 'flex',
                   'alignItems': 'center',
@@ -238,6 +252,9 @@ const createSchemeTheme = (schemeKey?: string) => {
                   'color': 'white',
                   '&.MuiLink-selected': {
                     fontWeight: 400
+                  },
+                  '&:hover': {
+                    color: baseSchemeTheme.palette.primary.light
                   },
                   [baseSchemeTheme.breakpoints.down('md')]: {
                     color: 'black',
@@ -284,6 +301,108 @@ const createSchemeTheme = (schemeKey?: string) => {
 
                   '&:hover': {
                     color: baseSchemeTheme.palette.primary.main
+                  }
+                }
+              }
+            }
+          },
+          Hero: {
+            styleOverrides: {
+              contentContainer: {
+                //'backgroundColor': 'cyan',
+                '& > .MuiGrid-container': {
+                  alignItems: 'center'
+                }
+                // '& a': {
+                //   fontWeigth: 800,
+                //   padding: '8px 16px',
+                //   textDecoration: 'none',
+                //   borderRadius: '10px',
+                //   background: 'linear-gradient(90deg, rgba(92,83,167,1) 23%, rgba(249,112,187,1) 100%)'
+                // }
+              }
+            }
+          },
+          Link: {
+            styleOverrides: {
+              root: {
+                // background: 'cyan'
+              }
+            }
+          },
+          Media: {
+            styleOverrides: {
+              root: {
+                display: 'block',
+                width: '100%',
+                height: '100%'
+              }
+            }
+          },
+          Section: {
+            styleOverrides: {
+              root: {
+                padding: baseSchemeTheme.spacing(8),
+                [baseSchemeTheme.breakpoints.up('md')]: {
+                  paddingLeft: baseSchemeTheme.spacing(10),
+                  paddingRight: baseSchemeTheme.spacing(10)
+                },
+                // NOTE: Framework should have smart default that stacks vertically on mobile
+                [baseSchemeTheme.breakpoints.down('md')]: {
+                  '& > [class*="Section-gridContainer"] > [class*="Section-gridItem"]': {
+                    flex: '0 100%'
+                  }
+                }
+              }
+            }
+          },
+          Card: {
+            styleOverrides: {
+              root: {
+                'width': '100%',
+                'backgroundColor': baseSchemeTheme.palette.background.default,
+                'boxShadow': 'none',
+                '& .MuiTypography-h3': {
+                  paddingBottom: baseSchemeTheme.spacing(2)
+                },
+                '& .MuiCardMedia-root': {
+                  '& img': {
+                    width: '100%',
+                    maxWidth: '100%',
+                    objectFit: 'cover'
+                  },
+                  '& svg': {
+                    width: '100%',
+                    maxWidth: '100%',
+                    objectFit: 'cover'
+                  }
+                }
+              }
+            }
+          },
+          Collection: {
+            styleOverrides: {
+              root: {
+                'maxWidth': 1280,
+                'margin': '0 auto',
+                '[class*="Section-gridContainer"]': {
+                  'display': 'grid',
+                  'gridAutoRows': '1fr',
+                  '[class*="Box-content"]': {
+                    display: 'block'
+                  }
+                },
+                '[class*="Section-gridItem"]': {
+                  display: 'flex',
+                  justifyContent: 'center',
+                  flexBasis: '100%',
+                  maxWidth: '100%',
+                  height: '100%',
+                  [baseSchemeTheme.breakpoints.up('md')]: {
+                    flexBasis: '50%'
+                  },
+                  [baseSchemeTheme.breakpoints.up('lg')]: {
+                    flexBasis: '33.333333%'
                   }
                 }
               }

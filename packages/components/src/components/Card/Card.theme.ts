@@ -23,22 +23,77 @@ const createVariants = (_theme: Theme): ComponentsVariants['Card'] => [
   // Use prop matching to set variant styles
   {
     props: {
-      variant: 'example'
+      variant: 'icon-centered'
     },
     style: {
-      position: 'relative'
-      // backgroundColor: theme.palette.primary.main
+      'textAlign': 'center',
+      '& .MuiCardMedia-root': {
+        'maxHeight': _theme.spacing(12),
+        'marginBottom': _theme.spacing(2),
+        [_theme.breakpoints.up('sm')]: {
+          minHeight: _theme.spacing(14),
+          marginBottom: _theme.spacing(4)
+        },
+
+        '& img': {
+          [_theme.breakpoints.down('md')]: {
+            aspectRatio: '1'
+          }
+        },
+
+        '& svg': {
+          [_theme.breakpoints.down('md')]: {
+            aspectRatio: '1'
+          }
+        }
+      }
+    }
+  },
+  {
+    props: {
+      variant: 'blog-featured'
+    },
+    style: {
+      '& .MuiCardMedia-root': {
+        '& img': {
+          aspectRatio: '16/9'
+        },
+
+        '& svg': {
+          aspectRatio: '16/9'
+        }
+      },
+
+      '& .MuiCardActions-root': {
+        marginTop: _theme.spacing(1),
+        padding: _theme.spacing(2, 0)
+      }
+    }
+  },
+  {
+    props: {
+      variant: 'left-align'
+    },
+    style: {
+      'borderRadius': 0,
+      'backgroundColor': 'black',
+      'color': 'white',
+      '& .MuiCardMedia-root': {
+        'display': 'flex',
+        'justifyContent': 'start',
+        '& img': {
+          maxWidth: 64
+        }
+      },
+      '& .MuiTypography-h3': {
+        fontSize: 28,
+        fontWeight: 500
+      },
+      '& .MuiTypography-body': {
+        fontSize: 16
+      }
     }
   }
-  // Other props are also valid
-  // {
-  //   props: {
-  //     backgroundColor: 'primary.main',
-  //   },
-  //   style: {
-  //     color: theme.palette.primary.contrastText
-  //   }
-  // }
 ];
 
 export default (theme: Theme): ThemeOptions => ({

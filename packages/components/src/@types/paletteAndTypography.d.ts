@@ -16,4 +16,25 @@ declare module '@mui/material/styles' {
     'gradient-primary'?: PaletteOptions['primary'];
     'backgroundOption'?: PaletteOptions['primary'];
   }
+
+  interface TypographyVariants {
+    body3: React.CSSProperties;
+    body: React.CSSProperties;
+    heading: React.CSSProperties;
+  }
+
+  // allow configuration using `createTheme`
+  interface TypographyVariantsOptions {
+    body3?: React.CSSProperties;
+    body?: React.CSSProperties;
+    heading?: React.CSSProperties;
+  }
+}
+
+declare module '@mui/material/Typography' {
+  interface TypographyPropsVariantOverrides {
+    body3: true;
+    body: true;
+    heading: true;
+  }
 }

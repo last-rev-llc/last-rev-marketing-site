@@ -1,10 +1,9 @@
 import React from 'react';
-import { responsiveMediaMock } from '../Media/Media.mock';
-import Hero from './Hero';
-import heroMock from './Hero.mock';
+import Hero, { HeroProps } from '@last-rev/component-library/dist/components/Hero/Hero';
+import heroMock, { featuredImageMock } from './Hero.mock';
 
 export default {
-  title: '1. LR Components / Hero',
+  title: 'Modules / Hero',
   component: Hero,
   decorators: [(storyFn: () => boolean | React.ReactChild | React.ReactFragment | React.ReactPortal) => storyFn()],
   argTypes: {
@@ -12,10 +11,10 @@ export default {
       name: 'Variant',
       control: {
         type: 'inline-radio',
-        options: ['default', 'centered']
+        options: ['centered', 'featured-image']
       },
       table: {
-        defaultValue: { summary: 'default' }
+        defaultValue: { summary: 'centered' }
       }
     },
     title: { name: 'Title' },
@@ -23,59 +22,27 @@ export default {
     body: { name: 'Body' },
     image: { name: 'Image' },
     background: { name: 'Background' },
-    backgroundColor: {
-      name: 'Background Color',
-      control: {
-        type: 'inline-radio',
-        options: ['none', 'black', 'white', 'primary', 'secondary']
-      },
-      table: {
-        defaultValue: { summary: 'none' }
-      }
-    },
+    backgroundColor: { name: 'Background Color' },
+    actions: { name: 'Actions' },
+    contentWidth: { name: 'Content Width' },
     contentHeight: {
       name: 'Content Height',
       control: {
         type: 'inline-radio',
-        options: ['sm', 'md', 'lg', 'xl']
+        options: { Small: 'sm', Medium: 'md', Large: 'lg' }
       },
       table: {
-        defaultValue: { summary: 'md' }
+        defaultValue: { summary: 'lg' }
       }
     },
-    contentWidth: {
-      name: 'Content Width',
-      control: {
-        type: 'inline-radio',
-        options: ['xs', 'sm', 'md', 'lg', 'xl']
-      },
-      table: {
-        defaultValue: { summary: 'xl' }
-      }
-    },
-    actions: { name: 'Actions' },
-    __typename: { table: { disable: true } },
-    sidekickLookup: { table: { disable: true } }
+    __typename: { table: { disable: true } }
   }
 };
 
-const Template = (args: JSX.IntrinsicAttributes) => <Hero id={''} __typename={''} theme={undefined} {...args} />;
-export const Default = Template.bind({});
-Default.args = { ...heroMock(), background: undefined };
+const Template = (args: HeroProps) => <Hero {...args} />;
 
-export const BackgroundImage = Template.bind({});
-BackgroundImage.args = {
-  ...heroMock(),
-  backgroundColor: null,
-  contentHeight: 'xl',
-  contentWidth: 'xl'
-};
+export const Centered = Template.bind({});
+Centered.args = { ...heroMock };
 
-export const ResponsiveBackgroundImage = Template.bind({});
-ResponsiveBackgroundImage.args = {
-  ...heroMock,
-  backgroundColor: null,
-  contentHeight: 'xl',
-  contentWidth: 'xl',
-  background: responsiveMediaMock
-};
+export const FeaturedImage = Template.bind({});
+FeaturedImage.args = { ...featuredImageMock };
