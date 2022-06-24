@@ -22,7 +22,6 @@ export const Quote = ({
     <ErrorBoundary>
       <Root {...sidekick(sidekickLookup)} {...props} data-testid="Quote">
         {logo && <MediaItem {...logo} {...sidekick(sidekickLookup?.logo)} />}
-
         {quote && (
           <QuoteText {...sidekick(sidekickLookup?.quote)}>
             <QuoteSymbol>"</QuoteSymbol>
@@ -40,8 +39,10 @@ export const Quote = ({
         {authorImage || authorName || authorTitle ? (
           <AuthorRoot>
             {authorImage && <AuthorImage {...authorImage} {...sidekick(sidekickLookup?.authorImage)} />}
-            {authorName && <AuthorName {...sidekick(sidekickLookup?.authorName)}>{authorName}</AuthorName>}
-            {authorTitle && <AuthorTitle {...sidekick(sidekickLookup?.authorTitle)}>{authorTitle}</AuthorTitle>}
+            <Box>
+              {authorName && <AuthorName {...sidekick(sidekickLookup?.authorName)}>{authorName}</AuthorName>}
+              {authorTitle && <AuthorTitle {...sidekick(sidekickLookup?.authorTitle)}>{authorTitle}</AuthorTitle>}
+            </Box>
           </AuthorRoot>
         ) : null}
       </Root>
@@ -59,31 +60,49 @@ const AuthorRoot = styled(Box, {
   name: 'Quote',
   slot: 'AuthorRoot',
   overridesResolver: (_, styles) => [styles.authorRoot]
-})``;
+})`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`;
 
 const MediaItem = styled(Media, {
   name: 'Quote',
   slot: 'MediaItem',
   overridesResolver: (_, styles) => [styles.mediaItem]
-})<MediaProps>(() => ({}));
+})<MediaProps>(() => ({
+  maxWidth: '120px',
+  marginBottom: '8px'
+}));
 
 const AuthorImage = styled(Media, {
   name: 'Quote',
   slot: 'AuthorImage',
   overridesResolver: (_, styles) => [styles.authorImage]
-})<MediaProps>(() => ({}));
+})<MediaProps>(() => ({
+  maxWidth: '60px',
+  margin: '20px 20px 20px 0px',
+  borderRadius: '100%',
+  aspectRatio: '1 / 1',
+  objectFit: 'cover'
+}));
 
 const QuoteText = styled(Typography, {
   name: 'Quote',
   slot: 'QuoteText',
   overridesResolver: (_, styles) => [styles.quoteText]
-})``;
+})`
+  font-size: 20px;
+`;
 
 const AuthorName = styled(Typography, {
   name: 'Quote',
   slot: 'AuthorName',
   overridesResolver: (_, styles) => [styles.authorName]
-})``;
+})`
+  font-weight: 700;
+  font-size: 18px;
+`;
 
 const QuoteSymbol = styled('span', {
   name: 'Quote',
@@ -95,7 +114,9 @@ const AuthorTitle = styled(Typography, {
   name: 'Quote',
   slot: 'AuthorTitle',
   overridesResolver: (_, styles) => [styles.authorTitle]
-})``;
+})`
+  font-size: 15px;
+`;
 
 const ActionsRoot = styled(Typography, {
   name: 'Quote',

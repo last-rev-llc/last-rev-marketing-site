@@ -54,20 +54,18 @@ const createVariants = (_theme: Theme): ComponentsVariants['Card'] => [
       variant: 'blog-featured'
     },
     style: {
-      '& .MuiCardMedia-root': {
-        '& img': {
-          aspectRatio: '16/9'
-        },
-
-        '& svg': {
-          aspectRatio: '16/9'
-        }
-      },
-
-      '& .MuiCardActions-root': {
-        marginTop: _theme.spacing(1),
-        padding: _theme.spacing(2, 0)
-      }
+      // '& .MuiCardMedia-root': {
+      //   '& img': {
+      //     aspectRatio: '16/9'
+      //   },
+      //   '& svg': {
+      //     aspectRatio: '16/9'
+      //   }
+      // }
+      // '& .MuiCardActions-root': {
+      //   marginTop: _theme.spacing(1),
+      //   padding: _theme.spacing(2, 0)
+      // }
     }
   },
   {

@@ -3,7 +3,7 @@ import { MediaProps } from './Media';
 
 export const mediaMock = (): MediaProps => ({
   file: {
-    url: './flower-large.jpg',
+    url: './marketly-logo.jpeg',
     width: '920',
     height: '613'
   },
@@ -39,7 +39,7 @@ export const responsiveMediaMock = {
   __typename: 'Media',
   file: {
     // url: flowerLarge,
-    url: './flower-large.jpg',
+    url: './flower-large.png',
     width: '1728px',
     height: '1152px'
   },

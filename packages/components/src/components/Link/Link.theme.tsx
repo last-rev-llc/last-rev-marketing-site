@@ -21,25 +21,25 @@ export const styleOverrides: ComponentsOverrides<Theme>['MuiLink'] = {
 // https://mui.com/customization/theme-components/#adding-new-component-variants
 const createVariants = (_theme: Theme): ComponentsVariants['MuiLink'] => [
   // Use prop matching to set variant styles
-  {
-    props: {
-      variant: 'gradient'
-    },
-    style: {
-      fontWeight: 'bold',
-      //display: 'none',
-      backgroundColor: 'cyan',
-      // '& .MuiTypography-root-MuiLink-root': {
-      //   color: 'cyan'
-      // },
-      color: 'cyan',
-      textDecoration: 'none',
-      fontSize: 30
-      // '& .MuiLink-root': {
-      //   background: 'linear-gradient(90deg, rgba(92,83,167,1) 23%, rgba(249,112,187,1) 100%)'
-      // }
-    }
-  }
+  // {
+  //   props: {
+  //     variant: 'gradient'
+  //   },
+  //   style: {
+  //     fontWeight: 'bold',
+  //     //display: 'none',
+  //     backgroundColor: 'cyan',
+  //     // '& .MuiTypography-root-MuiLink-root': {
+  //     //   color: 'cyan'
+  //     // },
+  //     color: 'cyan',
+  //     textDecoration: 'none',
+  //     fontSize: 30
+  //     // '& .MuiLink-root': {
+  //     //   background: 'linear-gradient(90deg, rgba(92,83,167,1) 23%, rgba(249,112,187,1) 100%)'
+  //     // }
+  //   }
+  // },
   // Other props are also valid
   // {
   //   props: {

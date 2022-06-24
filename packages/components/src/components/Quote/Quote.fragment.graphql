@@ -4,7 +4,10 @@ fragment Quote_BaseFragment on Quote {
   quote
   authorName
   authorTitle
-  image {
+  authorImage {
+    ...Media_BaseFragment
+  }
+  logo {
     ...Media_BaseFragment
   }
 }

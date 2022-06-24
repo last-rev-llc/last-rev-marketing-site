@@ -228,7 +228,8 @@ type Quote implements Content {
   quote: String
   authorName: String
   authorTitle: String
-  image: Media
+  authorImage: Media
+  logo: Media
 }
 type Section implements Content {
   sidekickLookup: JSON
@@ -284,6 +285,7 @@ type Blog implements Content {
   tags: [String]
   disableBackToTop: Boolean
   seo: JSON
+  newField: String
   relatedLinks: [Link]
   categories: [CategoryBlog]
   author: Person

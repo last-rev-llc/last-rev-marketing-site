@@ -361,7 +361,6 @@ const createSchemeTheme = (schemeKey?: string) => {
               root: {
                 'width': '100%',
                 'backgroundColor': baseSchemeTheme.palette.background.default,
-                'boxShadow': 'none',
                 '& .MuiTypography-h3': {
                   paddingBottom: baseSchemeTheme.spacing(2)
                 },
@@ -383,7 +382,6 @@ const createSchemeTheme = (schemeKey?: string) => {
           Collection: {
             styleOverrides: {
               root: {
-                'maxWidth': 1280,
                 'margin': '0 auto',
                 '[class*="Section-gridContainer"]': {
                   'display': 'grid',
@@ -405,6 +403,16 @@ const createSchemeTheme = (schemeKey?: string) => {
                     flexBasis: '33.333333%'
                   }
                 }
+              }
+            }
+          },
+          Quote: {
+            styleOverrides: {
+              root: {
+                //color: '#fff'
+                // '& .MuiTypography-root-Quote-authorName': {
+                //   color: 'cyan'
+                // }
               }
             }
           }
