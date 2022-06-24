@@ -186,7 +186,7 @@
     "@types/node" "^10.1.0"
     long "^4.0.0"
 
-"@apollo/rover@^0.4.1":
+"@apollo/rover@0.4.1":
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/@apollo/rover/-/rover-0.4.1.tgz#70b4a8276c16265cb50dea8b8f65bb9a96ff5c22"
   integrity sha512-Dq/GIrODDWz4QCv3sgfTpA0Mw/uPBR+1kZAup/qfXRdDq4IJJHokZRGjdwAZiO4IHENtPbQraQm10xNDY0HkPQ==
@@ -3372,10 +3372,10 @@
     tar "^6.1.0"
     uuid "^8.3.2"
 
-"@last-rev/component-library@^0.3.16":
-  version "0.3.16"
-  resolved "https://registry.yarnpkg.com/@last-rev/component-library/-/component-library-0.3.16.tgz#1f05dee35fe4146b33b88aa9760aaad82e341bb8"
-  integrity sha512-+PwGtEqgmPMAqiatoDpP/lURcXFBhw2Mplv7aOvN8VplzsT3NKtmbxYnOnBc9jODAqKtouuGfP9AItsPj4eoUQ==
+"@last-rev/component-library@^0.4.7":
+  version "0.4.7"
+  resolved "https://registry.yarnpkg.com/@last-rev/component-library/-/component-library-0.4.7.tgz#81b9f51c0055930bfb74c45639733f4e30c5914a"
+  integrity sha512-/94jXpCx4pdaA54AVP80KXYMRkrWoFGHc8qsaqWXmXOEJMCI4huKzXxqijBBHXWhVUQ5Nrqae7CipVaWB5vZgg==
   dependencies:
     "@contentful/rich-text-react-renderer" "^15.0.0"
     "@contentful/rich-text-types" "^15.0.0"
@@ -3383,9 +3383,8 @@
     "@emotion/styled" "^11.3.0"
     "@last-rev/contentful-sidekick-util" "^0.1.0"
     "@last-rev/rollup-config" "^0.1.1"
-    "@last-rev/testing-library" "0.1.5"
+    "@last-rev/testing-library" "0.1.9"
     "@rollup/plugin-typescript" "^8.3.0"
-    "@sentry/react" "^6.7.1"
     framer-motion "^4.1.17"
     lodash "^4.17.21"
     react-context-composer "^0.0.4"
@@ -3768,17 +3767,17 @@
     handlebars "^4.7.7"
     lodash "^4.17.21"
 
-"@last-rev/testing-library@0.1.5", "@last-rev/testing-library@^0.1.2":
-  version "0.1.5"
-  resolved "https://registry.yarnpkg.com/@last-rev/testing-library/-/testing-library-0.1.5.tgz#092e66486a02e5dd085fff97614db61e5d24c048"
-  integrity sha512-G6rSPIYdQVLlzc5flaUno4bAIrAvUxtsjZtXOR3rZfAlYhhRWD+C+38o0WCrB1p4sYMoXniZBXcKwogUhXaaWw==
-  dependencies:
-    ts-jest "^26.5.4"
-
-"@last-rev/testing-library@^0.1.9":
+"@last-rev/testing-library@0.1.9", "@last-rev/testing-library@^0.1.9":
   version "0.1.9"
   resolved "https://registry.yarnpkg.com/@last-rev/testing-library/-/testing-library-0.1.9.tgz#32a3d41b58c93f38deb968baff852eddf6b39b19"
   integrity sha512-4cf5aPk01ijKX/O8PROKPYlSgQstLdLXX9u76gO3q0mFUW7+OANmPwC5jur+uvmRG5Tdkiotp9gKlkwXj/YgaQ==
+  dependencies:
+    ts-jest "^26.5.4"
+
+"@last-rev/testing-library@^0.1.2":
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/@last-rev/testing-library/-/testing-library-0.1.5.tgz#092e66486a02e5dd085fff97614db61e5d24c048"
+  integrity sha512-G6rSPIYdQVLlzc5flaUno4bAIrAvUxtsjZtXOR3rZfAlYhhRWD+C+38o0WCrB1p4sYMoXniZBXcKwogUhXaaWw==
   dependencies:
     ts-jest "^26.5.4"
 

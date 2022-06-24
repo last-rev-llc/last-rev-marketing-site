@@ -230,7 +230,7 @@ type Quote implements Content {
   authorTitle: String
   authorImage: Media
   logo: Media
-  actions: [Content]
+  actions: [Link]
 }
 type Section implements Content {
   sidekickLookup: JSON

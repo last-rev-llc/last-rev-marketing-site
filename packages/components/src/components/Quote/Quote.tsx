@@ -21,7 +21,7 @@ export const Quote = ({
   return (
     <ErrorBoundary>
       <Root {...sidekick(sidekickLookup)} {...props} data-testid="Quote">
-        {logo && <MediaItem {...logo} {...sidekick(sidekickLookup?.logo)} />}
+        {logo && <MediaItem {...(logo as any)} {...sidekick(sidekickLookup?.logo)} />}
         {quote && (
           <QuoteText {...sidekick(sidekickLookup?.quote)}>
             <QuoteSymbol>"</QuoteSymbol>
@@ -31,14 +31,12 @@ export const Quote = ({
         )}
         {actions && (
           <ActionsRoot>
-            {actions.map((action) => (
-              <Link {...action} key={action.id} />
-            ))}
+            {actions.map((action) => (action?.__typename == 'Link' ? <Link {...action} key={action?.id} /> : null))}
           </ActionsRoot>
         )}
         {authorImage || authorName || authorTitle ? (
           <AuthorRoot>
-            {authorImage && <AuthorImage {...authorImage} {...sidekick(sidekickLookup?.authorImage)} />}
+            {authorImage && <AuthorImage {...(authorImage as any)} {...sidekick(sidekickLookup?.authorImage)} />}
             <Box>
               {authorName && <AuthorName {...sidekick(sidekickLookup?.authorName)}>{authorName}</AuthorName>}
               {authorTitle && <AuthorTitle {...sidekick(sidekickLookup?.authorTitle)}>{authorTitle}</AuthorTitle>}
