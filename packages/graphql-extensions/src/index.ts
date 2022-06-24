@@ -20,6 +20,7 @@ import {
 } from '@last-rev/graphql-contentful-extensions';
 
 import * as Theme from './Theme';
+import * as Quote from './Quote';
 // Uncomment if using Algolia, else delete the related file
 // import * as Algolia from './Algolia';
 
@@ -60,7 +61,8 @@ const extensions: GraphQlExtension[] = [
   Section,
   Media,
   RichText,
-  Theme
+  Theme,
+  Quote
 ];
 
 export const typeDefs = mergeTypeDefs(compact(map(extensions, 'typeDefs')));

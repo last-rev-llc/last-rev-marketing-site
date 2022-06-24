@@ -10,4 +10,7 @@ fragment Quote_BaseFragment on Quote {
   logo {
     ...Media_BaseFragment
   }
+  actions {
+    ...Link_BaseFragment
+  }
 }
