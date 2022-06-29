@@ -21,6 +21,7 @@ import {
 
 import * as Theme from './Theme';
 import * as Quote from './Quote';
+import * as Footer from './Footer';
 // Uncomment if using Algolia, else delete the related file
 // import * as Algolia from './Algolia';
 
@@ -62,7 +63,8 @@ const extensions: GraphQlExtension[] = [
   Media,
   RichText,
   Theme,
-  Quote
+  Quote,
+  Footer
 ];
 
 export const typeDefs = mergeTypeDefs(compact(map(extensions, 'typeDefs')));

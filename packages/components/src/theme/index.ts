@@ -169,7 +169,6 @@ const createSchemeTheme = (schemeKey?: string) => {
       {
         createSchemeTheme,
         components: {
-          // CollectionAccordionMedia:
           MuiContainer: {
             styleOverrides: {
               root: {
@@ -265,43 +264,21 @@ const createSchemeTheme = (schemeKey?: string) => {
             }
           },
           Footer: {
-            // to do: find out why was this declared here
-            //   mobileMenuBreakpoint: 'md',
             styleOverrides: {
               root: {
-                'padding': baseSchemeTheme.spacing(6, 2, 12),
-                //to do: add this colors
-                'backgroundColor': baseSchemeTheme.palette.backgroundOption?.light,
-                [baseSchemeTheme.breakpoints.up('md')]: {
-                  padding: baseSchemeTheme.spacing(8, 5)
+                'backgroundColor': 'black',
+                '& .MuiGrid-container': {
+                  'paddingTop': baseSchemeTheme.spacing(2),
+                  '& .MuiGrid-root': {
+                    display: 'flex',
+                    alignSelf: 'flex-start'
+                  }
                 },
-
                 '& [class*="Media-root"]': {
-                  height: baseSchemeTheme.spacing(2.5)
-                },
+                  padding: '40px 0px',
 
-                '& .MuiList-root': {
                   display: 'flex',
-                  flexDirection: 'row',
-                  padding: 0,
-                  marginLeft: 'auto',
-
-                  [baseSchemeTheme.breakpoints.up('md')]: {
-                    justifyContent: 'flex-end'
-                  }
-                },
-
-                '& .MuiListItem-root': {
-                  width: 'auto'
-                },
-
-                '& .MuiLink-root': {
-                  //to do: add this colors
-                  // 'color': baseSchemeTheme.palette.text.main,
-
-                  '&:hover': {
-                    color: baseSchemeTheme.palette.primary.main
-                  }
+                  maxWidth: '120px'
                 }
               }
             }
@@ -309,24 +286,9 @@ const createSchemeTheme = (schemeKey?: string) => {
           Hero: {
             styleOverrides: {
               contentContainer: {
-                //'backgroundColor': 'cyan',
                 '& > .MuiGrid-container': {
                   alignItems: 'center'
                 }
-                // '& a': {
-                //   fontWeigth: 800,
-                //   padding: '8px 16px',
-                //   textDecoration: 'none',
-                //   borderRadius: '10px',
-                //   background: 'linear-gradient(90deg, rgba(92,83,167,1) 23%, rgba(249,112,187,1) 100%)'
-                // }
-              }
-            }
-          },
-          Link: {
-            styleOverrides: {
-              root: {
-                // background: 'cyan'
               }
             }
           },
@@ -347,7 +309,6 @@ const createSchemeTheme = (schemeKey?: string) => {
                   paddingLeft: baseSchemeTheme.spacing(10),
                   paddingRight: baseSchemeTheme.spacing(10)
                 },
-                // NOTE: Framework should have smart default that stacks vertically on mobile
                 [baseSchemeTheme.breakpoints.down('md')]: {
                   '& > [class*="Section-gridContainer"] > [class*="Section-gridItem"]': {
                     flex: '0 100%'
@@ -408,12 +369,7 @@ const createSchemeTheme = (schemeKey?: string) => {
           },
           Quote: {
             styleOverrides: {
-              root: {
-                //color: '#fff'
-                // '& .MuiTypography-root-Quote-authorName': {
-                //   color: 'cyan'
-                // }
-              }
+              root: {}
             }
           }
         }

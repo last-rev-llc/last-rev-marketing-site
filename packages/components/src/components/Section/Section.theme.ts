@@ -40,7 +40,7 @@ const createVariants = (_theme: Theme): ComponentsVariants['Section'] => [
         'display': 'flex',
         'alignItems': 'center',
         '& svg': {
-          maxWidth: 450
+          maxWidth: 400
         },
         '& [class*="Section-gridItem"]': {
           display: 'flex',

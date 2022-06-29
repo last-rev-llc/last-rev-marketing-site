@@ -1,12 +1,11 @@
-fragment Header_BaseFragment on Header {
+fragment Footer_BaseFragment on Footer {
   ...Content_BaseFragment
   variant
-  colorScheme
   logo {
     ...Media_BaseFragment
   }
   logoUrl
-
+  brandAndYear
   navigationItems {
     ...Collection_BaseFragment
   }

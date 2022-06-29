@@ -28,18 +28,15 @@ const createMuiLinkVariants = (_theme: Theme): ComponentsVariants['MuiLink'] => 
       variant: 'gradient'
     },
     style: {
-      fontWeight: 'bold',
-      //display: 'none',
-      backgroundColor: 'cyan',
-      // '& .MuiTypography-root-MuiLink-root': {
-      //   color: 'cyan'
-      // },
-      color: 'cyan',
-      textDecoration: 'none',
-      fontSize: 30
-      // '& .MuiLink-root': {
-      //   background: 'linear-gradient(90deg, rgba(92,83,167,1) 23%, rgba(249,112,187,1) 100%)'
-      // }
+      'fontWeight': 'bold',
+      'padding': '10px 30px',
+      'borderRadius': '30px',
+      'textDecoration': 'none',
+      'fontSize': 18,
+      'background': 'linear-gradient(90deg, rgba(92,83,167,1) 23%, rgba(249,112,187,1) 100%)',
+      '&:hover': {
+        background: 'linear-gradient(90deg, rgba(141, 128, 217, 1) 23%, rgb(255, 163, 237,1) 100%)'
+      }
     }
   }
   // Other props are also valid
@@ -58,11 +55,8 @@ export default (theme: Theme): ThemeOptions => ({
     Link: {
       defaultProps,
       styleOverrides
-      //  variants: createVariants(theme)
     },
     MuiLink: {
-      // defaultProps,
-      // styleOverrides,
       variants: createMuiLinkVariants(theme)
     }
   }

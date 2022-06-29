@@ -142,6 +142,17 @@ type Collection implements Content {
   introText: Text
   itemsConnection(limit: Int, offset: Int, filter: CollectionFilterInput): CollectionItemConnection
 }
+type Footer implements Content {
+  sidekickLookup: JSON
+  id: String
+  theme: [Theme]
+  animation: JSON
+  variant: String
+  logo: Media
+  logoUrl: String
+  brandAndYear: String
+  navigationItems: [Collection]
+}
 type Header implements Content {
   sidekickLookup: JSON
   id: String
