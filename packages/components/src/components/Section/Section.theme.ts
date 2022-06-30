@@ -6,10 +6,8 @@ export const defaultProps: ComponentsProps['Section'] = {};
 // https://mui.com/customization/theme-components/#global-style-overrides
 export const styleOverrides: ComponentsOverrides<Theme>['Section'] = {
   // Set some static styles
-  // root: {
-  //   backgroundColor: 'red'
-  // }
-  //
+  root: {}
+
   // Use the ownerState to set dynamic styles
   // root: ({ ownerState, theme }) => {
   //   return {
@@ -40,7 +38,7 @@ const createVariants = (_theme: Theme): ComponentsVariants['Section'] => [
         'display': 'flex',
         'alignItems': 'center',
         '& svg': {
-          maxWidth: 400
+          maxWidth: 350
         },
         '& [class*="Section-gridItem"]': {
           display: 'flex',
@@ -74,9 +72,6 @@ const createVariants = (_theme: Theme): ComponentsVariants['Section'] => [
             flexDirection: 'column',
             justifyContent: 'flex-start',
             height: '100%'
-          },
-          '& .MuiCardActions-root': {
-            marginTop: 'auto'
           }
         }
       }
@@ -107,9 +102,6 @@ const createVariants = (_theme: Theme): ComponentsVariants['Section'] => [
             flexDirection: 'column',
             justifyContent: 'flex-start',
             height: '100%'
-          },
-          '& .MuiCardActions-root': {
-            marginTop: 'auto'
           }
         }
       }

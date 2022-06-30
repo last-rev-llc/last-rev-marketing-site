@@ -32,6 +32,7 @@ const createMuiLinkVariants = (_theme: Theme): ComponentsVariants['MuiLink'] => 
       'padding': '10px 30px',
       'borderRadius': '30px',
       'textDecoration': 'none',
+      'textAlign': 'center',
       'fontSize': 18,
       'background': 'linear-gradient(90deg, rgba(92,83,167,1) 23%, rgba(249,112,187,1) 100%)',
       '&:hover': {

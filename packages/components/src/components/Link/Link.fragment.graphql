@@ -5,6 +5,7 @@ fragment Link_BaseFragment on Link {
   variant
   icon
   iconPosition
+  color
 }
 
 fragment Link_CardFragment on Link {
@@ -14,4 +15,5 @@ fragment Link_CardFragment on Link {
   variant
   icon
   iconPosition
+  color
 }

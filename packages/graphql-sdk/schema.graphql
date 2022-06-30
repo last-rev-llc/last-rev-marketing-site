@@ -193,6 +193,7 @@ type Link implements Content {
   text: String
   icon: String
   iconPosition: String
+  color: String
   href: String!
 }
 type ModuleIntegration implements Content {

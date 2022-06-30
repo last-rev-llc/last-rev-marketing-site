@@ -29,7 +29,7 @@ export const Footer = ({ logo, logoUrl, navigationItems, brandAndYear, sidekickL
       <Root sx={{ backgroundColor: 'black' }} {...sidekick(sidekickLookup)}>
         <Container maxWidth="xl">
           <Grid container spacing={{ xs: 4, md: 2 }}>
-            <Grid item xs={12} md={2} data-testid="Footer-Logo">
+            <Grid item xs={12} md={2} data-testid="Footer-Logo" justifyContent={['flex-start']}>
               {!!logo && (
                 <Link
                   sx={{
@@ -43,7 +43,7 @@ export const Footer = ({ logo, logoUrl, navigationItems, brandAndYear, sidekickL
                 </Link>
               )}
             </Grid>
-            <Grid display={'flex'} alignItems={'flex-start'} item xs={12}>
+            <Grid xs={12} md={8} display={'flex'} alignItems={'flex-start'} justifyContent={'flex-start'} item>
               <List data-testid="Footer-Navigation">
                 {navigationItems?.map((collection) => (
                   <ListItem

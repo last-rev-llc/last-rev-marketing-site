@@ -56,20 +56,30 @@ const createVariants = (_theme: Theme): ComponentsVariants['Hero'] => [
         justifyContent: 'flex-end'
       },
       '& img': {
-        maxWidth: 600
+        maxWidth: 450,
+        [_theme.breakpoints.down('md')]: {
+          margin: 'auto',
+          maxWidth: 300
+        }
       },
       [_theme.breakpoints.up('md')]: {
         padding: _theme.spacing(8, 0)
       }
     }
   }
-  // Other props are also valid
+
+  //to do: figure out how to make this prop work
   // {
   //   props: {
-  //     backgroundColor: 'primary.main',
+  //     backgroundColor: 'black'
   //   },
   //   style: {
-  //     color: theme.palette.primary.contrastText
+  //     'display': 'none',
+  //     'backgroundColor': 'cyan',
+  //     '& .MuiGrid-item:nth-child(2)': {
+  //       backgroundColor: 'cyan',
+  //       color: _theme.palette.primary.contrastText
+  //     }
   //   }
   // }
 ];

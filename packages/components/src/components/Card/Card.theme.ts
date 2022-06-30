@@ -54,18 +54,21 @@ const createVariants = (_theme: Theme): ComponentsVariants['Card'] => [
       variant: 'blog-featured'
     },
     style: {
-      // '& .MuiCardMedia-root': {
-      //   '& img': {
-      //     aspectRatio: '16/9'
-      //   },
-      //   '& svg': {
-      //     aspectRatio: '16/9'
-      //   }
-      // }
-      // '& .MuiCardActions-root': {
-      //   marginTop: _theme.spacing(1),
-      //   padding: _theme.spacing(2, 0)
-      // }
+      'boxShadow': '0px 0px 0px 0px',
+      'borderRadius': 0,
+
+      '& .MuiCardMedia-root': {
+        '& img': {
+          aspectRatio: '16/9'
+        },
+        '& svg': {
+          aspectRatio: '16/9'
+        }
+      },
+      '& .MuiCardActions-root': {
+        marginTop: _theme.spacing(1),
+        padding: _theme.spacing(2, 0)
+      }
     }
   },
   {
@@ -79,8 +82,17 @@ const createVariants = (_theme: Theme): ComponentsVariants['Card'] => [
       '& .MuiCardMedia-root': {
         'display': 'flex',
         'justifyContent': 'start',
+        [_theme.breakpoints.down('md')]: {
+          justifyContent: 'center',
+          textAlign: 'center'
+        },
         '& img': {
           maxWidth: 64
+        }
+      },
+      '& .MuiTypography-root': {
+        [_theme.breakpoints.down('md')]: {
+          textAlign: 'center'
         }
       },
       '& .MuiTypography-h3': {

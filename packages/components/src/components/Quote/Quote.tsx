@@ -52,25 +52,43 @@ const Root = styled(Box, {
   name: 'Quote',
   slot: 'Root',
   overridesResolver: (_, styles) => [styles.root]
-})``;
+})<QuoteProps>(({ theme }) => ({
+  [theme.breakpoints.up('xl')]: {
+    paddingTop: theme.spacing(3),
+    paddingBottom: theme.spacing(3)
+  },
+  '& .MuiTypography-root': {
+    [theme.breakpoints.down('md')]: {
+      textAlign: 'center'
+    }
+  }
+}));
 
 const AuthorRoot = styled(Box, {
   name: 'Quote',
   slot: 'AuthorRoot',
   overridesResolver: (_, styles) => [styles.authorRoot]
-})`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-`;
+})<{ variant?: string }>(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  [theme.breakpoints.down('md')]: {
+    flexDirection: 'column'
+  }
+}));
 
 const MediaItem = styled(Media, {
   name: 'Quote',
   slot: 'MediaItem',
   overridesResolver: (_, styles) => [styles.mediaItem]
-})<MediaProps>(() => ({
+})<MediaProps>(({ theme }) => ({
   maxWidth: '120px',
-  marginBottom: '8px'
+  marginBottom: theme.spacing(1),
+  [theme.breakpoints.down('md')]: {
+    margin: 'auto',
+    maxWidth: '150px',
+    marginBottom: theme.spacing(2)
+  }
 }));
 
 const AuthorImage = styled(Media, {
