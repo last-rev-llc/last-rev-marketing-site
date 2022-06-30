@@ -7,6 +7,5 @@ export default (): LinkProps => ({
   variant: 'gradient',
   href: '/contact',
   text: 'Contact Us',
-  //icon: 'chevron-right',
   iconPosition: 'Right'
 });

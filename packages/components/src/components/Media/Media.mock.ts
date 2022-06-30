@@ -38,7 +38,6 @@ export const fileMock = () => ({
 export const responsiveMediaMock = {
   __typename: 'Media',
   file: {
-    // url: flowerLarge,
     url: './flower-large.png',
     width: '1728px',
     height: '1152px'
@@ -62,7 +61,6 @@ export const responsiveMediaMock = {
 export const SVGMediaMock = {
   __typename: 'Media',
   file: {
-    // url: flowerLarge,
     url: './logo.svg',
     width: '1728px',
     height: '1152px'
@@ -75,7 +73,6 @@ export const SVGMediaMock = {
 export const ExternalSVGMediaMock = {
   __typename: 'Media',
   file: {
-    // url: flowerLarge,
     url: './logo.svg',
     width: '1728px',
     height: '1152px'
