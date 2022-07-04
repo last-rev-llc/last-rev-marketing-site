@@ -42,22 +42,22 @@ const baseTheme: ThemeOptions = {
       lineHeight: 1.25
     },
     h3: {
-      fontSize: '1.25rem',
+      fontSize: '1.55rem',
       fontWeight: 600,
       lineHeight: 1.5
     },
     h4: {
-      fontSize: '1.5rem',
-      fontWeight: 600,
-      lineHeight: 1.5
-    },
-    h5: {
       fontSize: '1.25rem',
       fontWeight: 600,
       lineHeight: 1.5
     },
+    h5: {
+      fontSize: '1.15rem',
+      fontWeight: 600,
+      lineHeight: 1.5
+    },
     h6: {
-      fontSize: '1.125rem',
+      fontSize: '1.15rem',
       fontWeight: 600,
       lineHeight: 1.5555
     },
@@ -351,6 +351,18 @@ const createSchemeTheme = (schemeKey?: string) => {
                     maxWidth: '100%',
                     objectFit: 'cover'
                   }
+                },
+                '& .MuiCard-root': {
+                  height: '100%'
+                },
+                '& .MuiCardContent-root': {
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'flex-start',
+                  height: '100%'
+                },
+                '& .MuiCardActions-root': {
+                  marginTop: 'auto'
                 }
               }
             }

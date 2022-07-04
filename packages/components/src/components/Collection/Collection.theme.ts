@@ -35,20 +35,8 @@ const createVariants = (_theme: Theme): ComponentsVariants['Collection'] => [
           gridTemplateColumns: 'repeat(3, 1fr)'
         },
         ' > [class*="Section-gridItem"]': {
-          'maxWidth': '100%',
-          'height': '100%',
-          '& .MuiCard-root': {
-            height: '100%'
-          },
-          '& .MuiCardContent-root': {
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'flex-start',
-            height: '100%'
-          },
-          '& .MuiCardActions-root': {
-            marginTop: 'auto'
-          }
+          maxWidth: '100%',
+          height: '100%'
         }
       }
     }
@@ -68,20 +56,8 @@ const createVariants = (_theme: Theme): ComponentsVariants['Collection'] => [
           gridTemplateColumns: 'repeat(4, 1fr)'
         },
         ' > [class*="Section-gridItem"]': {
-          'maxWidth': '100%',
-          'height': '100%',
-          '& .MuiCard-root': {
-            height: '100%'
-          },
-          '& .MuiCardContent-root': {
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'flex-start',
-            height: '100%'
-          },
-          '& .MuiCardActions-root': {
-            marginTop: 'auto'
-          }
+          maxWidth: '100%',
+          height: '100%'
         }
       }
     }

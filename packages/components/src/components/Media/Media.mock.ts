@@ -43,13 +43,11 @@ export const responsiveMediaMock = {
     height: '1152px'
   },
   fileTablet: {
-    // url: flowerMedium,
     url: './flower-medium.jpg',
     width: '920',
     height: '613'
   },
   fileMobile: {
-    // url: flowerSmall,
     url: './flower-small.jpg',
     width: '540',
     height: '540'

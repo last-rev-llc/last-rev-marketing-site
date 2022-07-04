@@ -19,7 +19,7 @@ export const styleOverrides: ComponentsOverrides<Theme>['Card'] = {
 };
 
 // https://mui.com/customization/theme-components/#adding-new-component-variants
-const createVariants = (_theme: Theme): ComponentsVariants['Card'] => [
+const createVariants = (theme: Theme): ComponentsVariants['Card'] => [
   // Use prop matching to set variant styles
   {
     props: {
@@ -28,21 +28,21 @@ const createVariants = (_theme: Theme): ComponentsVariants['Card'] => [
     style: {
       'textAlign': 'center',
       '& .MuiCardMedia-root': {
-        'maxHeight': _theme.spacing(12),
-        'marginBottom': _theme.spacing(2),
-        [_theme.breakpoints.up('sm')]: {
-          minHeight: _theme.spacing(14),
-          marginBottom: _theme.spacing(4)
+        'maxHeight': theme.spacing(12),
+        'marginBottom': theme.spacing(2),
+        [theme.breakpoints.up('sm')]: {
+          minHeight: theme.spacing(14),
+          marginBottom: theme.spacing(4)
         },
 
         '& img': {
-          [_theme.breakpoints.down('md')]: {
+          [theme.breakpoints.down('md')]: {
             aspectRatio: '1'
           }
         },
 
         '& svg': {
-          [_theme.breakpoints.down('md')]: {
+          [theme.breakpoints.down('md')]: {
             aspectRatio: '1'
           }
         }
@@ -66,8 +66,8 @@ const createVariants = (_theme: Theme): ComponentsVariants['Card'] => [
         }
       },
       '& .MuiCardActions-root': {
-        marginTop: _theme.spacing(1),
-        padding: _theme.spacing(2, 0)
+        marginTop: theme.spacing(1),
+        padding: theme.spacing(2, 0)
       }
     }
   },
@@ -82,7 +82,7 @@ const createVariants = (_theme: Theme): ComponentsVariants['Card'] => [
       '& .MuiCardMedia-root': {
         'display': 'flex',
         'justifyContent': 'start',
-        [_theme.breakpoints.down('md')]: {
+        [theme.breakpoints.down('md')]: {
           justifyContent: 'center',
           textAlign: 'center'
         },
@@ -91,16 +91,9 @@ const createVariants = (_theme: Theme): ComponentsVariants['Card'] => [
         }
       },
       '& .MuiTypography-root': {
-        [_theme.breakpoints.down('md')]: {
+        [theme.breakpoints.down('md')]: {
           textAlign: 'center'
         }
-      },
-      '& .MuiTypography-h3': {
-        fontSize: 28,
-        fontWeight: 500
-      },
-      '& .MuiTypography-body': {
-        fontSize: 16
       }
     }
   }
