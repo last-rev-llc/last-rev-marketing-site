@@ -3,7 +3,7 @@
 import { Canvas, Meta, Story, ArgsTable } from '@storybook/addon-docs';
 
 import Card from './Card';
-import cardMock, { cardWithTags } from './Card.mock';
+import { iconCenteredMock, blogFeaturedMock } from './Card.mock';
 
 <Meta
   title="Components / Card"
@@ -14,9 +14,9 @@ import cardMock, { cardWithTags } from './Card.mock';
   argTypes={{
     variant: {
       description: 'Controls the variant to be displayed',
-      options: [],
+      options: ['icon-centered', 'blog-featured'],
       table: {
-        defaultValue: {}
+        defaultValue: { summary: 'icon-centered' }
       }
     },
     loading: {
@@ -39,7 +39,13 @@ import cardMock, { cardWithTags } from './Card.mock';
   }}
 />
 
-export const Template = (args) => <Card {...args} />;
+const Template = (args: CardProps) => <Card {...args} />;
+
+export const IconCentered = Template.bind({});
+IconCentered.args = { ...iconCenteredMock };
+
+export const BlogFeatured = Template.bind({});
+BlogFeatured.args = { ...blogFeaturedMock };
 
 # Card
 

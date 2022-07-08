@@ -19,16 +19,27 @@ export const styleOverrides: ComponentsOverrides<Theme>['Link'] = {
 };
 
 // https://mui.com/customization/theme-components/#adding-new-component-variants
-const createVariants = (_theme: Theme): ComponentsVariants['Link'] => [
+const createMuiLinkVariants = (_theme: Theme): ComponentsVariants['MuiLink'] => [
   // Use prop matching to set variant styles
-  // {
-  //   props: {
-  //     variant: 'example'
-  //   },
-  //   style: {
-  //     backgroundColor: theme.palette.primary.main
-  //   }
-  // }
+  {
+    props: {
+      // TODO: Enable variants on Link component
+      // @ts-ignore
+      variant: 'gradient'
+    },
+    style: {
+      'fontWeight': 'bold',
+      'padding': '10px 30px',
+      'borderRadius': '30px',
+      'textDecoration': 'none',
+      'textAlign': 'center',
+      'fontSize': 18,
+      'background': 'linear-gradient(90deg, rgba(92,83,167,1) 23%, rgba(249,112,187,1) 100%)',
+      '&:hover': {
+        background: 'linear-gradient(90deg, rgba(141, 128, 217, 1) 23%, rgb(255, 163, 237,1) 100%)'
+      }
+    }
+  }
   // Other props are also valid
   // {
   //   props: {
@@ -44,8 +55,10 @@ export default (theme: Theme): ThemeOptions => ({
   components: {
     Link: {
       defaultProps,
-      styleOverrides,
-      variants: createVariants(theme)
+      styleOverrides
+    },
+    MuiLink: {
+      variants: createMuiLinkVariants(theme)
     }
   }
 });

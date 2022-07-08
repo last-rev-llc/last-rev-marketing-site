@@ -3,7 +3,7 @@ import { MediaProps } from './Media';
 
 export const mediaMock = (): MediaProps => ({
   file: {
-    url: './flower-large.jpg',
+    url: './marketly-logo.jpeg',
     width: '920',
     height: '613'
   },
@@ -11,16 +11,15 @@ export const mediaMock = (): MediaProps => ({
   description: lorem.sentence()
 });
 
-export const mediaVideoMock = () => ({
+export const mediaVideoMock = {
+  __typename: 'Media',
+  variant: 'embed',
+  title: 'Netlify Vimeo video',
   file: {
-    url: './LastRev.mp4',
-    width: '1280',
-    height: '720'
+    url: 'https://player.vimeo.com/video/677844564'
   },
-  variant: 'video',
-  title: lorem.sentence(),
   controls: true
-});
+};
 
 export const assetMock = () => ({
   file: {
@@ -39,19 +38,16 @@ export const fileMock = () => ({
 export const responsiveMediaMock = {
   __typename: 'Media',
   file: {
-    // url: flowerLarge,
-    url: './flower-large.jpg',
+    url: './flower-large.png',
     width: '1728px',
     height: '1152px'
   },
   fileTablet: {
-    // url: flowerMedium,
     url: './flower-medium.jpg',
     width: '920',
     height: '613'
   },
   fileMobile: {
-    // url: flowerSmall,
     url: './flower-small.jpg',
     width: '540',
     height: '540'
@@ -63,7 +59,6 @@ export const responsiveMediaMock = {
 export const SVGMediaMock = {
   __typename: 'Media',
   file: {
-    // url: flowerLarge,
     url: './logo.svg',
     width: '1728px',
     height: '1152px'
@@ -76,7 +71,6 @@ export const SVGMediaMock = {
 export const ExternalSVGMediaMock = {
   __typename: 'Media',
   file: {
-    // url: flowerLarge,
     url: './logo.svg',
     width: '1728px',
     height: '1152px'

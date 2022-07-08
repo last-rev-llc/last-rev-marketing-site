@@ -142,6 +142,17 @@ type Collection implements Content {
   introText: Text
   itemsConnection(limit: Int, offset: Int, filter: CollectionFilterInput): CollectionItemConnection
 }
+type Footer implements Content {
+  sidekickLookup: JSON
+  id: String
+  theme: [Theme]
+  animation: JSON
+  variant: String
+  logo: Media
+  logoUrl: String
+  brandAndYear: String
+  navigationItems: [Collection]
+}
 type Header implements Content {
   sidekickLookup: JSON
   id: String
@@ -182,6 +193,7 @@ type Link implements Content {
   text: String
   icon: String
   iconPosition: String
+  color: String
   href: String!
 }
 type ModuleIntegration implements Content {
@@ -228,7 +240,9 @@ type Quote implements Content {
   quote: String
   authorName: String
   authorTitle: String
-  image: Media
+  authorImage: Media
+  logo: Media
+  actions: [Link]
 }
 type Section implements Content {
   sidekickLookup: JSON
@@ -284,6 +298,7 @@ type Blog implements Content {
   tags: [String]
   disableBackToTop: Boolean
   seo: JSON
+  newField: String
   relatedLinks: [Link]
   categories: [CategoryBlog]
   author: Person

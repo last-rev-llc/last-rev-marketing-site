@@ -20,15 +20,48 @@ export const styleOverrides: ComponentsOverrides<Theme>['Collection'] = {
 
 // https://mui.com/customization/theme-components/#adding-new-component-variants
 const createVariants = (_theme: Theme): ComponentsVariants['Collection'] => [
-  // Use prop matching to set variant styles
-  // {
-  //   props: {
-  //     variant: 'example'
-  //   },
-  //   style: {
-  //     backgroundColor: theme.palette.primary.main
-  //   }
-  // }
+  {
+    props: {
+      variant: 'three-per-row'
+    },
+    style: {
+      '& > [class*="Section-gridContainer"], & div > [class*="Section-gridContainer"]': {
+        'display': 'grid',
+        'gridTemplateColumns': '1fr',
+        [_theme.breakpoints.up('md')]: {
+          gridTemplateColumns: 'repeat(2, 1fr)'
+        },
+        [_theme.breakpoints.up('lg')]: {
+          gridTemplateColumns: 'repeat(3, 1fr)'
+        },
+        ' > [class*="Section-gridItem"]': {
+          maxWidth: '100%',
+          height: '100%'
+        }
+      }
+    }
+  },
+  {
+    props: {
+      variant: 'four-per-row'
+    },
+    style: {
+      '& > [class*="Section-gridContainer"], & div > [class*="Section-gridContainer"]': {
+        'display': 'grid',
+        'gridTemplateColumns': '1fr',
+        [_theme.breakpoints.up('md')]: {
+          gridTemplateColumns: 'repeat(2, 1fr)'
+        },
+        [_theme.breakpoints.up('lg')]: {
+          gridTemplateColumns: 'repeat(4, 1fr)'
+        },
+        ' > [class*="Section-gridItem"]': {
+          maxWidth: '100%',
+          height: '100%'
+        }
+      }
+    }
+  }
   // Other props are also valid
   // {
   //   props: {

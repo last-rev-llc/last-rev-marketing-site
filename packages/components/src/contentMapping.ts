@@ -22,6 +22,8 @@ const Hero = dynamic(() => import('./components/Hero'));
 
 const Text = dynamic(() => import('./components/Text'));
 
+const Footer = dynamic(() => import('./components/Footer'));
+
 const BackToTop = dynamic(() => import('@last-rev/component-library/dist/components/BackToTop'));
 const CollectionCarousel = dynamic(() => import('@last-rev/component-library/dist/components/CollectionCarousel'));
 
@@ -52,7 +54,8 @@ const contentMapping: {
   Link,
   NavigationItem,
   Hero,
-  Quote
+  Quote,
+  Footer
 };
 
 export default contentMapping;

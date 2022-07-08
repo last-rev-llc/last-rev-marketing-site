@@ -24,21 +24,62 @@ export const styleOverrides: ComponentsOverrides<Theme>['Hero'] = {
 // https://mui.com/customization/theme-components/#adding-new-component-variants
 const createVariants = (_theme: Theme): ComponentsVariants['Hero'] => [
   // Use prop matching to set variant styles
+  {
+    props: {
+      variant: 'centered'
+    },
+    style: {
+      '& .MuiGrid-container': {
+        'justifyContent': 'center',
+
+        '& > .MuiGrid-item': {
+          margin: '0 auto'
+        }
+      },
+
+      '& .MuiTypography-root': {
+        textAlign: 'center'
+      },
+
+      '& [class*="Hero-actionsRoot"]': {
+        justifyContent: 'center'
+      }
+    }
+  },
+  {
+    props: {
+      variant: 'featured-image'
+    },
+    style: {
+      '& .MuiGrid-item:nth-child(2)': {
+        display: 'flex',
+        justifyContent: 'flex-end'
+      },
+      '& img': {
+        maxWidth: 450,
+        [_theme.breakpoints.down('md')]: {
+          margin: 'auto',
+          maxWidth: 300
+        }
+      },
+      [_theme.breakpoints.up('md')]: {
+        padding: _theme.spacing(8, 0)
+      }
+    }
+  }
+
+  //to do: figure out how to make this prop work
   // {
   //   props: {
-  //     variant: 'example'
+  //     backgroundColor: 'black'
   //   },
   //   style: {
-  //     backgroundColor: theme.palette.primary.main
-  //   }
-  // }
-  // Other props are also valid
-  // {
-  //   props: {
-  //     backgroundColor: 'primary.main',
-  //   },
-  //   style: {
-  //     color: theme.palette.primary.contrastText
+  //     'display': 'none',
+  //     'backgroundColor': 'cyan',
+  //     '& .MuiGrid-item:nth-child(2)': {
+  //       backgroundColor: 'cyan',
+  //       color: _theme.palette.primary.contrastText
+  //     }
   //   }
   // }
 ];

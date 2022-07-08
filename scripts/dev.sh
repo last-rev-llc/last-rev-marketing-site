@@ -9,4 +9,6 @@ function cleanup() {
 trap "cleanup" EXIT
 
 echo "Starting develop server..."
-yarn propagate:env && turbo run dev --output-logs=new-only
+yarn propagate:env 
+yarn sync:cms
+turbo run dev --output-logs=new-only

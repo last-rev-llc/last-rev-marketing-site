@@ -160,6 +160,14 @@ declare module '@mui/material/styles' {
        */
       variants?: ComponentsVariants['NavigationBar'];
     };
+    Footer?: {
+      defaultProps?: ComponentsProps['Footer'];
+      styleOverrides?: ComponentsOverrides<Theme>['Footer'];
+      /**
+       * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
+       */
+      variants?: ComponentsVariants['Footer'];
+    };
     // MailchimpForm?: {
     //   defaultProps?: ComponentsProps['MailchimpForm'];
     //   styleOverrides?: ComponentsOverrides<Theme>['MailchimpForm'];

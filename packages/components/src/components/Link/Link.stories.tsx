@@ -11,7 +11,7 @@ export default {
       name: 'Variant',
       control: {
         type: 'select',
-        options: ['link', 'button-contained', 'button-outlined', 'button-text', '']
+        options: ['link', 'button-contained', 'button-outlined', 'button-text', 'gradient']
       },
       table: {
         defaultValue: { summary: 'link' }

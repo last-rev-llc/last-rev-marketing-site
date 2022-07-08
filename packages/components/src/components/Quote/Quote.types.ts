@@ -1,18 +1,7 @@
 import { Quote_BaseFragmentFragment } from '@last-rev-marketing-site/graphql-sdk/dist';
-import { LinkProps } from '../Link';
-import { MediaProps } from '../Media';
 
 export interface QuoteProps extends Quote_BaseFragmentFragment {
   variant?: 'one-column' | 'two-column';
-  // __typename?: string;
-  id?: string;
-  sidekickLookup?: any;
-  quote: string;
-  authorName?: string;
-  authorImage?: MediaProps;
-  authorTitle?: string;
-  logo?: MediaProps;
-  actions?: Array<LinkProps>;
 }
 
 export interface QuoteClasses {

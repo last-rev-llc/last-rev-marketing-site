@@ -7,7 +7,6 @@ export default {
   title: '1. LR Components / Header',
   component: Header
 };
-
 const Template = (args: JSX.IntrinsicAttributes) => <Header sidekickLookup={{}} {...args} />;
 export const Default = Template.bind({});
 Default.args = { ...headerMock() };

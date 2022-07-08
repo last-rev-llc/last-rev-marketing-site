@@ -29,74 +29,78 @@ const baseTheme: ThemeOptions = {
     }
   },
   typography: {
-    // Customize add and/or remove as necesary
+    fontSize: 16,
+    fontFamily: "'Open Sans', 'sans-serif'",
+    h1: {
+      fontSize: '3rem',
+      fontWeight: 600,
+      lineHeight: 1.25
+    },
+    h2: {
+      fontSize: '2.25rem',
+      fontWeight: 600,
+      lineHeight: 1.25
+    },
+    h3: {
+      fontSize: '1.55rem',
+      fontWeight: 600,
+      lineHeight: 1.5
+    },
+    h4: {
+      fontSize: '1.25rem',
+      fontWeight: 600,
+      lineHeight: 1.5
+    },
+    h5: {
+      fontSize: '1.15rem',
+      fontWeight: 600,
+      lineHeight: 1.5
+    },
+    h6: {
+      fontSize: '1.15rem',
+      fontWeight: 600,
+      lineHeight: 1.5555
+    },
     body1: {
-      fontFamily: 'Open Sans',
+      fontSize: '1rem',
       fontWeight: 400,
-      fontSize: '1.125rem',
       lineHeight: 1.5
     },
     body2: {
-      fontFamily: 'Open Sans',
+      fontSize: '1rem',
       fontWeight: 400,
-      fontSize: '1.125rem',
       lineHeight: 1.5
     },
-    h1: {
-      fontFamily: 'Open Sans',
-      fontSize: '4rem',
-      lineHeight: 1.25,
+    body3: {
+      fontSize: '0.875rem',
       fontWeight: 400,
-      fontStyle: 'normal'
+      lineHeight: '21px'
     },
-    h2: {
-      fontFamily: 'Open Sans',
-      fontSize: '3rem',
-      lineHeight: 1.25,
-      fontWeight: 400,
-      fontStyle: 'normal'
+    body: {
+      fontFamily: "'Open Sans', 'sans-serif'",
+      fontWeight: 400
     },
-    h3: {
-      fontFamily: 'Open Sans',
-      fontSize: '2rem',
-      lineHeight: 1.375,
-      fontWeight: 400,
-      fontStyle: 'normal'
-    },
-    h4: {
-      fontFamily: 'Open Sans',
-      fontSize: '1.5rem',
-      lineHeight: 1.5,
-      fontWeight: 400,
-      fontStyle: 'normal'
-    },
-    h5: {
-      fontFamily: 'Open Sans',
-      fontSize: '1.25rem',
-      lineHeight: 1.2,
-      fontWeight: 400,
-      fontStyle: 'normal'
-    },
-    h6: {
-      fontFamily: 'Open Sans',
-      fontSize: '1.125rem',
-      lineHeight: 1.3333,
-      fontWeight: 600,
-      fontStyle: 'normal'
+    heading: {
+      fontFamily: "'Open Sans', 'sans-serif'",
+      fontWeight: 700
     }
   },
   palette: {
     mode: 'light',
     primary: {
       main: '#9146ff',
-      contrastText: '#FFFFFF'
+      light: '#a76aff',
+      dark: '#6530b2',
+      contrastText: 'white'
     },
     secondary: {
-      main: '#F9F871',
-      contrastText: 'rgba(0, 0, 0, 0.87)'
+      main: '#ffff55',
+      light: '#ffff55',
+      dark: '#c6b300',
+      contrastText: 'white'
     },
     text: {
-      primary: '#00030B',
+      primary: '#170262',
       secondary: '#E5E5E5',
       disabled: 'rgba(0, 0, 0, 0.38)'
     },
@@ -127,6 +131,11 @@ const baseTheme: ThemeOptions = {
       light: '#4caf50',
       dark: '#1b5e20',
       contrastText: '#fff'
+    },
+    backgroundOption: {
+      main: '#FFF',
+      light: '#F7F7F7',
+      dark: '#000'
     }
   }
 };
@@ -154,30 +163,240 @@ const createSchemeTheme = (schemeKey?: string) => {
       {
         createSchemeTheme,
         components: {
-          // CollectionAccordionMedia:
           MuiContainer: {
-            defaultProps: {
-              maxWidth: 'xl'
-            },
             styleOverrides: {
               root: {
-                [baseSchemeTheme.breakpoints.down('sm')]: {
-                  'paddingLeft': baseSchemeTheme.spacing(5),
-                  'paddingRight': baseSchemeTheme.spacing(5),
-                  '&.MuiContainer-disableGutters': {
-                    paddingLeft: 0,
-                    paddingRight: 0
-                  }
-                },
-                [baseSchemeTheme.breakpoints.up('sm')]: {
+                [baseSchemeTheme.breakpoints.up('lg')]: {
                   paddingLeft: baseSchemeTheme.spacing(10),
                   paddingRight: baseSchemeTheme.spacing(10)
                 },
-                '&.MuiContainer-disableGutters': {
+                '& .MuiContainer-disableGutters': {
                   paddingLeft: 0,
                   paddingRight: 0
                 }
               }
+            }
+          },
+          Header: {
+            height: 80,
+            styleOverrides: {
+              root: {
+                '& img': {
+                  width: 180,
+                  height: 'auto'
+                },
+                '&::before': {
+                  backgroundColor: 'black'
+                }
+              },
+              contentContainer: {
+                'backgroundColor': 'black',
+                'width': '100%',
+                'maxWidth': baseSchemeTheme.breakpoints.values.xl,
+                'margin': 'auto',
+                'paddingLeft': baseSchemeTheme.spacing(4),
+                'paddingRight': baseSchemeTheme.spacing(4),
+                [baseSchemeTheme.breakpoints.up('sm')]: {
+                  paddingLeft: baseSchemeTheme.spacing(6),
+                  paddingRight: baseSchemeTheme.spacing(6)
+                },
+                [baseSchemeTheme.breakpoints.up('lg')]: {
+                  paddingLeft: baseSchemeTheme.spacing(10),
+                  paddingRight: baseSchemeTheme.spacing(10)
+                },
+                'height': 80,
+                '& svg[class*="Header-logo"]': {
+                  maxHeight: 36
+                },
+                '& img[class*="Header-logo"]': {
+                  height: 33,
+                  width: 'auto'
+                },
+                '& a': {
+                  textDecoration: 'none',
+                  [baseSchemeTheme.breakpoints.down('md')]: {
+                    display: 'flex',
+                    justifyContent: 'center'
+                  }
+                },
+                '& .MuiSvgIcon-root': {
+                  color: 'white'
+                },
+                '[data-csk-entry-type="collection"]': {
+                  padding: '24px 0px'
+                }
+              }
+            }
+          },
+          NavigationBar: {
+            styleOverrides: {
+              root: {
+                '& .MuiButton-contained': {
+                  textTransform: 'capitalize',
+                  fontSize: 17
+                },
+                '& .MuiLink-root': {
+                  'display': 'flex',
+                  'alignItems': 'center',
+                  'padding': 10,
+                  'color': 'white',
+                  '&.MuiLink-selected': {
+                    fontWeight: 400
+                  },
+                  '&:hover': {
+                    color: baseSchemeTheme.palette.primary.light
+                  }
+                },
+                '[data-csk-entry-type="navigationItem"]': {
+                  [baseSchemeTheme.breakpoints.down('md')]: {
+                    color: 'black',
+                    textAlign: 'center'
+                  }
+                }
+              }
+            }
+          },
+          Footer: {
+            styleOverrides: {
+              root: {
+                'backgroundColor': 'black',
+                '& .MuiGrid-container': {
+                  'paddingTop': baseSchemeTheme.spacing(2),
+                  '& .MuiGrid-root': {
+                    display: 'flex',
+                    alignSelf: 'flex-start'
+                  }
+                },
+                '& [class*="Media-root"]': {
+                  padding: '40px 0px',
+                  display: 'flex',
+                  maxWidth: '150px'
+                },
+                '[data-csk-entry-type="navigationItem"]': {
+                  [baseSchemeTheme.breakpoints.down('md')]: {
+                    color: 'white',
+                    textAlign: 'center'
+                  }
+                }
+              }
+            }
+          },
+          Hero: {
+            styleOverrides: {
+              contentContainer: {
+                '& > .MuiGrid-container': {
+                  alignItems: 'center'
+                },
+                '& [class*="Hero-actionsRoot"]': {
+                  [baseSchemeTheme.breakpoints.down('md')]: {
+                    'maxWidth': 200,
+                    'margin': 'auto',
+                    'flexDirection': 'column',
+                    '& :nth-child(n)': {
+                      marginBottom: baseSchemeTheme.spacing(2)
+                    },
+                    '& :last-child': {
+                      marginBottom: baseSchemeTheme.spacing(0)
+                    }
+                  }
+                }
+              }
+            }
+          },
+          Media: {
+            styleOverrides: {
+              root: {
+                display: 'block',
+                width: '100%',
+                height: '100%'
+              }
+            }
+          },
+          Section: {
+            styleOverrides: {
+              root: {
+                padding: baseSchemeTheme.spacing(4),
+                [baseSchemeTheme.breakpoints.up('xl')]: {
+                  paddingTop: baseSchemeTheme.spacing(5),
+                  paddingBottom: baseSchemeTheme.spacing(5)
+                },
+                [baseSchemeTheme.breakpoints.up('md')]: {
+                  paddingLeft: baseSchemeTheme.spacing(10),
+                  paddingRight: baseSchemeTheme.spacing(10)
+                },
+                [baseSchemeTheme.breakpoints.down('md')]: {
+                  '& > [class*="Section-gridContainer"] > [class*="Section-gridItem"]': {
+                    flex: '0 100%'
+                  }
+                }
+              }
+            }
+          },
+          Card: {
+            styleOverrides: {
+              root: {
+                'width': '100%',
+                'backgroundColor': baseSchemeTheme.palette.background.default,
+                '& .MuiTypography-h3': {
+                  paddingBottom: baseSchemeTheme.spacing(2)
+                },
+                '& .MuiCardMedia-root': {
+                  '& img': {
+                    width: '100%',
+                    maxWidth: '100%',
+                    objectFit: 'cover'
+                  },
+                  '& svg': {
+                    width: '100%',
+                    maxWidth: '100%',
+                    objectFit: 'cover'
+                  }
+                },
+                '& .MuiCard-root': {
+                  height: '100%'
+                },
+                '& .MuiCardContent-root': {
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'flex-start',
+                  height: '100%'
+                },
+                '& .MuiCardActions-root': {
+                  marginTop: 'auto'
+                }
+              }
+            }
+          },
+          Collection: {
+            styleOverrides: {
+              root: {
+                'margin': '0 auto',
+                '[class*="Section-gridContainer"]': {
+                  'display': 'grid',
+                  'gridAutoRows': '1fr',
+                  '[class*="Box-content"]': {
+                    display: 'block'
+                  }
+                },
+                '[class*="Section-gridItem"]': {
+                  display: 'flex',
+                  justifyContent: 'center',
+                  flexBasis: '100%',
+                  maxWidth: '100%',
+                  height: '100%',
+                  [baseSchemeTheme.breakpoints.up('md')]: {
+                    flexBasis: '50%'
+                  },
+                  [baseSchemeTheme.breakpoints.up('lg')]: {
+                    flexBasis: '33.333333%'
+                  }
+                }
+              }
+            }
+          },
+          Quote: {
+            styleOverrides: {
+              root: {}
             }
           }
         }
