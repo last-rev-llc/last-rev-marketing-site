@@ -216,7 +216,6 @@ yarn start
 
 | Secret                    | Description                                                                                   |
 | ------------------------- | --------------------------------------------------------------------------------------------- |
-| CONTENTFUL_DELIVERY_TOKEN | Delivery token from Contentful (ask your admin for this value)                                |
 | NETLIFY_SITE_ID           | Netlify site id from Netlify (ask your admin for this value)                                  |
 | CYPRESS_PROJECT_ID        | Cypress project id, get it from the [project settings](https://dashboard.cypress.io/)         |
 | CYPRESS_RECORD_KEY        | Cypress project record key, get it from the [project settings](https://dashboard.cypress.io/) |
