@@ -8,7 +8,7 @@ type Data = {
 
 const themeHandler = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
   await cors(req, res);
-  const theme = await import('@last-rev-marketing-site/components/src/theme');
+  const { default: theme } = await import('@last-rev-marketing-site/components/src/theme');
 
   res.status(200).json(JSON.parse(JSON.stringify(theme)));
 };
