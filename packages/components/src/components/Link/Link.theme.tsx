@@ -28,6 +28,7 @@ const createMuiLinkVariants = (_theme: Theme): ComponentsVariants['MuiLink'] => 
       variant: 'gradient'
     },
     style: {
+      'color': 'white',
       'fontWeight': 'bold',
       'padding': '10px 30px',
       'borderRadius': '30px',

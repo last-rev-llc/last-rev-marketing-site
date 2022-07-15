@@ -87,6 +87,16 @@ const baseTheme: ThemeOptions = {
   },
   palette: {
     mode: 'light',
+    ...{
+      white: {
+        main: '#FFF',
+        contrastText: 'rgba(0, 0, 0, 0.87)'
+      },
+      black: {
+        main: '#000',
+        contrastText: '#FFF'
+      }
+    },
     primary: {
       main: '#9146ff',
       light: '#a76aff',
@@ -99,6 +109,7 @@ const baseTheme: ThemeOptions = {
       dark: '#c6b300',
       contrastText: 'white'
     },
+
     text: {
       primary: '#170262',
       secondary: '#E5E5E5',
@@ -403,7 +414,7 @@ const createSchemeTheme = (schemeKey?: string) => {
       }
     )
   );
-  // console.log('CreateSchemeTheme', schemeTheme);
+
   return responsiveFontSizes(schemeTheme);
 };
 
