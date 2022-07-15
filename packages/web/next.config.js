@@ -32,10 +32,10 @@ const securityHeaders = [
     key: 'Content-Security-Policy',
     value: ContentSecurityPolicy.replace(/\s{2,}/g, ' ').trim()
   },
-  {
-    key: 'X-Frame-Options',
-    value: 'SAMEORIGIN'
-  },
+  // {
+  //   key: 'X-Frame-Options',
+  //   value: 'SAMEORIGIN'
+  // },
   {
     key: 'X-Content-Type-Options',
     value: 'nosniff'
