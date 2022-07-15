@@ -1,11 +1,10 @@
 import dynamic from 'next/dynamic';
 
-const Section = dynamic(() => import('./components/Section'));
+import Section from './components/Section';
+// import Card from './components/Card';
+import Collection from './components/Collection';
 
 const Card = dynamic(() => import('./components/Card'));
-
-const Collection = dynamic(() => import('./components/Collection'));
-
 const CollectionAccordion = dynamic(() => import('./components/CollectionAccordion'));
 
 const NavigationBar = dynamic(() => import('./components/NavigationBar'));
