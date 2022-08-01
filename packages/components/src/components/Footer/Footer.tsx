@@ -24,9 +24,9 @@ export interface FooterProps {
 }
 
 export const Footer = ({ logo, logoUrl, navigationItems, brandAndYear, sidekickLookup }: FooterProps) => {
-  // useEffect(() => {
-  //   throw new Error('error in footer, test');
-  // }, []);
+  useEffect(() => {
+    throw new Error('error in footer, test');
+  }, []);
   return (
     <ErrorBoundary>
       <Root sx={{ backgroundColor: 'black' }} {...sidekick(sidekickLookup)}>
