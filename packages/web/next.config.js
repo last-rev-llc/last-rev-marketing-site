@@ -1,3 +1,4 @@
+const { withSentryConfig } = require('@sentry/nextjs');
 require('dotenv').config();
 const path = require('path');
 const withPlugins = require('next-compose-plugins');
@@ -49,6 +50,16 @@ const securityHeaders = [
     value: 'camera=(), microphone=(), geolocation=()'
   }
 ];
+
+const sentryWebpackPluginOptions = {
+  // Additional config options for the Sentry Webpack plugin. Keep in mind that
+  // the following options are set automatically, and overriding them is not
+  // recommended:
+  //   release, url, org, project, authToken, configFile, stripPrefix,
+  //   urlPrefix, include, ignore
+  // For all available options, see:
+  // https://github.com/getsentry/sentry-webpack-plugin#options.
+};
 
 const nextConfig = {
   ...(process.env.NODE_ENV === 'production' && {
@@ -121,4 +132,7 @@ const nextConfig = {
   }
 };
 
-module.exports = withPlugins([[withTM], withBundleAnalyzer /*, [withSentryConfig]*/], nextConfig);
+module.exports = withPlugins(
+  [[withTM], withBundleAnalyzer, [withSentryConfig, sentryWebpackPluginOptions]],
+  nextConfig
+);
