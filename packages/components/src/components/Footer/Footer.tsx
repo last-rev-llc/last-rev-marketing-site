@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Grid from '@mui/material/Grid';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -45,6 +45,14 @@ export const Footer = ({ logo, logoUrl, navigationItems, brandAndYear, sidekickL
             </Grid>
             <Grid xs={12} md={8} display={'flex'} alignItems={'flex-start'} justifyContent={'flex-start'} item>
               <List data-testid="Footer-Navigation">
+                {/* //this is a Sentry test */}
+                {/* <button
+                  type="button"
+                  onClick={() => {
+                    throw new Error('Sentry Frontend Error');
+                  }}>
+                  Throw error
+                </button> */}
                 {navigationItems?.map((collection) => (
                   <ListItem
                     data-testid="Footer-Navigation-Item"
