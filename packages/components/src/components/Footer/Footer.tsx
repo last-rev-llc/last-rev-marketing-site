@@ -24,9 +24,6 @@ export interface FooterProps {
 }
 
 export const Footer = ({ logo, logoUrl, navigationItems, brandAndYear, sidekickLookup }: FooterProps) => {
-  useEffect(() => {
-    throw new Error('error in footer, test');
-  }, []);
   return (
     <ErrorBoundary>
       <Root sx={{ backgroundColor: 'black' }} {...sidekick(sidekickLookup)}>
@@ -48,6 +45,14 @@ export const Footer = ({ logo, logoUrl, navigationItems, brandAndYear, sidekickL
             </Grid>
             <Grid xs={12} md={8} display={'flex'} alignItems={'flex-start'} justifyContent={'flex-start'} item>
               <List data-testid="Footer-Navigation">
+                {/* //this is a Sentry test */}
+                {/* <button
+                  type="button"
+                  onClick={() => {
+                    throw new Error('Sentry Frontend Error');
+                  }}>
+                  Throw error
+                </button> */}
                 {navigationItems?.map((collection) => (
                   <ListItem
                     data-testid="Footer-Navigation-Item"
