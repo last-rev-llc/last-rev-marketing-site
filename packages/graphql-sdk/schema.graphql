@@ -31,6 +31,7 @@ type Media implements Content {
   asset: Media
   tablet: Media
   mobile: Media
+  controls: String
   fileTablet: Asset
   fileMobile: Asset
 }
@@ -211,16 +212,6 @@ type NavigationItem implements Content {
   subNavigation: [SubnavigationItem]
   image: Media
 }
-type Person implements Content {
-  sidekickLookup: JSON
-  id: String
-  theme: [Theme]
-  animation: JSON
-  variant: String
-  name: String
-  jobTitle: String
-  image: Media
-}
 type Quote implements Content {
   sidekickLookup: JSON
   id: String
@@ -249,6 +240,11 @@ type Section implements Content {
   contentSpacing: Int
   contentWidth: String
   styles: JSON
+  settings: JSON
+  paddingLeft: Int
+  paddingRight: Int
+  paddingBottom: Int
+  paddingTop: Int
   contents: [Content]
   background: Media
 }
@@ -261,6 +257,16 @@ type Site implements Content {
   internalTitle: String
   siteKey: String
   seo: JSON
+}
+type Template implements Content {
+  sidekickLookup: JSON
+  id: String
+  theme: [Theme]
+  animation: JSON
+  variant: String
+  templateName: String
+  image: Media
+  category: String
 }
 type Text implements Content {
   sidekickLookup: JSON
@@ -297,6 +303,21 @@ type Blog implements Content {
   header: Header
   footer: Content
 }
+type BlogDetail implements Content {
+  sidekickLookup: JSON
+  id: String
+  theme: [Theme]
+  animation: JSON
+  slug: String
+  lr__path__: String
+  internalTitle: String
+  title: String
+  creationDate: String
+  author: String
+  body: RichText
+  tags: [String]
+  seo: JSON
+}
 type CategoryBlog implements Content {
   sidekickLookup: JSON
   id: String
@@ -318,7 +339,6 @@ type Page implements Content {
   animation: JSON
   slug: String
   lr__path__: String
-  internalTitle: String
   title: String
   seo: JSON
   colorScheme: String
@@ -327,6 +347,21 @@ type Page implements Content {
   footer: Content
   hero: Hero
   contents: [Content]
+}
+type Person implements Content {
+  sidekickLookup: JSON
+  id: String
+  theme: [Theme]
+  animation: JSON
+  slug: String
+  lr__path__: String
+  name: String
+  jobTitle: String
+  image: Media
+  emailAddress: String
+  phone: String
+  linkedIn: String
+  calendlyUrl: String
 }
 type AlgoliaObject {
   index: String!
