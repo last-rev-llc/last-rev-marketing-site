@@ -21,9 +21,35 @@ export const styleOverrides: ComponentsOverrides<Theme>['Card'] = {
 // https://mui.com/customization/theme-components/#adding-new-component-variants
 const createVariants = (theme: Theme): ComponentsVariants['Card'] => [
   // Use prop matching to set variant styles
+
   {
     props: {
       variant: 'icon-centered'
+    },
+    style: {
+      'textAlign': 'center',
+      'display': 'flex',
+      'flexDirection': 'column',
+      '& .MuiTypography-h4': {
+        fontSize: '1.1rem'
+      },
+      '& .MuiCardMedia-root': {
+        'display': 'flex',
+        'justifyContent': 'center',
+        '& img': {
+          aspectRatio: '1',
+          width: '100%',
+          height: 'auto',
+          objectFit: 'contain',
+          minWidth: 200,
+          maxWidth: 200
+        }
+      }
+    }
+  },
+  {
+    props: {
+      variant: 'left-icon-centered-text'
     },
     style: {
       'textAlign': 'center',
@@ -88,6 +114,50 @@ const createVariants = (theme: Theme): ComponentsVariants['Card'] => [
         },
         '& img': {
           maxWidth: 64
+        }
+      },
+      '& .MuiTypography-root': {
+        [theme.breakpoints.down('md')]: {
+          textAlign: 'center'
+        }
+      }
+    }
+  },
+  {
+    props: {
+      variant: 'left-align-no-bg'
+    },
+    style: {
+      'color': theme.palette.text.primary,
+      'display': 'flex',
+      '& .MuiTypography-h4': {
+        fontSize: '1.1rem'
+      },
+
+      '& .MuiCardContent-root': {
+        height: 'auto',
+        justifyContent: 'center'
+      },
+
+      '& .MuiCardMedia-root': {
+        'display': 'flex',
+        'justifyContent': 'center',
+        'width': 'max-content',
+        'height': 'auto',
+
+        [theme.breakpoints.down('md')]: {
+          justifyContent: 'center',
+          textAlign: 'center'
+        },
+        '& img': {
+          paddingLeft: 20,
+          paddingRight: 20,
+          width: '100%',
+          height: 'auto',
+          objectFit: 'contain',
+          minWidth: 250,
+          maxWidth: 250,
+          aspectRatio: '1'
         }
       },
       '& .MuiTypography-root': {

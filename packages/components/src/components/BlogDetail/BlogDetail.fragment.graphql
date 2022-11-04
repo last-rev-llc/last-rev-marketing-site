@@ -1,0 +1,19 @@
+fragment BlogDetail_BaseFragment on BlogDetail {
+  ...Content_BaseFragment
+  seo
+  title
+  slug
+  author
+  quote
+  tags
+  creationDate
+  featuredMedia {
+    ...Media_BaseFragment
+  }
+  body {
+    ...RichText_BaseFragment
+  }
+  relatedLinks {
+    ...Link_BaseFragment
+  }
+}

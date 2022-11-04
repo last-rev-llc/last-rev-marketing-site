@@ -4,7 +4,6 @@ import { Source, DocumentNode, GraphQLSchema } from 'graphql';
 import { typeDefs as algoliaTypeDefs } from '@last-rev/graphql-algolia-integration';
 
 import {
-  Blog,
   Card,
   Collection,
   Header,
@@ -18,9 +17,10 @@ import {
   Theme
 } from '@last-rev/graphql-contentful-extensions';
 
-
 import * as Quote from './Quote';
 import * as Footer from './Footer';
+import * as BlogDetail from '../../components/src/components/BlogDetail/BlogDetail';
+
 // Uncomment if using Algolia, else delete the related file
 // import * as Algolia from './Algolia';
 
@@ -35,7 +35,6 @@ export type GraphQlExtension = {
 const extensions: GraphQlExtension[] = [
   { typeDefs: algoliaTypeDefs },
   // Algolia,
-  Blog,
   Card,
   Collection,
   Header,
@@ -49,6 +48,7 @@ const extensions: GraphQlExtension[] = [
   Quote,
   Footer,
   Section,
+  BlogDetail
 ];
 
 export const typeDefs = mergeTypeDefs(compact(map(extensions, 'typeDefs')));

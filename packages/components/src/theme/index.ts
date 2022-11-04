@@ -10,6 +10,7 @@ import Text from '../components/Text/Text.theme';
 import NavigationBar from '../components/NavigationBar/NavigationBar.theme';
 import NavigationItem from '../components/NavigationItem/NavigationItem.theme';
 import Collection from '../components/Collection/Collection.theme';
+import CollectionCarousel from '../components/CollectionCarousel/CollectionCarousel.theme';
 import merge from 'lodash/merge';
 import camelCase from 'lodash/camelCase';
 
@@ -32,7 +33,7 @@ const baseTheme: ThemeOptions = {
     fontSize: 16,
     fontFamily: "'Open Sans', 'sans-serif'",
     h1: {
-      fontSize: '3rem',
+      fontSize: '2.65rem',
       fontWeight: 600,
       lineHeight: 1.25
     },
@@ -169,7 +170,8 @@ const createSchemeTheme = (schemeKey?: string) => {
         NavigationBar(baseSchemeTheme),
         Link(baseSchemeTheme),
         Section(baseSchemeTheme),
-        Collection(baseSchemeTheme)
+        Collection(baseSchemeTheme),
+        CollectionCarousel(baseSchemeTheme)
       ],
       {
         createSchemeTheme,
@@ -270,6 +272,9 @@ const createSchemeTheme = (schemeKey?: string) => {
           Footer: {
             styleOverrides: {
               root: {
+                '& a': {
+                  textDecoration: 'none'
+                },
                 'backgroundColor': 'black',
                 '& .MuiGrid-container': {
                   'paddingTop': baseSchemeTheme.spacing(2),
@@ -299,6 +304,9 @@ const createSchemeTheme = (schemeKey?: string) => {
                   alignItems: 'center'
                 },
                 '& [class*="Hero-actionsRoot"]': {
+                  '& a': {
+                    textDecoration: 'none'
+                  },
                   [baseSchemeTheme.breakpoints.down('md')]: {
                     'maxWidth': 200,
                     'margin': 'auto',

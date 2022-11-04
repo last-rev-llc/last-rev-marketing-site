@@ -3,6 +3,7 @@ import dynamic from 'next/dynamic';
 import Section from './components/Section';
 // import Card from './components/Card';
 import Collection from './components/Collection';
+import BlogDetail from './components/BlogDetail';
 
 const Card = dynamic(() => import('./components/Card'));
 const CollectionAccordion = dynamic(() => import('./components/CollectionAccordion'));
@@ -24,7 +25,6 @@ const Text = dynamic(() => import('./components/Text'));
 const Footer = dynamic(() => import('./components/Footer'));
 
 const BackToTop = dynamic(() => import('@last-rev/component-library/dist/components/BackToTop'));
-const CollectionCarousel = dynamic(() => import('@last-rev/component-library/dist/components/CollectionCarousel'));
 
 // Custom components
 const CollectionFiltered = dynamic(() => import('./components/CollectionFiltered'));
@@ -32,6 +32,7 @@ const CollectionFiltered = dynamic(() => import('./components/CollectionFiltered
 // Custom components
 const Quote = dynamic(() => import('./components/Quote'));
 const Page = dynamic(() => import('./components/Page'));
+const CollectionCarousel = dynamic(() => import('./components/CollectionCarousel'));
 
 const contentMapping: {
   [key: string]: any;
@@ -43,8 +44,6 @@ const contentMapping: {
   'Collection:carousel': CollectionCarousel,
   'Collection:accordion': CollectionAccordion,
   'Collection:filtered': CollectionFiltered,
-  'Collection:carousel-large': CollectionCarousel,
-  'Collection:carousel-small': CollectionCarousel,
   'Collection:navigation-bar': NavigationBar,
   BackToTop,
   Card,
@@ -54,7 +53,8 @@ const contentMapping: {
   NavigationItem,
   Hero,
   Quote,
-  Footer
+  Footer,
+  BlogDetail
 };
 
 export default contentMapping;
