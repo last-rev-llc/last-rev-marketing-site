@@ -6,9 +6,24 @@ export const defaultProps: ComponentsProps['NavigationItem'] = {};
 // https://mui.com/customization/theme-components/#global-style-overrides
 export const styleOverrides: ComponentsOverrides<Theme>['NavigationItem'] = {
   // Set some static styles
-  // root: {
-  //   backgroundColor: 'red'
-  // }
+  root: {
+    '& .MuiPaper-root': {
+      'paddingLeft': 0,
+      '& .MuiTypography-root': {
+        color: 'black'
+      },
+      '& .MuiMenuItem-root': {
+        paddingLeft: 32,
+        paddingRight: 32
+      },
+      '& .MuiBox-root': {
+        '& :hover': {
+          backgroundColor: '#E9E9E9'
+        }
+      }
+    }
+    //    .css-8on9re-MuiPaper-root-NavigationItem-menuRoot
+  }
   //
   // Use the ownerState to set dynamic styles
   // root: ({ ownerState, theme }) => {
