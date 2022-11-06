@@ -247,6 +247,7 @@ type Section implements Content {
   paddingTop: Int
   contents: [Content]
   background: Media
+  introText: Text
 }
 type Site implements Content {
   sidekickLookup: JSON
@@ -296,10 +297,6 @@ type Blog implements Content {
   disableBackToTop: Boolean
   seo: JSON
   newField: String
-  relatedLinks: [Link]
-  categories: [CategoryBlog]
-  author: Person
-  contents: [Content]
   header: Header
   footer: Content
 }
@@ -317,6 +314,8 @@ type BlogDetail implements Content {
   body: RichText
   tags: [String]
   seo: JSON
+  relatedLinks: [Link]
+  featuredMedia: [Media]
 }
 type CategoryBlog implements Content {
   sidekickLookup: JSON
