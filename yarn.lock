@@ -3151,10 +3151,10 @@
     tar "^6.1.0"
     uuid "^8.3.2"
 
-"@last-rev/component-library@^0.5.2":
-  version "0.5.2"
-  resolved "https://registry.yarnpkg.com/@last-rev/component-library/-/component-library-0.5.2.tgz#8c1c13a85409aa134612b4540e9ad2c51e43a3a1"
-  integrity sha512-QV1Ru8tbXHTcIKfyDyfwk+UzF67qn5OYv+xpecZQ5hRkodrZMt9cnBGN7XESBzMFVisISeWGPsCr81CEKtfTFw==
+"@last-rev/component-library@^0.5.9":
+  version "0.5.9"
+  resolved "https://registry.yarnpkg.com/@last-rev/component-library/-/component-library-0.5.9.tgz#b828f8f88d525978b76210b840f0c587fcc337b7"
+  integrity sha512-pO9Nqk4CDZRDvXyEmv/leGjfWmJRghkJCNCIR5wmBrX4dGTyKtuPPTUtDa5PVV/pBir99W355/O/v8XOganlgQ==
   dependencies:
     "@contentful/rich-text-react-renderer" "^15.0.0"
     "@contentful/rich-text-types" "^15.0.0"

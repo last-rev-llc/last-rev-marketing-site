@@ -13,12 +13,13 @@ import {
   NavigationItem,
   Page,
   RichText,
-  Section,
+  Section as LRSection,
   Theme
 } from '@last-rev/graphql-contentful-extensions';
 
 import * as Quote from './Quote';
 import * as Footer from './Footer';
+import * as Section from './Section';
 import * as BlogDetail from '../../components/src/components/BlogDetail/BlogDetail';
 
 // Uncomment if using Algolia, else delete the related file
@@ -47,8 +48,9 @@ const extensions: GraphQlExtension[] = [
   Theme,
   Quote,
   Footer,
-  Section,
-  BlogDetail
+  LRSection,
+  BlogDetail,
+  Section
 ];
 
 export const typeDefs = mergeTypeDefs(compact(map(extensions, 'typeDefs')));

@@ -1,4 +1,6 @@
 import gql from 'graphql-tag';
+import { getDefaultFieldValue } from '@last-rev/graphql-contentful-core';
+import { ContentfulPathsGenerator } from '@last-rev/types';
 
 export const createPath = (...slug: string[]) => {
   let path = slug.join('/').replace(/\/\//g, '/');
@@ -19,4 +21,22 @@ export const mappers: any = {
   BlogDetail: {
     BlogDetail: {}
   }
+};
+
+const blog: ContentfulPathsGenerator = async (blogItem, _loaders, defaultLocale, _locales, _preview) => {
+  const slug = getDefaultFieldValue(blogItem, 'slug', defaultLocale);
+  const blogLandingSlug = 'blog';
+  const fullPath = createPath(blogLandingSlug, slug);
+  return {
+    [fullPath]: {
+      fullPath,
+      isPrimary: true,
+      contentId: blogItem.sys.id,
+      excludedLocales: []
+    }
+  };
+};
+
+export const pathsConfigs = {
+  BlogDetail: blog
 };

@@ -4,7 +4,7 @@ fragment BlogDetail_BaseFragment on BlogDetail {
   title
   slug
   author
-  quote
+  #quote
   tags
   creationDate
   featuredMedia {
