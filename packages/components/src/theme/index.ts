@@ -328,7 +328,8 @@ const createSchemeTheme = (schemeKey?: string) => {
                 display: 'block',
                 width: '100%',
                 height: '100%'
-              }
+              },
+              embedRoot: { minHeight: 400 }
             }
           },
           Section: {

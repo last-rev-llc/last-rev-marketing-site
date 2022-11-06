@@ -12,17 +12,17 @@ export const defaultProps: ComponentsProps['Media'] = {
 // https://mui.com/customization/theme-components/#global-style-overrides
 export const styleOverrides: ComponentsOverrides<Theme>['Media'] = {
   // Set some static styles
-  root: () => ({
+  root: {
     // img default display: inline introduces a line-height space at the bottom
     display: 'block',
     maxWidth: `100%`,
     margin: 'auto',
+    height: 'auto'
+  },
+  embedRoot: {
+    minHeight: 400
+  }
 
-    height: 'auto',
-    iframe: {
-      minHeight: 300
-    }
-  })
   // root: {
   //   backgroundColor: 'red'
   // }
@@ -37,15 +37,14 @@ export const styleOverrides: ComponentsOverrides<Theme>['Media'] = {
 
 // https://mui.com/customization/theme-components/#adding-new-component-variants
 const createVariants = (_theme: Theme): ComponentsVariants['Media'] => [
-  // Use prop matching to set variant styles
-  // {
-  //   props: {
-  //     variant: 'example'
-  //   },
-  //   style: {
-  //     backgroundColor: theme.palette.primary.main
-  //   }
-  // }
+  {
+    props: {
+      variant: 'embed'
+    },
+    style: {
+      minHeight: 400
+    }
+  }
   // Other props are also valid
   // {
   //   props: {

@@ -9,6 +9,9 @@ export const styleOverrides: ComponentsOverrides<Theme>['Section'] = {
   root: {
     '[class*="Section-introText"]': {
       marginBottom: '2rem'
+    },
+    '[class*="Media-embedRoot"]': {
+      minHeight: 368
     }
   }
 
