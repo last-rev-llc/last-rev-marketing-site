@@ -18,7 +18,7 @@ import { SectionClassKey } from '../components/Section';
 import { NavigationBarClassKey } from '../components/NavigationBar';
 import { PageClassKey } from '../components/Page';
 import { QuoteClassKey } from '../components/Quote';
-// import { CollectionCarouselClassKey } from '../components/CollectionCarousel';
+import { CollectionCarouselClassKey } from '../components/CollectionCarousel';
 // import { MailchimpFormClassKey } from '../components/MailchimpForm';
 // import { BackToTopClassKey } from '../components/BackToTop';
 // import { FormMarketoEmbedClassKey } from '../components/FormMarketoEmbed';
@@ -41,7 +41,7 @@ declare module '@mui/material/styles' {
     Media: MediaClassKey;
     Section: SectionClassKey;
     Collection: CollectionClassKey;
-    // CollectionCarousel: CollectionCarouselClassKey;
+    CollectionCarousel: CollectionCarouselClassKey;
     CollectionFiltered: CollectionFilteredClassKey;
     CollectionAccordion: CollectionAccordionClassKey;
     NavigationBar: NavigationBarClassKey;

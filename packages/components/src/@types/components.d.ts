@@ -176,14 +176,14 @@ declare module '@mui/material/styles' {
     //    */
     //   variants?: ComponentsVariants['MailchimpForm'];
     // };
-    // CollectionCarousel?: {
-    //   defaultProps?: ComponentsProps['CollectionCarousel'];
-    //   styleOverrides?: ComponentsOverrides<Theme>['CollectionCarousel'];
-    //   /**
-    //    * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
-    //    */
-    //   variants?: ComponentsVariants['CollectionCarousel'];
-    // };
+    CollectionCarousel?: {
+      defaultProps?: ComponentsProps['CollectionCarousel'];
+      styleOverrides?: ComponentsOverrides<Theme>['CollectionCarousel'];
+      /**
+       * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
+       */
+      variants?: ComponentsVariants['CollectionCarousel'];
+    };
     // BackToTop?: {
     //   defaultProps?: ComponentsProps['BackToTop'];
     //   styleOverrides?: ComponentsOverrides<Theme>['BackToTop'];

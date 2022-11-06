@@ -361,8 +361,6 @@ type PageBlog implements Content {
   seo: JSON
   relatedLinks: [Link]
   featuredMedia: [Media]
-  header: Header
-  footer: Content
 }
 type Person implements Content {
   sidekickLookup: JSON

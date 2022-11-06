@@ -13,6 +13,7 @@ import { HeroProps } from '../components/Hero';
 import { MediaProps } from '../components/Media';
 import { SectionProps } from '../components/Section';
 import { CollectionProps } from '../components/Collection';
+import { CollectionCarouselProps } from '../components/CollectionCarousel';
 import { CollectionFilteredProps } from '../components/CollectionFiltered';
 import { CollectionAccordionProps } from '../components/CollectionAccordion';
 import { NavigationBarProps } from '../components/NavigationBar';
@@ -41,7 +42,7 @@ declare module '@mui/material/styles' {
     NavigationBar: NavigationBarProps;
     Page: PageProps;
     // MailchimpForm: MailchimpFormProps;
-    // CollectionCarousel: CollectionCarouselProps;
+    CollectionCarousel: CollectionCarouselProps;
     // BackToTop: BackToTopProps;
     // FormMarketoEmbed: FormMarketoEmbedProps;
 

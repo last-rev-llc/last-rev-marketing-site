@@ -18,7 +18,10 @@ export const styleOverrides: ComponentsOverrides<Theme>['Media'] = {
     maxWidth: `100%`,
     margin: 'auto',
 
-    height: 'auto'
+    height: 'auto',
+    iframe: {
+      minHeight: 300
+    }
   })
   // root: {
   //   backgroundColor: 'red'
