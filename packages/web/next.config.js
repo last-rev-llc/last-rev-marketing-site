@@ -103,7 +103,7 @@ const nextConfig = {
   },
   productionBrowserSourceMaps: enableAnalyzer,
   images: {
-    domains: ['images.ctfassets.net'],
+    domains: ['images.ctfassets.net', 'videos.ctfassets.net'],
     // Disabled as it's timing out on Netlify
     // formats: ['image/avif', 'image/webp']
     formats: ['image/webp']

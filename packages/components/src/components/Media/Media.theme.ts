@@ -6,7 +6,8 @@ export const defaultProps: ComponentsProps['Media'] = {
   disableInlineSVG: true,
   priority: false,
   // All images are shown close to full bleed size
-  sizes: '100vw'
+  sizes: '100vw',
+  autoplay: true
 };
 
 // https://mui.com/customization/theme-components/#global-style-overrides
