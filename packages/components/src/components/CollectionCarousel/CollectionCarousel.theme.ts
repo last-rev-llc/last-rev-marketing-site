@@ -34,7 +34,7 @@ const createVariants = (): ComponentsVariants['CollectionCarousel'] => [
   }
 ];
 
-export default (): ThemeOptions => ({
+export default (_theme: any): ThemeOptions => ({
   components: {
     CollectionCarousel: {
       defaultProps,
