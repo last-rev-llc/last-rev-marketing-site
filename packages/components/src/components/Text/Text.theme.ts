@@ -11,6 +11,10 @@ export const styleOverrides: ComponentsOverrides<Theme>['Text'] = {
       /* Revert padding reset is what gives the indentation to list */
 
       padding: 'revert'
+    },
+    'h2': {
+      paddingTop: 16,
+      paddingBottom: 16
     }
   }
   //

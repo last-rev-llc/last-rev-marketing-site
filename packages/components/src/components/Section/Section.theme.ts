@@ -6,7 +6,11 @@ export const defaultProps: ComponentsProps['Section'] = {};
 // https://mui.com/customization/theme-components/#global-style-overrides
 export const styleOverrides: ComponentsOverrides<Theme>['Section'] = {
   // Set some static styles
-  root: {}
+  root: {
+    '[class*="Section-introText"]': {
+      marginBottom: '2rem'
+    }
+  }
 
   // Use the ownerState to set dynamic styles
   // root: ({ ownerState, theme }) => {

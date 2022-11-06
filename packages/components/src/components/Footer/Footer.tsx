@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import Grid from '@mui/material/Grid';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -29,7 +29,7 @@ export const Footer = ({ logo, logoUrl, navigationItems, brandAndYear, sidekickL
       <Root sx={{ backgroundColor: 'black' }} {...sidekick(sidekickLookup)}>
         <Container maxWidth="xl">
           <Grid container spacing={{ xs: 4, md: 2 }}>
-            <Grid item xs={12} md={2} data-testid="Footer-Logo" justifyContent={['flex-start']}>
+            <Grid item xs={12} md={2} data-testid="Footer-Logo" justifyContent={['flex-start']} flexDirection="row">
               {!!logo && (
                 <Link
                   sx={{
@@ -43,22 +43,21 @@ export const Footer = ({ logo, logoUrl, navigationItems, brandAndYear, sidekickL
                 </Link>
               )}
             </Grid>
-            <Grid xs={12} md={8} display={'flex'} alignItems={'flex-start'} justifyContent={'flex-start'} item>
+            <Grid
+              xs={12}
+              md={8}
+              display={'flex'}
+              alignItems={'flex-start'}
+              justifyContent={'flex-start'}
+              item
+              flexDirection="row">
               <List data-testid="Footer-Navigation">
-                {/* //this is a Sentry test */}
-                {/* <button
-                  type="button"
-                  onClick={() => {
-                    throw new Error('Sentry Frontend Error');
-                  }}>
-                  Throw error
-                </button> */}
                 {navigationItems?.map((collection) => (
                   <ListItem
                     data-testid="Footer-Navigation-Item"
                     sx={{
                       '& .MuiGrid-container': {
-                        flexDirection: 'column'
+                        flexDirection: 'row'
                       }
                     }}>
                     <ContentModule {...collection} key={collection.id} />
@@ -66,14 +65,12 @@ export const Footer = ({ logo, logoUrl, navigationItems, brandAndYear, sidekickL
                 ))}
               </List>
             </Grid>
-            <Grid display={'flex'} flexDirection="column" alignItems={'flex-start'} item xs={12}>
-              <Divider sx={{ width: '100%', height: 1, backgroundColor: theme.palette.primary.light }} />
-              <Box pt={[2, 8]} pb={[2, 16]} sx={{ display: 'flex', backgroundColor: 'black' }}>
-                <Typography variant="body1" sx={{ color: theme.palette.primary.light }}>
-                  {brandAndYear}
-                </Typography>
-              </Box>
-            </Grid>
+            <Divider sx={{ width: '100%', height: 1, backgroundColor: theme.palette.primary.light }} />
+            <Box pt={[2, 8]} pb={[2, 16]} sx={{ display: 'flex', backgroundColor: 'black' }}>
+              <Typography variant="body1" sx={{ color: theme.palette.primary.light }}>
+                {brandAndYear}
+              </Typography>
+            </Box>
           </Grid>
         </Container>
       </Root>
