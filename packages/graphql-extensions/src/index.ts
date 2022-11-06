@@ -20,7 +20,7 @@ import {
 import * as Quote from './Quote';
 import * as Footer from './Footer';
 import * as Section from './Section';
-import * as BlogDetail from '../../components/src/components/BlogDetail/BlogDetail';
+import * as PageBlog from '../../components/src/components/PageBlog/PageBlog';
 
 // Uncomment if using Algolia, else delete the related file
 // import * as Algolia from './Algolia';
@@ -49,7 +49,7 @@ const extensions: GraphQlExtension[] = [
   Quote,
   Footer,
   LRSection,
-  BlogDetail,
+  PageBlog,
   Section
 ];
 

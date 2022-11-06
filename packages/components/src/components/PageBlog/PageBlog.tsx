@@ -26,9 +26,13 @@ export interface BlogProps {
   tags?: any;
   relatedLinks?: LinkProps[];
   contents?: any;
+  header: any;
+  footer: any;
 }
 
-export const BlogDetail = ({
+export const PageBlog = ({
+  header,
+  footer,
   title,
   creationDate,
   slug,
@@ -60,9 +64,10 @@ export const BlogDetail = ({
         <meta name="content_type" content="blog" />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: `${xss(JSON.stringify(schemaData))}` }} />
       </Head>
+      {header ? <ContentModule {...(header as any)} /> : null}
       <Root {...sidekick(sidekickLookup)} itemScope itemType="https://schema.org/Blog">
         <ContentContainer maxWidth={'xl'}>
-          <Grid container spacing={5} sx={{ py: { lg: 4 } }}>
+          <Grid container spacing={5} sx={{ py: { lg: 4 } }} justifyContent="center">
             <Grid component="article" item xs={12} sm={9}>
               {title ? (
                 <Typography
@@ -100,7 +105,7 @@ export const BlogDetail = ({
               </ContentsWrapper>
             </Grid>
 
-            <Grid component="aside" item xs={12} sm={3} sx={{}}>
+            {/* <Grid component="aside" item xs={12} sm={3} sx={{}}>
               {quote ? (
                 <Box
                   component="blockquote"
@@ -268,10 +273,11 @@ export const BlogDetail = ({
                   ) : null}
                 </List>
               </Box>
-            </Grid>
+            </Grid> */}
           </Grid>
         </ContentContainer>
       </Root>
+      {footer ? <ContentModule {...(footer as any)} /> : null}
     </ErrorBoundary>
   );
 };
@@ -353,4 +359,4 @@ const ContentsWrapper = styled(Box, {
   overridesResolver: (_, styles) => [styles.contentsWrapper]
 })<{ variant?: string }>(() => ({}));
 
-export default BlogDetail;
+export default PageBlog;

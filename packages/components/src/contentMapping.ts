@@ -3,7 +3,7 @@ import dynamic from 'next/dynamic';
 import Section from './components/Section';
 // import Card from './components/Card';
 import Collection from './components/Collection';
-import BlogDetail from './components/BlogDetail';
+import PageBlog from './components/PageBlog';
 
 const Card = dynamic(() => import('./components/Card'));
 const CollectionAccordion = dynamic(() => import('./components/CollectionAccordion'));
@@ -54,7 +54,7 @@ const contentMapping: {
   Hero,
   Quote,
   Footer,
-  BlogDetail
+  PageBlog
 };
 
 export default contentMapping;

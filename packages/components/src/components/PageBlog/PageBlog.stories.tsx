@@ -1,6 +1,6 @@
 import React from 'react';
-import Blog from './BlogDetail';
-import mockContent from './BlogDetail.mock';
+import Blog from './PageBlog';
+import mockContent from './PageBlog.mock';
 
 export default {
   title: 'Modules / Blog',

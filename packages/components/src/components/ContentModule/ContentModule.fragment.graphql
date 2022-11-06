@@ -12,7 +12,6 @@ fragment ContentModule_BaseFragment on Content {
   ...Section_BaseFragment
   ...Text_BaseFragment
   ...Footer_BaseFragment
-  ...BlogDetail_BaseFragment
 }
 
 fragment ContentModule_SectionFragment on Content {
@@ -25,7 +24,6 @@ fragment ContentModule_SectionFragment on Content {
   ...Collection_BaseFragment
   ...Link_BaseFragment
   # when path created for the Blog detail works, this can be removed :)
-  ...BlogDetail_BaseFragment
   #...Section_BaseFragment
 }
 

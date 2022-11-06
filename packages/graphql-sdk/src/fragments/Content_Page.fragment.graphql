@@ -1,3 +1,4 @@
 fragment Content_PageFragment on Content {
   ...Page_BaseFragment
+  ...PageBlog_BaseFragment
 }

@@ -1,5 +1,11 @@
-fragment BlogDetail_BaseFragment on BlogDetail {
+fragment PageBlog_BaseFragment on PageBlog {
   ...Content_BaseFragment
+  header {
+    ...ContentModule_BaseFragment
+  }
+  footer {
+    ...ContentModule_BaseFragment
+  }
   seo
   title
   slug

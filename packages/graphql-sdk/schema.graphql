@@ -314,8 +314,6 @@ type BlogDetail implements Content {
   body: RichText
   tags: [String]
   seo: JSON
-  relatedLinks: [Link]
-  featuredMedia: [Media]
 }
 type CategoryBlog implements Content {
   sidekickLookup: JSON
@@ -346,6 +344,25 @@ type Page implements Content {
   footer: Content
   hero: Hero
   contents: [Content]
+}
+type PageBlog implements Content {
+  sidekickLookup: JSON
+  id: String
+  theme: [Theme]
+  animation: JSON
+  slug: String
+  lr__path__: String
+  internalTitle: String
+  title: String
+  creationDate: String
+  author: String
+  body: RichText
+  tags: [String]
+  seo: JSON
+  relatedLinks: [Link]
+  featuredMedia: [Media]
+  header: Header
+  footer: Content
 }
 type Person implements Content {
   sidekickLookup: JSON
