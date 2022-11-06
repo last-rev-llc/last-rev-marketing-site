@@ -46,6 +46,14 @@ const createVariants = (_theme: Theme): ComponentsVariants['Text'] => [
   //     color: theme.palette.primary.contrastText
   //   }
   // }
+  {
+    props: { variant: 'blog' },
+    style: {
+      'ol, ul, li': { padding: 'revert' },
+      'h2': { paddingTop: 16, paddingBottom: 16 },
+      'p': { paddingBottom: 16 }
+    }
+  }
 ];
 
 export default (theme: Theme): ThemeOptions => ({
