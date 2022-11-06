@@ -6,8 +6,7 @@ export const defaultProps: ComponentsProps['Media'] = {
   disableInlineSVG: true,
   priority: false,
   // All images are shown close to full bleed size
-  sizes: '100vw',
-  autoplay: true
+  sizes: '100vw'
 };
 
 // https://mui.com/customization/theme-components/#global-style-overrides
@@ -19,9 +18,6 @@ export const styleOverrides: ComponentsOverrides<Theme>['Media'] = {
     maxWidth: `100%`,
     margin: 'auto',
     height: 'auto'
-  },
-  embedRoot: {
-    minHeight: 400
   }
 
   // root: {
