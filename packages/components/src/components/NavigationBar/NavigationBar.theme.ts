@@ -6,6 +6,7 @@ export const defaultProps: ComponentsProps['NavigationBar'] = {};
 // https://mui.com/customization/theme-components/#global-style-overrides
 export const styleOverrides: ComponentsOverrides<Theme>['NavigationBar'] = {
   root: {
+    'background': 'black',
     '& .MuiLink-root': {
       'textDecoration': 'none',
       '&.MuiLink-selected': { fontWeight: 'bold' }
