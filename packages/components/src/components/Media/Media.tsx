@@ -28,7 +28,7 @@ const Media = (props: MediaProps) => {
                       videoSource.src = videoSource.dataset.src;
                     }
                   }
-
+                  // @ts-ignore
                   video?.target?.load();
                   video?.target?.classList.remove('lazy');
                   if (ref.current) lazyVideoObserver?.unobserve(ref.current);
