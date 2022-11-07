@@ -17,7 +17,8 @@ export const styleOverrides: ComponentsOverrides<Theme>['Text'] = {
       paddingBottom: 16
     },
     'h3': { paddingBottom: 16 },
-    'h4': { paddingBottom: 16 }
+    'h4': { paddingBottom: 16 },
+    'p': { paddingBottom: 16 }
   }
   //
   // Use the ownerState to set dynamic styles
