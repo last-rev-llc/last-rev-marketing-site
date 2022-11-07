@@ -30,7 +30,8 @@ const Media = (props: MediaProps) => {
                   }
                   // @ts-ignore
                   video?.target?.load();
-                  video?.target?.classList.remove('lazy');
+                  // @ts-ignore
+                  video?.target?.play();
                   if (ref.current) lazyVideoObserver?.unobserve(ref.current);
                 }
               });
@@ -53,7 +54,7 @@ const Media = (props: MediaProps) => {
         autoPlay={true}
         muted
         loop
-        playsInline
+        playsinline={true}
         sx={{ width: '100%', height: '100%', ...props.sx }}>
         <source data-src={props?.file?.url} />
         Your browser does not support the video tag.
