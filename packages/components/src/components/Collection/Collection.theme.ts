@@ -22,6 +22,25 @@ export const styleOverrides: ComponentsOverrides<Theme>['Collection'] = {
 const createVariants = (_theme: Theme): ComponentsVariants['Collection'] => [
   {
     props: {
+      variant: 'two-per-row'
+    },
+    style: {
+      '& > [class*="Section-gridContainer"], & div > [class*="Section-gridContainer"]': {
+        'display': 'grid',
+        'gridTemplateColumns': '1fr',
+        [_theme.breakpoints.up('md')]: {
+          gridTemplateColumns: 'repeat(2, 1fr)'
+        },
+
+        ' > [class*="Section-gridItem"]': {
+          maxWidth: '100%',
+          height: '100%'
+        }
+      }
+    }
+  },
+  {
+    props: {
       variant: 'three-per-row'
     },
     style: {
