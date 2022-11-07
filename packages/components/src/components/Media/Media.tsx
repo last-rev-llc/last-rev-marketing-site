@@ -23,7 +23,7 @@ const Media = (props: MediaProps) => {
       </VideoRoot>
     );
   }
-  return <LRMedia {...props} />;
+  return <LRMedia {...props} sx={{ maxWidth: `${props?.file?.width}px` }} />;
 };
 
 const VideoRoot = styled('video', {

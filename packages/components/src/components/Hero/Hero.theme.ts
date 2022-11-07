@@ -9,9 +9,12 @@ export const defaultProps: ComponentsProps['Hero'] = {
 // https://mui.com/customization/theme-components/#global-style-overrides
 export const styleOverrides: ComponentsOverrides<Theme>['Hero'] = {
   // Set some static styles
-  // root: {
-  //   backgroundColor: 'red'
-  // }
+  root: {
+    minHeight: '60vh',
+    h1: {
+      paddingBottom: 16
+    }
+  }
   //
   // Use the ownerState to set dynamic styles
   // root: ({ ownerState, theme }) => {
