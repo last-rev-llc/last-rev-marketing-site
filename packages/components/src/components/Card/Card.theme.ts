@@ -57,7 +57,7 @@ const createVariants = (theme: Theme): ComponentsVariants['Card'] => [
       'textAlign': 'center',
       'display': 'flex',
       'flexDirection': 'column',
-
+      'transition': 'all 0.3s ease-in-out',
       'box-shadow': '0 0 0 1px hsl(0deg 0% 100% / 15%)',
       '& .MuiTypography-h4': {
         fontSize: '1.1rem'
@@ -73,6 +73,9 @@ const createVariants = (theme: Theme): ComponentsVariants['Card'] => [
           minWidth: 200,
           maxWidth: 200
         }
+      },
+      '&:hover': {
+        backgroundColor: '#111111'
       }
     }
   },

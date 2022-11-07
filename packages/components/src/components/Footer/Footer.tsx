@@ -66,7 +66,7 @@ export const Footer = ({ logo, logoUrl, navigationItems, brandAndYear, sidekickL
               </List>
             </Grid>
             <Divider sx={{ width: '100%', height: 1, backgroundColor: theme.palette.primary.light }} />
-            <Box pt={[2, 8]} pb={[2, 16]} sx={{ display: 'flex', backgroundColor: 'black' }}>
+            <Box pt={[2, 8]} pb={[2, 8]} sx={{ display: 'flex', backgroundColor: 'black' }}>
               <Typography variant="body1" sx={{ color: theme.palette.primary.light }}>
                 {brandAndYear}
               </Typography>
