@@ -52,6 +52,7 @@ const createVariants = (theme: Theme): ComponentsVariants['Card'] => [
       variant: 'dark'
     },
     style: {
+      'padding': 24,
       'backgroundColor': 'black',
       'color': 'white',
       'textAlign': 'center',
@@ -59,8 +60,13 @@ const createVariants = (theme: Theme): ComponentsVariants['Card'] => [
       'flexDirection': 'column',
       'transition': 'all 0.3s ease-in-out',
       'box-shadow': '0 0 0 1px hsl(0deg 0% 100% / 15%)',
+      '& .MuiTypography-h3': {
+        fontSize: '1.5rem',
+        paddingBottom: 16
+      },
       '& .MuiTypography-h4': {
-        fontSize: '1.1rem'
+        fontSize: '1.1rem',
+        paddingBottom: 16
       },
       '& .MuiCardMedia-root': {
         'display': 'flex',

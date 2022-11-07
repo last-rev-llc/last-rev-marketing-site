@@ -335,7 +335,7 @@ const createSchemeTheme = (schemeKey?: string) => {
           Section: {
             styleOverrides: {
               root: {
-                padding: baseSchemeTheme.spacing(4),
+                padding: baseSchemeTheme.spacing(4, 0),
                 [baseSchemeTheme.breakpoints.up('xl')]: {
                   paddingTop: baseSchemeTheme.spacing(5),
                   paddingBottom: baseSchemeTheme.spacing(5)
