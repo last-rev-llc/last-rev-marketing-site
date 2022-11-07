@@ -57,7 +57,8 @@ const createVariants = (theme: Theme): ComponentsVariants['Card'] => [
       'textAlign': 'center',
       'display': 'flex',
       'flexDirection': 'column',
-      'border': '1px solid rgba(255,255,255,0.8)',
+
+      'box-shadow': '0 0 0 1px hsl(0deg 0% 100% / 15%)',
       '& .MuiTypography-h4': {
         fontSize: '1.1rem'
       },
