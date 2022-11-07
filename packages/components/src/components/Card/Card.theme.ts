@@ -49,6 +49,34 @@ const createVariants = (theme: Theme): ComponentsVariants['Card'] => [
   },
   {
     props: {
+      variant: 'dark'
+    },
+    style: {
+      'backgroundColor': 'black',
+      'color': 'white',
+      'textAlign': 'center',
+      'display': 'flex',
+      'flexDirection': 'column',
+      'border': '1px solid rgba(255,255,255,0.8)',
+      '& .MuiTypography-h4': {
+        fontSize: '1.1rem'
+      },
+      '& .MuiCardMedia-root': {
+        'display': 'flex',
+        'justifyContent': 'center',
+        '& img': {
+          aspectRatio: '1',
+          width: '100%',
+          height: 'auto',
+          objectFit: 'contain',
+          minWidth: 200,
+          maxWidth: 200
+        }
+      }
+    }
+  },
+  {
+    props: {
       variant: 'left-icon-centered-text'
     },
     style: {
