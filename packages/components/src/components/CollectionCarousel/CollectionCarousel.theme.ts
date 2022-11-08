@@ -19,7 +19,7 @@ export const styleOverrides: ComponentsOverrides<Theme>['CollectionCarousel'] = 
 };
 
 // https://mui.com/customization/theme-components/#adding-new-component-variants
-const createVariants = (): ComponentsVariants['CollectionCarousel'] => [
+const createVariants = (_theme: Theme): ComponentsVariants['CollectionCarousel'] => [
   {
     props: {
       variant: 'carousel'
@@ -27,7 +27,10 @@ const createVariants = (): ComponentsVariants['CollectionCarousel'] => [
     style: {
       '& [class*="CollectionCarousel-carouselItem"]': {
         '& .MuiPaper-root': {
-          boxShadow: 'none'
+          boxShadow: 'none',
+          [_theme.breakpoints.down('md')]: {
+            padding: _theme.spacing(4)
+          }
         }
       }
     }
@@ -39,7 +42,7 @@ export default (_theme: any): ThemeOptions => ({
     CollectionCarousel: {
       defaultProps,
       styleOverrides,
-      variants: createVariants()
+      variants: createVariants(_theme)
     }
   }
 });
