@@ -12,6 +12,9 @@ export const styleOverrides: ComponentsOverrides<Theme>['Section'] = {
     },
     '[class*="Media-embedRoot"]': {
       minHeight: 368
+    },
+    '& img': {
+      padding: 8
     }
   }
 
@@ -26,6 +29,18 @@ export const styleOverrides: ComponentsOverrides<Theme>['Section'] = {
 // https://mui.com/customization/theme-components/#adding-new-component-variants
 const createVariants = (_theme: Theme): ComponentsVariants['Section'] => [
   // Use prop matching to set variant styles
+  {
+    props: {
+      variant: 'default-responsive'
+    },
+    style: {
+      '& [class*="Section-gridContainer"]': {
+        [_theme.breakpoints.down('md')]: {
+          flexDirection: 'column-reverse'
+        }
+      }
+    }
+  },
   {
     props: {
       variant: 'split-panel'

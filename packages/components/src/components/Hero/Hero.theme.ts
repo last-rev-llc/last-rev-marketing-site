@@ -10,9 +10,17 @@ export const defaultProps: ComponentsProps['Hero'] = {
 export const styleOverrides: ComponentsOverrides<Theme>['Hero'] = {
   // Set some static styles
   root: {
-    minHeight: '60vh',
-    h1: {
+    'minHeight': '60vh',
+    'h1': {
       paddingBottom: 16
+    },
+    '& [class*="Hero-contentContainer"]': {
+      '& .MuiGrid-container': {
+        '@media (max-width: 800px)': {
+          flexDirection: 'column-reverse',
+          textAlign: 'center'
+        }
+      }
     }
   }
   //

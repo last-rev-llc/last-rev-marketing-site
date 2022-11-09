@@ -166,6 +166,9 @@ const createVariants = (theme: Theme): ComponentsVariants['Card'] => [
       variant: 'left-align-no-bg'
     },
     style: {
+      [theme.breakpoints.down('md')]: {
+        flexDirection: 'column'
+      },
       'color': theme.palette.text.primary,
       'display': 'flex',
       '& .MuiTypography-h4': {
@@ -174,7 +177,8 @@ const createVariants = (theme: Theme): ComponentsVariants['Card'] => [
 
       '& .MuiCardContent-root': {
         height: 'auto',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        alignItems: 'center'
       },
 
       '& .MuiCardMedia-root': {
@@ -182,6 +186,7 @@ const createVariants = (theme: Theme): ComponentsVariants['Card'] => [
         'justifyContent': 'center',
         'width': 'max-content',
         'height': 'auto',
+        'margin': '0 auto',
 
         [theme.breakpoints.down('md')]: {
           justifyContent: 'center',
