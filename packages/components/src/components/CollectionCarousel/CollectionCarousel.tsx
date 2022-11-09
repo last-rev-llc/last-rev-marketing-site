@@ -21,7 +21,8 @@ const CollectionCarousel = (props: CollectionCarouselProps) => {
         CarouselVariantProps={{
           carousel: {
             loop: true,
-            slidesPerView: 1,
+            slidesPerView: 'auto',
+            loopedSlides: props?.items?.length,
             spaceBetween: 80,
             pagination: false,
             navigation: false,

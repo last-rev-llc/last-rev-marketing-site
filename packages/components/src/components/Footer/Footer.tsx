@@ -28,7 +28,7 @@ export const Footer = ({ logo, logoUrl, navigationItems, brandAndYear, sidekickL
     <ErrorBoundary>
       <Root sx={{ backgroundColor: 'black' }} {...sidekick(sidekickLookup)}>
         <Container maxWidth="xl">
-          <Grid container spacing={{ xs: 4, md: 2 }}>
+          <Grid container>
             <Grid item xs={12} md={2} data-testid="Footer-Logo" justifyContent={['flex-start']} flexDirection="row">
               {!!logo && (
                 <Link
@@ -66,7 +66,7 @@ export const Footer = ({ logo, logoUrl, navigationItems, brandAndYear, sidekickL
               </List>
             </Grid>
             <Divider sx={{ width: '100%', height: 1, backgroundColor: theme.palette.primary.light }} />
-            <Box pt={[2, 8]} pb={[2, 8]} pl={[7, 0]} pr={[7, 0]} sx={{ display: 'flex', backgroundColor: 'black' }}>
+            <Box pt={[2, 8]} pb={[2, 8]} pl={[3, 0]} pr={[3, 0]} sx={{ display: 'flex', backgroundColor: 'black' }}>
               <Typography variant="body1" sx={{ color: theme.palette.primary.light }}>
                 {brandAndYear}
               </Typography>

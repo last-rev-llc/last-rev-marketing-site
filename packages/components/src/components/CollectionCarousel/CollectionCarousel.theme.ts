@@ -28,8 +28,9 @@ const createVariants = (_theme: Theme): ComponentsVariants['CollectionCarousel']
       '& [class*="CollectionCarousel-carouselItem"]': {
         '& .MuiPaper-root': {
           boxShadow: 'none',
+          borderRadius: 0,
           [_theme.breakpoints.down('md')]: {
-            padding: _theme.spacing(4)
+            padding: '0px 32px 40px 32px'
           }
         }
       }
