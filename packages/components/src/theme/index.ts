@@ -31,7 +31,7 @@ const baseTheme: ThemeOptions = {
   },
   typography: {
     fontSize: 16,
-    fontFamily: "'Open Sans', 'sans-serif'",
+    // fontFamily: "'Open Sans', 'sans-serif'",
     h1: {
       fontSize: '2.65rem',
       fontWeight: 600,
@@ -79,11 +79,11 @@ const baseTheme: ThemeOptions = {
       lineHeight: '21px'
     },
     body: {
-      fontFamily: "'Open Sans', 'sans-serif'",
+      // fontFamily: "'Open Sans', 'sans-serif'",
       fontWeight: 400
     },
     heading: {
-      fontFamily: "'Open Sans', 'sans-serif'",
+      // fontFamily: "'Open Sans', 'sans-serif'",
       fontWeight: 700
     }
   },

@@ -82,6 +82,6 @@ const Root = styled(Box, {
   name: 'Footer',
   slot: 'Root',
   overridesResolver: (_, styles) => [styles.root]
-})();
+})``;
 
 export default Footer;

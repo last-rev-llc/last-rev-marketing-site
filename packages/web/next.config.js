@@ -76,11 +76,7 @@ const nextConfig = {
   /**
    * @type {import('next').NextConfig}
    */
-  experimental: {
-    images: {
-      allowFutureImage: true
-    }
-  },
+  experimental: {},
   i18n: {
     // TODO: generate these and read from that
     locales: ['en-US'],
@@ -106,9 +102,11 @@ const nextConfig = {
     domains: ['images.ctfassets.net', 'videos.ctfassets.net'],
     // Disabled as it's timing out on Netlify
     // formats: ['image/avif', 'image/webp']
-    formats: ['image/webp']
+    formats: ['image/webp'],
+    loader: 'custom',
+    loaderFile: './src/contentfulLoader.ts'
   },
-  ...(!process.env.SENTRY_PROJECT && {
+  ...((!process.env.SENTRY_PROJECT || process.env.NODE_ENV !== 'production') && {
     sentry: {
       disableServerWebpackPlugin: true,
       disableClientWebpackPlugin: true

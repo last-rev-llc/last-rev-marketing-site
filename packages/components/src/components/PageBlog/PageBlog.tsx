@@ -7,7 +7,7 @@ import styled from '@mui/system/styled';
 // import TwitterIcon from '@mui/icons-material/Twitter';
 // import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ErrorBoundary from '@last-rev/component-library/dist/components/ErrorBoundary';
-import Media, { MediaProps } from '@last-rev/component-library/dist/components/Media';
+import { MediaProps } from '@last-rev/component-library/dist/components/Media';
 import Text from '@last-rev/component-library/dist/components/Text';
 import { LinkProps } from '@last-rev/component-library/dist/components/Link';
 import sidekick from '@last-rev/contentful-sidekick-util';
@@ -94,7 +94,7 @@ export const PageBlog = ({
               ) : null}
               {featuredMedia ? (
                 <MediaWrap>
-                  <Media {...featuredMedia[0]} {...sidekick(sidekickLookup?.featuredMedia)} />
+                  <ContentModule {...featuredMedia[0]} {...sidekick(sidekickLookup?.featuredMedia)} />
                 </MediaWrap>
               ) : null}
               {body ? <Text variant="blog" sidekickLookup={sidekickLookup?.body} body={body} /> : null}
