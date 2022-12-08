@@ -6,7 +6,7 @@ import { ThemeProvider } from '@mui/system';
 import CssBaseline from '@mui/material/CssBaseline';
 import theme from '@last-rev-marketing-site/components/src/theme';
 import { CacheProvider, EmotionCache } from '@emotion/react';
-
+import { Open_Sans } from '@next/font/google';
 import '@last-rev/component-library/dist/styles.css';
 import SEO from '@last-rev/component-library/dist/components/SEO';
 
@@ -15,6 +15,7 @@ import SEO from '@last-rev/component-library/dist/components/SEO';
 import { createEmotionCache } from '../src/createEmotionCache';
 
 const clientSideEmotionCache = createEmotionCache();
+const openSans = Open_Sans({ subsets: ['latin'] });
 
 interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache;
@@ -22,19 +23,13 @@ interface MyAppProps extends AppProps {
 // const loadFeatures = () => import('../src/features').then((res) => res.default);
 
 // Make sure this URLs matche what font files your site loads
-const FONT_URLS = ['https://fonts.gstatic.com/s/opensans/v29/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTS-mu0SC55I.woff2'];
+// const FONT_URLS = ['https://fonts.gstatic.com/s/opensans/v29/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTS-mu0SC55I.woff2'];
 
 function MyApp({ Component, emotionCache = clientSideEmotionCache, pageProps }: MyAppProps) {
   return (
     <CacheProvider value={emotionCache}>
       {pageProps.pageData?.page?.seo ? <SEO seo={pageProps.pageData.page.seo} /> : null}
       <Head>
-        {
-          /* This is loaded here to force NextJS to put font preloads as the first thing */
-          FONT_URLS.map((url) => (
-            <link key={url} rel="preload" href={url} as="font" type="font/woff2" crossOrigin="anonymous"></link>
-          ))
-        }
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         {!!pageProps.pageData?.page?.seo?.title ? <title>{pageProps.pageData.page.seo.title.value}</title> : null}
         <meta name="contentful_space" content={process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID} />
@@ -72,7 +67,9 @@ function MyApp({ Component, emotionCache = clientSideEmotionCache, pageProps }: 
       <ThemeProvider theme={theme}>
         {/* <LazyMotion strict features={loadFeatures}> */}
         <CssBaseline />
-        <Component {...pageProps} />
+        <main className={openSans.className}>
+          <Component {...pageProps} />
+        </main>
         {/* </LazyMotion> */}
       </ThemeProvider>
     </CacheProvider>

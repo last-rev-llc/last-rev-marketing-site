@@ -1,0 +1,26 @@
+diff --git a/node_modules/@last-rev/component-library/dist/components/Image/Image.esm.js b/node_modules/@last-rev/component-library/dist/components/Image/Image.esm.js
+index 85df936..9c67c68 100644
+--- a/node_modules/@last-rev/component-library/dist/components/Image/Image.esm.js
++++ b/node_modules/@last-rev/component-library/dist/components/Image/Image.esm.js
+@@ -1,7 +1,7 @@
+ import { __rest, __assign } from 'tslib';
+ import React__default from 'react';
+ import Head from 'next/head';
+-import NextImage from 'next/future/image';
++import NextImage from 'next/image';
+ import { ErrorBoundary } from '../ErrorBoundary/ErrorBoundary.esm.js';
+ import getImgSrcTag from '../../utils/getImgSrcTag.esm.js';
+ 
+diff --git a/node_modules/@last-rev/component-library/dist/components/Image/Image.js b/node_modules/@last-rev/component-library/dist/components/Image/Image.js
+index 68e5a62..f84c18d 100644
+--- a/node_modules/@last-rev/component-library/dist/components/Image/Image.js
++++ b/node_modules/@last-rev/component-library/dist/components/Image/Image.js
+@@ -3,7 +3,7 @@
+ var tslib = require('tslib');
+ var React = require('react');
+ var Head = require('next/head');
+-var NextImage = require('next/future/image');
++var NextImage = require('next/image');
+ var ErrorBoundary = require('../ErrorBoundary/ErrorBoundary.js');
+ var getImgSrcTag = require('../../utils/getImgSrcTag.js');
+ 

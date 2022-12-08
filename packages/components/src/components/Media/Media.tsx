@@ -1,11 +1,13 @@
 import React from 'react';
-import LRMedia, { MediaProps } from '@last-rev/component-library/dist/components/Media';
+import { MediaProps } from '@last-rev/component-library/dist/components/Media';
+import LRMedia from './LRMedia';
 import { styled } from '@mui/system';
 import sidekick from '@last-rev/contentful-sidekick-util';
 export type { MediaProps, MediaClassKey, MediaClasses } from '@last-rev/component-library/dist/components/Media';
 
 const isVideo = (src?: string) => src && /mp4|webm/.test(src);
 let lazyVideoObserver: IntersectionObserver | null = null;
+
 const Media = (props: MediaProps) => {
   if (isVideo(props?.file?.url)) {
     const ref = React.useRef<HTMLVideoElement>(null);
@@ -16,10 +18,9 @@ const Media = (props: MediaProps) => {
             lazyVideoObserver = new IntersectionObserver(function (entries, observer) {
               entries.forEach(function (video) {
                 if (video.isIntersecting) {
-                  console.log('Source', {});
                   for (var source in video?.target?.children) {
                     var videoSource = video?.target?.children[source as any] as HTMLSourceElement;
-                    console.log('Source', { videoSource });
+
                     if (
                       typeof videoSource.tagName === 'string' &&
                       videoSource.tagName === 'SOURCE' &&

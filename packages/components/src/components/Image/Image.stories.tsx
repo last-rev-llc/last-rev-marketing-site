@@ -1,10 +1,9 @@
 import React from 'react';
-import Box from '@mui/material/Box';
 import Image from './Image';
 import mockContent from './Image.mock';
 
 export default {
-  title: '1. LR Components / Image',
+  title: 'Components / Image',
   component: Image,
   argTypes: {
     alt: { name: 'Alt' },

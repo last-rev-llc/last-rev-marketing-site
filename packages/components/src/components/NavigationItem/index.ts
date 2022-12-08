@@ -1,2 +1,2 @@
 export { default } from './NavigationItem';
-export * from './NavigationItem';
+export type { NavigationItemProps, NavigationItemClassKey, NavigationItemClasses } from './NavigationItem.types';
