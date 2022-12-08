@@ -22,6 +22,9 @@ export const styleOverrides: ComponentsOverrides<Theme>['Hero'] = {
         }
       }
     }
+  },
+  mediaRoot: {
+    width: '100%'
   }
   //
   // Use the ownerState to set dynamic styles
