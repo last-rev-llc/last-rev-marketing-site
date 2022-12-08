@@ -1,55 +1,125 @@
 import React from 'react';
-import LRCollectionCarousel, {
-  CollectionCarouselProps
-} from '@last-rev/component-library/dist/components/CollectionCarousel';
-export type {
-  CollectionCarouselProps,
-  CollectionCarouselClassKey,
-  CollectionCarouselClasses
-} from '@last-rev/component-library/dist/components/CollectionCarousel';
-import { Box } from '@mui/system';
+import { Container, Box } from '@mui/material';
+import styled from '@mui/system/styled';
+import { Swiper, SwiperSlide } from 'swiper/react';
 
-import SwiperCore, { Autoplay } from 'swiper/core';
+import { Autoplay, A11y } from 'swiper';
 
-SwiperCore.use([Autoplay]);
+import ErrorBoundary from '../ErrorBoundary';
+import ContentModule from '../ContentModule';
+import sidekick from '@last-rev/contentful-sidekick-util';
+import { CollectionCarouselProps } from './CollectionCarousel.types';
 
-const CollectionCarousel = (props: CollectionCarouselProps) => {
+export const CollectionCarousel = ({
+  items,
+  variant,
+  itemsWidth,
+  itemsVariant,
+  sidekickLookup
+}: CollectionCarouselProps) => {
+  if (!items?.length) return null;
+  const itemsWithVariant = items.map((item: any) => ({ ...item, variant: itemsVariant ?? item?.variant }));
+
+  // const config = CarouselVariantProps[variant];
+
   return (
-    <Box py={[3, 2]}>
-      <LRCollectionCarousel
-        {...props}
-        CarouselVariantProps={{
-          carousel: {
-            loop: true,
-            slidesPerView: 'auto',
-            loopedSlides: props?.items?.length,
-            spaceBetween: 80,
-            pagination: false,
-            navigation: false,
-            speed: 10000,
-            autoplay: {
-              delay: 1,
-              disableOnInteraction: false
-            },
-            breakpoints: {
-              684: {
-                slidesPerView: 1
+    <ErrorBoundary>
+      <Root {...sidekick(sidekickLookup)} variant={variant} data-testid="CollectionCarousel">
+        <ContentContainer maxWidth={itemsWidth} disableGutters>
+          <CarouselContainer
+            modules={[Autoplay, A11y]}
+            {...{
+              loop: true,
+              slidesPerView: 'auto',
+              loopedSlides: items?.length,
+              spaceBetween: 80,
+              pagination: false,
+              navigation: false,
+              speed: 10000,
+              autoplay: {
+                delay: 1,
+                disableOnInteraction: false
               },
-              780: {
-                slidesPerView: 2
-              },
-              1024: {
-                slidesPerView: 3
-              },
-              1440: {
-                slidesPerView: 4
+              breakpoints: {
+                684: {
+                  slidesPerView: 1
+                },
+                780: {
+                  slidesPerView: 2
+                },
+                1024: {
+                  slidesPerView: 3
+                },
+                1440: {
+                  slidesPerView: 4
+                }
               }
-            }
-          }
-        }}
-      />
-    </Box>
+            }}>
+            {itemsWithVariant.map((item: any, idx: number) => (
+              <SwiperSlide key={idx}>
+                <CarouselItem>
+                  <ContentModule {...item} />
+                </CarouselItem>
+              </SwiperSlide>
+            ))}
+          </CarouselContainer>
+        </ContentContainer>
+      </Root>
+    </ErrorBoundary>
   );
 };
+
+const Root = styled(Box, {
+  name: 'CollectionCarousel',
+  slot: 'Root',
+  shouldForwardProp: (prop) => prop !== 'variant',
+  overridesResolver: (_, styles) => [styles.root]
+})<{ variant?: string }>(() => ({
+  display: 'flex',
+  justifyContent: 'center'
+}));
+
+const ContentContainer = styled(Container, {
+  name: 'CollectionCarousel',
+  slot: 'ContentContainer',
+  overridesResolver: (_, styles) => [styles.contentContainer]
+})<{ variant?: string }>(() => ({
+  // display: 'flex'
+}));
+
+const CarouselContainer = styled(Swiper, {
+  name: 'CollectionCarousel',
+  slot: 'CarouselContainer',
+  overridesResolver: (_, styles) => [styles.carouselContainer]
+})<{ variant?: string }>(({ theme }) => ({
+  'width': '100%',
+
+  'overflow': 'hidden',
+  '--swiper-theme-color': theme.palette.primary.main,
+  '& > .swiper-pagination-bullets span.swiper-pagination-bullet': {
+    margin: '0 10px'
+  },
+  '& .swiper-pagination-bullet': {
+    width: 10,
+    height: 10
+  },
+  '& .swiper-button-prev, .swiper-button-next': {
+    [theme.breakpoints.down('lg')]: {
+      display: 'none'
+    }
+  }
+}));
+
+const CarouselItem = styled(Box, {
+  name: 'CollectionCarousel',
+  slot: 'CarouselItem',
+  overridesResolver: (_, styles) => [styles.carouselItem]
+})<{ variant?: string }>(() => ({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  height: '100%',
+  width: '100%'
+}));
 
 export default CollectionCarousel;

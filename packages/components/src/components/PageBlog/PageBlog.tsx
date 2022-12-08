@@ -1,6 +1,6 @@
 import React from 'react';
 import Head from 'next/head';
-import xss from 'xss';
+
 import { Box, Container, Grid, Typography } from '@mui/material';
 import styled from '@mui/system/styled';
 // import EmailIcon from '@mui/icons-material/Email';
@@ -62,7 +62,7 @@ export const PageBlog = ({
     <ErrorBoundary>
       <Head>
         <meta name="content_type" content="blog" />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: `${xss(JSON.stringify(schemaData))}` }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }} />
       </Head>
       {header ? <ContentModule {...(header as any)} /> : null}
       <Root {...sidekick(sidekickLookup)} itemScope itemType="https://schema.org/Blog">
