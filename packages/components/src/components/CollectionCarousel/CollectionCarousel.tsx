@@ -9,9 +9,9 @@ export type {
 } from '@last-rev/component-library/dist/components/CollectionCarousel';
 import { Box } from '@mui/system';
 
-import SwiperCore, { Navigation, Pagination, Autoplay } from 'swiper/core';
+import SwiperCore, { Autoplay } from 'swiper/core';
 
-SwiperCore.use([Navigation, Pagination, Autoplay]);
+SwiperCore.use([Autoplay]);
 
 const CollectionCarousel = (props: CollectionCarouselProps) => {
   return (

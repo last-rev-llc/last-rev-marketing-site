@@ -1,17 +1,17 @@
 import React from 'react';
 import Head from 'next/head';
 import xss from 'xss';
-import { Box, Container, Grid, Typography, List, ListItem, ListItemText } from '@mui/material';
+import { Box, Container, Grid, Typography } from '@mui/material';
 import styled from '@mui/system/styled';
-import EmailIcon from '@mui/icons-material/Email';
-import TwitterIcon from '@mui/icons-material/Twitter';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+// import EmailIcon from '@mui/icons-material/Email';
+// import TwitterIcon from '@mui/icons-material/Twitter';
+// import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ErrorBoundary from '@last-rev/component-library/dist/components/ErrorBoundary';
 import Media, { MediaProps } from '@last-rev/component-library/dist/components/Media';
 import Text from '@last-rev/component-library/dist/components/Text';
-import Link, { LinkProps } from '@last-rev/component-library/dist/components/Link';
+import { LinkProps } from '@last-rev/component-library/dist/components/Link';
 import sidekick from '@last-rev/contentful-sidekick-util';
-import { ContentModule } from '@last-rev/component-library';
+import ContentModule from '@last-rev/component-library/dist/components/ContentModule';
 
 export interface BlogProps {
   __typename?: string;
