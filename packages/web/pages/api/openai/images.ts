@@ -1,4 +1,4 @@
-import { Configuration, OpenAIApi } from 'openai';
+import { Configuration, OpenAIApi, CreateImageRequest } from 'openai';
 
 import type { NextApiRequest, NextApiResponse } from 'next';
 
@@ -18,7 +18,9 @@ type Data = {
 // Initialize the OpenAIApi object with the necessary organization and API key
 const openai = initializeOpenAI();
 
-const defaultOptions = {
+
+const defaultOptions: CreateImageRequest = {
+    prompt: '',
     response_format: 'url',
     size: '512x512',
     n: 1
