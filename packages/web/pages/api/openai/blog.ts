@@ -43,7 +43,7 @@ const createBlogMarkdownPrompt = (text: string, headings: any) => {
 }
 
 const createBlogTagsPrompt = (text: string) => {
-    return `Provide 5 tags for a blog post topic on "${text}" using the best grammar and spelling you can. The tags should be seperated comma seperated.`;
+    return `Provide only 5 tags for a blog post topic on "${text}" using the best grammar and spelling you can. The tags should be seperated comma seperated.`;
 }
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
