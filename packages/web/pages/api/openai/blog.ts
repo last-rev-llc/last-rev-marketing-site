@@ -34,7 +34,7 @@ const createBlogTitlePrompt = (text: string) => {
 }
 
 const createBlogHeadersPrompt = (text: string) => {
-    return `Provide 5 headings for a blog post topic on "${text}" using the best grammar and spelling you can. The headings should be stored in a json object with the keys following the format "heading1", "heading2", etc.`
+    return `Provide 2 headings for a blog post topic on "${text}" using the best grammar and spelling you can. The headings should be stored in a json object with the keys following the format "heading1", "heading2", etc.`
 }
 
 const createBlogMarkdownPrompt = (text: string, headings: any) => {

@@ -6,7 +6,7 @@ import cors from '../../../src/cors';
 
 type Data = {
     prompt: string;
-    response: string;
+    response: any;
   };
   const initializeOpenAI = () => {
     const configuration = new Configuration({
@@ -50,7 +50,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
       // Get the error message and status code from the response
       const { message, status } = err.response;
 
-      res.status(200).json({ err } as any);
+      res.status(500).json({ prompt: prompt, response: { message, status  } } as any);
     }
   }
 };
