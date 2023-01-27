@@ -9,6 +9,7 @@ node_modules
 **/out
 .netlify
 *.code-workspace
+.DS_Store
 
 **/coverage
 
@@ -18,5 +19,7 @@ lerna-debug.log
 
 **/*sitemap.xml
 **/__generated/*.cy.js
+**/cypress/videos
+**/cypress/screenshots
 
 create-app.json

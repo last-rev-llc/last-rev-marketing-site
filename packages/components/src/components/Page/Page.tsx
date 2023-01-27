@@ -36,13 +36,19 @@ const Page = ({ header, hero, contents, footer, disableBackToTop, sidekickLookup
 
   const isBlogLanding = props.slug === '/blog';
   if (isBlogLanding) {
-    const collection = contents[0].contents
-      .find((item: any) => item.__typename === 'Collection')
-      .items.filter((card: any) => card.id !== hero?.id);
-
-    contents[0].contents.forEach((item: any, i: number) => {
-      if (item.__typename === 'Collection') contents[0].contents[i].items = collection;
-    });
+    // NOTE: contents is required
+    // @ts-ignore
+    const sections = contents[0]?.contents;
+    if (sections) {
+      const collection = sections
+        ?.find((item: any) => item?.__typename === 'Collection')
+        .items?.filter((card: any) => card?.id !== hero?.id);
+      if (collection) {
+        sections?.forEach((item: any, i: number) => {
+          if (item?.__typename === 'Collection') sections[i].items = collection;
+        });
+      }
+    }
   }
 
   return (
@@ -106,6 +112,7 @@ const Main = styled('main', {
       'transition': 'background-color 0.25s linear',
 
       '&:hover': {
+        // @ts-ignore
         backgroundColor: theme.palette.backgroundOption.light,
         transition: 'background-color 0.25s linear'
       },

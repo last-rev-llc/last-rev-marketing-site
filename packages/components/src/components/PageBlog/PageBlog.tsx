@@ -24,7 +24,7 @@ import sidekick from '@last-rev/contentful-sidekick-util';
 
 import Link from '../Link';
 
-export interface BlogProps {
+export interface PageBlogProps {
   __typename?: string;
   sidekickLookup?: any;
   seo?: any;
@@ -59,7 +59,7 @@ export const PageBlog = ({
   landingPageSummary,
   sidekickLookup,
   contents
-}: BlogProps) => {
+}: PageBlogProps) => {
   const schemaData = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
