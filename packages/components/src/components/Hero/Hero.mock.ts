@@ -43,7 +43,7 @@ export const heroMock = {
     file: {
       url: './MockImage.jpg'
     },
-    alt: 'Hero background'
+    title: 'Hero background'
   }
 };
 
@@ -55,7 +55,7 @@ export const featuredImageMock = {
     file: {
       url: 'https://images.ctfassets.net/imglmb3xms7o/1LJc7yiUjwgrHh9i52XnV7/266b378620624792e5c4b4d11e5ebf84/Asset_1.svg'
     },
-    alt: 'Featured image'
+    title: 'Featured image'
   }
 };
 

@@ -11,11 +11,14 @@ export default {
     slug: { name: 'Slug' },
     featuredMedia: { name: 'Featured Media' },
     author: { name: 'Author' },
+    landingPageSummary: { name: 'Landing Page Summary' },
     body: { name: 'Body' },
     quote: { name: 'Quote' },
     topics: { name: 'Topics' },
     tags: { name: 'Tags' },
-    __typename: { table: { disable: true } }
+    relatedLinks: { name: 'Related Links' },
+    __typename: { table: { disable: true } },
+    sidekickLookup: { table: { disable: true } }
   }
 };
 

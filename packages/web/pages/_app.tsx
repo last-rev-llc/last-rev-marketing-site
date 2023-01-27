@@ -67,9 +67,9 @@ function MyApp({ Component, emotionCache = clientSideEmotionCache, pageProps }: 
       <ThemeProvider theme={theme}>
         {/* <LazyMotion strict features={loadFeatures}> */}
         <CssBaseline />
-        <main className={openSans.className}>
+        <div className={openSans.className}>
           <Component {...pageProps} />
-        </main>
+        </div>
         {/* </LazyMotion> */}
       </ThemeProvider>
     </CacheProvider>

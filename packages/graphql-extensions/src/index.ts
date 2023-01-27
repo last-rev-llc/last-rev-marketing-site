@@ -11,7 +11,7 @@ import {
   Link,
   Media,
   NavigationItem,
-  Page,
+  // Page,
   RichText,
   Section as LRSection,
   Theme
@@ -20,6 +20,7 @@ import {
 import * as Quote from './Quote';
 import * as Footer from './Footer';
 import * as Section from './Section';
+import * as Page from './Page';
 import * as PageBlog from './PageBlog';
 
 // Uncomment if using Algolia, else delete the related file

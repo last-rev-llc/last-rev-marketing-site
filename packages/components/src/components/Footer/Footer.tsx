@@ -54,13 +54,14 @@ export const Footer = ({ logo, logoUrl, navigationItems, brandAndYear, sidekickL
               <List data-testid="Footer-Navigation">
                 {navigationItems?.map((collection) => (
                   <ListItem
+                    key={collection.id}
                     data-testid="Footer-Navigation-Item"
                     sx={{
                       '& .MuiGrid-container': {
                         flexDirection: 'row'
                       }
                     }}>
-                    <ContentModule {...collection} key={collection.id} />
+                    <ContentModule {...collection} />
                   </ListItem>
                 ))}
               </List>
