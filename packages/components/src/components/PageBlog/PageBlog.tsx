@@ -225,20 +225,20 @@ export const PageBlog = ({
                         padding: '0'
                       }}>
                       <li>
-                        <a
+                        <Link
                           href={`mailto:?subject=Check out this article&body=Check out this article:+${title}+${schemaData.url}`}
                           target="_blank"
                           rel="noopener noreferrer">
                           <EmailIcon sx={{ marginRight: 2, fontSize: '2.5rem' }} />
-                        </a>
+                        </Link>
                       </li>
                       <li>
-                        <a
+                        <Link
                           href={`https://twitter.com/share?url=${schemaData.url}&text=Check this article:+${title}`}
                           target="_blank"
                           rel="noopener noreferrer">
                           <TwitterIcon sx={{ fontSize: '2.5rem' }} />
-                        </a>
+                        </Link>
                       </li>
                     </ul>
                   </ListItem>
@@ -343,29 +343,6 @@ const Root = styled(Box, {
     paddingTop: theme.spacing(4)
   }
 }));
-
-// const BlogHeader = styled(Box, {
-//   name: 'PageBlog',
-//   slot: 'BlogHeader'
-// })<{ variant?: string }>(({ theme }) => ({
-//   'display': 'flex',
-//   'flexDirection': 'column-reverse',
-//   'justifyContent': 'center',
-//   'padding': theme.spacing(3, 1),
-//   'background': 'black',
-//   'textAlign': 'center',
-//   [theme.breakpoints.up('sm')]: {
-//     padding: theme.spacing(8, 2)
-//   },
-//   [theme.breakpoints.up('xl')]: {
-//     flexDirection: 'row-reverse'
-//   },
-//   '& .MuiTypography-root': {
-//     color: 'white',
-//     // TODO: adjust h3 font size
-//     fontSize: '1.6rem'
-//   }
-// }));
 
 const ContentContainer = styled(Container, {
   name: 'PageBlog',

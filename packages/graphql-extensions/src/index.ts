@@ -11,7 +11,6 @@ import {
   Link,
   Media,
   NavigationItem,
-  // Page,
   RichText,
   Section as LRSection,
   Theme

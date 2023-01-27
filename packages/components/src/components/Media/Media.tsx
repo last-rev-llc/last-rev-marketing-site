@@ -38,7 +38,6 @@ const Media = (props: MediaProps) => {
               });
             });
           }
-          // console.log('OBserve', ref?.current);
 
           lazyVideoObserver.observe(ref?.current);
         }
