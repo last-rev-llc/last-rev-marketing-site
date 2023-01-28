@@ -20,20 +20,47 @@ export const typeDefs = gql`
   }
 `;
 
+/**
+ * This function:
+ * - Converts the body object into a string
+ * - Removes headlines, lists, etc
+ * - Trims string to last punctuation
+ * - Ellipsis if longer and ends with space
+ */
 const formatBodyText = (body: any, length: number) => {
+  const punctuation = ['.', '!', '?'];
   let bodyText: any = body?.content
-    .map((item: any) => item.content[0].value)
+    .map((item: any, idx: number) => {
+      if (!item.nodeType.includes('paragraph')) {
+        delete item.content[0];
+        return undefined;
+      }
+      const str = item.content[0].value;
+      const hasPunc = str && punctuation.includes(str.charAt(str.length - 1));
+      if (!hasPunc && idx !== 0) return undefined;
+      return str;
+    })
     .join(' ')
     .toString()
     .substring(0, length);
 
-  // TODO:
-  // Check other punctuation (?!)
-  const dot = bodyText?.substr(0, bodyText.lastIndexOf('.'));
-  const space = bodyText?.substr(0, bodyText.lastIndexOf(' '));
+  const truncateText = (body: any) => {
+    if (bodyText.length > 50 && bodyText.at(-1) === ' ') {
+      const space = bodyText?.substr(0, bodyText.lastIndexOf(' '));
+      bodyText = bodyText.length > 50 ? `${space}...` : bodyText;
+      return bodyText;
+    }
+    let lastIndex = -1;
+    punctuation.forEach((punctuation) => {
+      const index = body.lastIndexOf(punctuation);
+      if (index > lastIndex) {
+        lastIndex = index;
+      }
+    });
+    return lastIndex > -1 ? bodyText.substr(0, lastIndex + 1) : bodyText;
+  };
 
-  bodyText = dot ? `${dot}.` : bodyText;
-  bodyText = !dot && bodyText.length > 50 ? `${space}...` : bodyText;
+  bodyText = truncateText(bodyText).trim();
   return bodyText;
 };
 
@@ -66,7 +93,8 @@ export const mappers: any = {
           color: 'white'
         });
         return [link];
-      }
+      },
+      internalTitle: () => null
     },
     PageBlog: {
       header: Page.mappers.Page.Page.header,
@@ -85,7 +113,10 @@ export const mappers: any = {
         if (summary) {
           body = createRichText(summary);
         } else {
-          body = createRichText(formatBodyText(body, 200));
+          // Trim body a bit for long card titles
+          const title: any = getLocalizedField(blog.fields, 'title', ctx);
+          const bodyChars = title.length < 140 ? 250 : 180;
+          body = createRichText(formatBodyText(body, bodyChars));
         }
         return body;
       },

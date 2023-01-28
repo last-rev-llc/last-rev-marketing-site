@@ -35,6 +35,9 @@ const Page = ({ header, hero, contents, footer, disableBackToTop, sidekickLookup
   };
 
   const isBlogLanding = props.slug === '/blog';
+  /**
+   * Filter out hero from card list
+   */
   if (isBlogLanding) {
     // NOTE: contents is required
     // @ts-ignore
