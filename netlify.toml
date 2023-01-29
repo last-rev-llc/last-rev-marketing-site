@@ -26,7 +26,7 @@
 #    configFile = "packages/web/cypress.netlify.json"
 
 [headers.values]
-  Content-Security-Policy = "default-src 'self' *.sentry.io *.netlify.app; style-src 'self' 'unsafe-inline' *.sentry.io; script-src 'unsafe-eval' 'self' 'unsafe-inline' *.sentry.io *.netlify.app; font-src 'self' *.sentry.io fonts.gstatic.com *.fontawesome.com data:; worker-src data: 'self' blob:; img-src * data:; media-src * data:; object-src 'none'"
+  Content-Security-Policy = "default-src 'self' *.sentry.io app.netlify.com *.netlify.app; style-src 'self' 'unsafe-inline' *.sentry.io; script-src 'unsafe-eval' 'self' 'unsafe-inline' *.sentry.io app.netlify.com *.netlify.app; font-src 'self' *.sentry.io fonts.gstatic.com *.fontawesome.com data:; worker-src data: 'self' blob:; img-src * data:; media-src * data:; object-src 'none'"
   Referrer-Policy = "strict-origin-when-cross-origin"
   Strict-Transport-Security = "max-age=15768000; includeSubdomains"
   X-Content-Type-Options = "nosniff"
