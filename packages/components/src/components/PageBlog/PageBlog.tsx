@@ -66,7 +66,7 @@ export const PageBlog = ({
     'headline': `${title}`,
     'image': featuredMedia ? `${featuredMedia[0]?.file?.url}` : null,
     'keywords': `${tags}`,
-    'url': `https://www.lastrev.com/blogs/${slug}`,
+    'url': `https://www.lastrev.com/blog/${slug}`,
     'author': {
       '@type': 'Person',
       'name': `${author || 'LastRev'}`
@@ -293,7 +293,7 @@ export const PageBlog = ({
                           <li
                             key={tag}
                             style={{ whiteSpace: 'nowrap', marginRight: i !== tags.length - 1 ? 5 : undefined }}>
-                            <Link text={tag} href={`/blogs?tags=${kebabCase(tag.toLowerCase())}`} />
+                            <Link text={tag} href={`/blog?tags=${kebabCase(tag.toLowerCase())}`} />
                             {i !== tags.length - 1 ? ', ' : ''}
                           </li>
                         ))}

@@ -24,12 +24,3 @@
 #    record = true
 #    start = "yarn percy exec:start"
 #    configFile = "packages/web/cypress.netlify.json"
-
-[headers.values]
-  Content-Security-Policy = "default-src 'self' *.sentry.io *.netlify.app; style-src 'self' 'unsafe-inline' *.sentry.io *.netlify.app; script-src 'unsafe-eval' 'self' 'unsafe-inline' *.sentry.io *.netlify.app netlify-cdp-loader.netlify.app; font-src 'self' *.sentry.io fonts.gstatic.com data: *.fontawesome.com; worker-src data: 'self' blob:; img-src * data:; media-src * data:; object-src 'none'"
-  Referrer-Policy = "strict-origin-when-cross-origin"
-  Strict-Transport-Security = "max-age=15768000; includeSubdomains"
-  X-Content-Type-Options = "nosniff"
-  X-Frame-Options = "SAMEORIGIN"
-  X-XSS-Protection = "1; mode=block"
-  Permissions-Policy = "camera=(), microphone=(), geolocation=()"
