@@ -133,7 +133,7 @@ export const mappers: any = {
   }
 };
 
-const blog: ContentfulPathsGenerator = async (blogItem, _loaders, defaultLocale, _locales, _preview) => {
+const pageBlog: ContentfulPathsGenerator = async (blogItem, _loaders, defaultLocale, _locales, _preview) => {
   const slug = getDefaultFieldValue(blogItem, 'slug', defaultLocale);
   const blogLandingSlug = 'blog';
   const fullPath = createPath(blogLandingSlug, slug);
@@ -148,5 +148,5 @@ const blog: ContentfulPathsGenerator = async (blogItem, _loaders, defaultLocale,
 };
 
 export const pathsConfigs = {
-  PageBlog: blog
+  pageBlog
 };
