@@ -1,19 +1,30 @@
 import React from 'react';
 import Head from 'next/head';
-
-import { Box, Container, Grid, Typography } from '@mui/material';
 import styled from '@mui/system/styled';
-// import EmailIcon from '@mui/icons-material/Email';
-// import TwitterIcon from '@mui/icons-material/Twitter';
+import { kebabCase } from 'lodash';
+import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import Container from '@mui/material/Container';
+import TextField from '@mui/material/TextField';
+import InputLabel from '@mui/material/InputLabel';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import EmailIcon from '@mui/icons-material/Email';
+import TwitterIcon from '@mui/icons-material/Twitter';
 // import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ErrorBoundary from '@last-rev/component-library/dist/components/ErrorBoundary';
-import { MediaProps } from '@last-rev/component-library/dist/components/Media';
+import ContentModule from '@last-rev/component-library/dist/components/ContentModule';
 import Text from '@last-rev/component-library/dist/components/Text';
+import { MediaProps } from '@last-rev/component-library/dist/components/Media';
 import { LinkProps } from '@last-rev/component-library/dist/components/Link';
 import sidekick from '@last-rev/contentful-sidekick-util';
-import ContentModule from '@last-rev/component-library/dist/components/ContentModule';
 
-export interface BlogProps {
+import Link from '../Link';
+
+export interface PageBlogProps {
   __typename?: string;
   sidekickLookup?: any;
   title?: string;
@@ -23,19 +34,20 @@ export interface BlogProps {
   author?: any;
   body?: any;
   quote?: string;
-  tags?: any;
+  tags?: Array<string>;
   relatedLinks?: LinkProps[];
   contents?: any;
   header: any;
   footer: any;
+  landingPageSummary?: string;
 }
 
 export const PageBlog = ({
   header,
   footer,
+  slug,
   title,
   creationDate,
-  slug,
   featuredMedia,
   author,
   body,
@@ -44,17 +56,17 @@ export const PageBlog = ({
   relatedLinks,
   sidekickLookup,
   contents
-}: BlogProps) => {
+}: PageBlogProps) => {
   const schemaData = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
     'headline': `${title}`,
     'image': featuredMedia ? `${featuredMedia[0]?.file?.url}` : null,
     'keywords': `${tags}`,
-    'url': `https://www.lastrev.com/blogs/${slug}`,
+    'url': `https://www.lastrev.com/blog/${slug}`,
     'author': {
       '@type': 'Person',
-      'name': `${author}`
+      'name': `${author || 'LastRev'}`
     }
   };
 
@@ -62,6 +74,7 @@ export const PageBlog = ({
     <ErrorBoundary>
       <Head>
         <meta name="content_type" content="blog" />
+        <link rel="shortcut icon" href="/images/favicon.ico" />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }} />
       </Head>
       {header ? <ContentModule {...(header as any)} /> : null}
@@ -80,7 +93,7 @@ export const PageBlog = ({
               ) : null}
               {creationDate ? (
                 <Typography
-                  variant="h5"
+                  variant="body1"
                   component="p"
                   sx={{ color: 'black', paddingTop: 1 }}
                   {...sidekick(sidekickLookup?.creationDate)}>
@@ -98,14 +111,23 @@ export const PageBlog = ({
                 </MediaWrap>
               ) : null}
               {body ? <Text variant="blog" sidekickLookup={sidekickLookup?.body} body={body} /> : null}
-              <ContentsWrapper sx={{ py: 3 }}>
-                {contents?.map((content: any) => (
-                  <ContentModule key={content?.id} {...content} />
-                ))}
-              </ContentsWrapper>
+              {contents ? (
+                <ContentsWrapper sx={{ py: 3 }}>
+                  {contents?.map((content: any) => (
+                    <ContentModule key={content?.id} {...content} />
+                  ))}
+                </ContentsWrapper>
+              ) : null}
             </Grid>
 
-            {/* <Grid component="aside" item xs={12} sm={3} sx={{}}>
+            <Grid
+              component="aside"
+              item
+              xs={12}
+              sm={3}
+              sx={{}}
+              // NOTE: Hidden for now per request
+              display="none">
               {quote ? (
                 <Box
                   component="blockquote"
@@ -236,7 +258,7 @@ export const PageBlog = ({
                               display: 'flex',
                               marginBottom: i !== relatedLinks.length - 1 ? 16 : undefined
                             }}>
-                            <Link {...(link as any)} />
+                            <Link {...(link as any)} variant="text" />
                           </li>
                         ))}
                       </ul>
@@ -264,16 +286,37 @@ export const PageBlog = ({
                           <li
                             key={tag}
                             style={{ whiteSpace: 'nowrap', marginRight: i !== tags.length - 1 ? 5 : undefined }}>
-                            <Link text={tag} href={`/blogs?tags=${tag}`} />
+                            <Link text={tag} href={`/blog?tags=${kebabCase(tag.toLowerCase())}`} />
                             {i !== tags.length - 1 ? ', ' : ''}
                           </li>
                         ))}
                       </ul>
                     </ListItem>
                   ) : null}
+                  <Box my={4}>
+                    <form name="email-subscribe" method="POST" data-netlify="true">
+                      <InputLabel htmlFor="email-input" sx={{ py: 1 }}>
+                        <TextField
+                          id="email-input"
+                          label="Email"
+                          type="email"
+                          name="email"
+                          autoComplete="email"
+                          sx={{
+                            '&::placeholder': {
+                              color: 'red'
+                            }
+                          }}
+                        />
+                      </InputLabel>
+                      <Button type="submit" variant="contained" disableElevation size="small">
+                        Send
+                      </Button>
+                    </form>
+                  </Box>
                 </List>
               </Box>
-            </Grid> */}
+            </Grid>
           </Grid>
         </ContentContainer>
       </Root>
@@ -283,38 +326,19 @@ export const PageBlog = ({
 };
 
 const Root = styled(Box, {
-  name: 'Blog',
+  name: 'PageBlog',
   slot: 'Root',
   overridesResolver: (_, styles) => [styles.root]
-})<{ variant?: string }>(() => ({
-  display: 'block'
-}));
-
-const BlogHeader = styled(Box, {
-  name: 'Section',
-  slot: 'BlogHeader'
 })<{ variant?: string }>(({ theme }) => ({
-  'display': 'flex',
-  'flexDirection': 'column-reverse',
-  'justifyContent': 'center',
-  'padding': theme.spacing(3, 1),
-  'background': 'black',
-  'textAlign': 'center',
-  [theme.breakpoints.up('sm')]: {
-    padding: theme.spacing(8, 2)
-  },
-  [theme.breakpoints.up('xl')]: {
-    flexDirection: 'row-reverse'
-  },
-  '& .MuiTypography-root': {
-    color: 'white',
-    // TODO: adjust h3 font size
-    fontSize: '1.6rem'
+  display: 'block',
+
+  [theme.breakpoints.down('lg')]: {
+    paddingTop: theme.spacing(4)
   }
 }));
 
 const ContentContainer = styled(Container, {
-  name: 'Section',
+  name: 'PageBlog',
   slot: 'ContentContainer',
   overridesResolver: (_, styles) => [styles.contentContainer]
 })<{ variant?: string }>(({ theme }) => ({
@@ -327,7 +351,7 @@ const ContentContainer = styled(Container, {
 }));
 
 const MediaWrap = styled(Box, {
-  name: 'Wrap',
+  name: 'PageBlog',
   slot: 'MediaWrap'
 })<{ variant?: string }>(({ theme }) => ({
   'paddingTop': theme.spacing(4),
@@ -354,7 +378,7 @@ const MediaWrap = styled(Box, {
 }));
 
 const ContentsWrapper = styled(Box, {
-  name: 'Blog',
+  name: 'PageBlog',
   slot: 'ContentsWrapper',
   overridesResolver: (_, styles) => [styles.contentsWrapper]
 })<{ variant?: string }>(() => ({}));

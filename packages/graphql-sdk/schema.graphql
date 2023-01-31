@@ -111,8 +111,6 @@ type Blog implements Content {
   animation: JSON
   variant: String
   placeholder: String
-  header: Header
-  footer: Content
 }
 type Card implements Content {
   sidekickLookup: JSON
@@ -309,10 +307,6 @@ type CategoryBlog implements Content {
   lr__path__: String
   title: String
   seo: JSON
-  header: Header
-  footer: Content
-  contents: [Content]
-  hero: Hero
 }
 type Page implements Content {
   sidekickLookup: JSON
@@ -326,7 +320,7 @@ type Page implements Content {
   colorScheme: String
   disableBackToTop: Boolean
   header: Header
-  footer: Content
+  footer: Footer
   hero: Hero
   contents: [Content]
 }
@@ -339,6 +333,7 @@ type PageBlog implements Content {
   lr__path__: String
   internalTitle: String
   title: String
+  landingPageSummary: String
   creationDate: String
   author: String
   body: RichText

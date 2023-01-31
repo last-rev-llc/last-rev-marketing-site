@@ -1,24 +1,27 @@
 import React from 'react';
-import Blog from './PageBlog';
+import PageBlog from './PageBlog';
 import mockContent from './PageBlog.mock';
 
 export default {
-  title: 'Modules / Blog',
-  component: Blog,
+  title: 'Modules / PageBlog',
+  component: PageBlog,
   decorators: [(storyFn: () => boolean | React.ReactChild | React.ReactFragment | React.ReactPortal) => storyFn()],
   argTypes: {
     title: { name: 'Title' },
     slug: { name: 'Slug' },
     featuredMedia: { name: 'Featured Media' },
     author: { name: 'Author' },
+    createdDate: { name: 'Created Date' },
+    landingPageSummary: { name: 'Landing Page Summary' },
     body: { name: 'Body' },
     quote: { name: 'Quote' },
-    topics: { name: 'Topics' },
     tags: { name: 'Tags' },
-    __typename: { table: { disable: true } }
+    relatedLinks: { name: 'Related Links' },
+    __typename: { table: { disable: true } },
+    sidekickLookup: { table: { disable: true } }
   }
 };
 
-const Template = (args: JSX.IntrinsicAttributes) => <Blog {...args} />;
+const Template = (args: JSX.IntrinsicAttributes) => <PageBlog {...args} />;
 export const Default = Template.bind({});
 Default.args = { ...mockContent };

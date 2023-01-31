@@ -12,6 +12,7 @@ fragment PageBlog_BaseFragment on PageBlog {
   author
   #quote
   tags
+  landingPageSummary
   creationDate
   featuredMedia {
     ...Media_BaseFragment

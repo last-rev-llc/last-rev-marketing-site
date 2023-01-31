@@ -1,17 +1,26 @@
 import { lorem, name } from 'faker';
+import { PageBlogProps } from './PageBlog';
 
-export default {
-  __typename: 'Blog',
+export default (): PageBlogProps => ({
+  __typename: 'PageBlog',
+  header: {},
+  footer: {},
   title: lorem.sentence(),
   slug: lorem.word(),
-  featuredMedia: {
-    __typename: 'Media',
-    file: {
-      url: 'https://images.ctfassets.net/m1b67l45sk9z/44WyHNg5cSOdPyTkVZoIOF/c8463ffc7e1482c5e740a342234983a6/Blog-image-detail.jpg'
-    },
-    alt: 'Girl deciding what to do',
-  },
+  creationDate: '11/16/2022',
+  featuredMedia: [
+    {
+      id: '1582221879',
+      __typename: 'Media',
+      variant: 'image',
+      file: {
+        url: 'https://images.ctfassets.net/imglmb3xms7o/4R9tkVBEpEC2saknYD4ABd/49016df2f72d21991d760180e140f8d2/1000_F_297109823_5QTgSppLWNTYy0FOSe6AeRMicFwHFpbB.jpg'
+      },
+      title: 'Featured image'
+    }
+  ],
   author: name.findName(),
+  landingPageSummary: lorem.paragraph(),
   body: {
     __typename: 'Text',
     json: {
@@ -45,34 +54,20 @@ export default {
       ]
     }
   },
-  quote: lorem.sentence(),
-  topics: [
-    {
-      title: 'Mental Health',
-      slug: 'mental-health'
-    },
-    {
-      title: 'Depression',
-      slug: 'depression'
-    },
-    {
-      title: 'Happiness',
-      slug: 'be-happy'
-    },
-  ],
+  quote: undefined,
   tags: ['Tag One', 'Tag Two', 'Tag Three'],
   relatedLinks: [
     {
       __typename: 'Link',
       variant: 'text',
       href: lorem.word(),
-      text: lorem.sentence(),
+      text: lorem.sentence()
     },
     {
       __typename: 'Link',
       variant: 'text',
       href: lorem.word(),
-      text: lorem.sentence(),
-    },
+      text: lorem.sentence()
+    }
   ]
-};
+});

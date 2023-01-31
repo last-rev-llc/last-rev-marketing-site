@@ -53,6 +53,7 @@ const createVariants = (_theme: Theme): ComponentsVariants['Text'] => [
     props: { variant: 'blog' },
     style: {
       'ol, ul, li': { padding: 'revert' },
+      'h1': { paddingTop: 16, paddingBottom: 16 },
       'h2': { paddingTop: 16, paddingBottom: 16 },
       'p': { paddingBottom: 16 }
     }
