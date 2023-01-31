@@ -134,7 +134,14 @@ export const PageBlog = ({
               ) : null}
             </Grid>
 
-            <Grid component="aside" item xs={12} sm={3} sx={{}}>
+            <Grid
+              component="aside"
+              item
+              xs={12}
+              sm={3}
+              sx={{}}
+              // NOTE: Hidden for now per request
+              display="none">
               {quote ? (
                 <Box
                   component="blockquote"
