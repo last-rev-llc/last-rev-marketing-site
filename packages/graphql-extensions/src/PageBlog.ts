@@ -114,6 +114,7 @@ export const mappers: any = {
         const seoKeywords = seo?.keywords?.value ? `${seo?.keywords?.value}, ${tags}` : tags;
 
         return {
+          ...seo,
           title: {
             name: 'title',
             value: seoTitle ?? 'Last Rev Blog'

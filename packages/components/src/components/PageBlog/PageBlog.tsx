@@ -23,12 +23,10 @@ import { LinkProps } from '@last-rev/component-library/dist/components/Link';
 import sidekick from '@last-rev/contentful-sidekick-util';
 
 import Link from '../Link';
-import SEO from '../SEO';
 
 export interface PageBlogProps {
   __typename?: string;
   sidekickLookup?: any;
-  seo?: any;
   title?: string;
   creationDate?: string;
   slug?: string;
@@ -47,7 +45,6 @@ export interface PageBlogProps {
 export const PageBlog = ({
   header,
   footer,
-  seo,
   slug,
   title,
   creationDate,
@@ -57,7 +54,6 @@ export const PageBlog = ({
   quote,
   tags,
   relatedLinks,
-  landingPageSummary,
   sidekickLookup,
   contents
 }: PageBlogProps) => {
@@ -77,7 +73,6 @@ export const PageBlog = ({
   return (
     <ErrorBoundary>
       <Head>
-        {!seo ? <SEO {...seo} /> : null}
         <meta name="content_type" content="blog" />
         <link rel="shortcut icon" href="/images/favicon.ico" />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }} />
