@@ -23,6 +23,7 @@ import { LinkProps } from '@last-rev/component-library/dist/components/Link';
 import sidekick from '@last-rev/contentful-sidekick-util';
 
 import Link from '../Link';
+import SEO from '../SEO';
 
 export interface PageBlogProps {
   __typename?: string;
@@ -76,17 +77,7 @@ export const PageBlog = ({
   return (
     <ErrorBoundary>
       <Head>
-        {!seo ? (
-          <>
-            <title>{title ?? 'Last Rev Blog'}</title>
-            <meta name="title" content={title ?? 'Last Rev Blog'} />
-            {(body || landingPageSummary) && (
-              <meta name="description" content={landingPageSummary || body.json.content[0].content[0].value} />
-            )}
-            {tags && <meta name="keywords" content={tags.join(',')} />}
-            <meta name="canonical" content={`https//lastrev.com/blog/${slug}`} />
-          </>
-        ) : null}
+        {!seo ? <SEO {...seo} /> : null}
         <meta name="content_type" content="blog" />
         <link rel="shortcut icon" href="/images/favicon.ico" />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }} />

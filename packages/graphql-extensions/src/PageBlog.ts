@@ -98,7 +98,45 @@ export const mappers: any = {
     },
     PageBlog: {
       header: Page.mappers.Page.Page.header,
-      footer: Page.mappers.Page.Page.footer
+      footer: Page.mappers.Page.Page.footer,
+      seo: async (blog: any, _args: any, ctx: ApolloContext) => {
+        const seo: any = getLocalizedField(blog.fields, 'seo', ctx);
+        const title: any = getLocalizedField(blog.fields, 'title', ctx);
+        const summary: any = getLocalizedField(blog.fields, 'landingPageSummary', ctx);
+
+        const body: any = getLocalizedField(blog.fields, 'body', ctx);
+
+        const tags: any = getLocalizedField(blog.fields, 'tags', ctx);
+
+        const seoTitle = seo?.title?.value && seo?.title?.value?.trim() !== '' ? seo?.title?.value : title;
+        const seoDescription =
+          seo?.description && seo?.description?.value?.trim() !== '' ? seo?.description?.value : summary;
+        const seoKeywords = seo?.keywords?.value ? `${seo?.keywords?.value}, ${tags}` : tags;
+
+        return {
+          title: {
+            name: 'title',
+            value: seoTitle ?? 'Last Rev Blog'
+          },
+          description: {
+            name: 'description',
+            value:
+              seoDescription ??
+              body.content[0].content[0].value ??
+              'Thought leadership on technology, content management and engineering'
+          },
+          keywords: {
+            name: 'keywords',
+            value: seoKeywords ?? 'Technology, Content Management, Engineering'
+          },
+          canonical: {
+            name: 'canonical',
+            value:
+              seo?.canonical?.value ??
+              `${'https//lastrev.com'}${createPath('blog', getLocalizedField(blog.fields, 'slug', ctx))}`
+          }
+        };
+      }
     },
     Card: {
       media: async (blog: any, _args: any, ctx: ApolloContext) => {

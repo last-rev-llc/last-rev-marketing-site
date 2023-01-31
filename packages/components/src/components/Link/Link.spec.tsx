@@ -62,7 +62,6 @@ describe('Link', () => {
       it('renders a basic link when variant is link', () => {
         mount(<Link {...mockedContent} variant="link" />);
         cy.get('a').should('exist').and('have.attr', 'href', mockedContent.href).and('have.text', mockedContent.text);
-        // cy.percySnapshot();
       });
 
       it('renders a basic link when variant is not provided', () => {
@@ -76,19 +75,16 @@ describe('Link', () => {
           .should('exist')
           .and('have.class', 'MuiButton-contained')
           .and('have.text', mockedContent.text);
-        // cy.percySnapshot();
       });
 
       it('renders an outlined button when variant is button-outlined', () => {
         mount(<Link {...mockedContent} variant="button-outlined" />);
         cy.get('a button').should('exist').and('have.class', 'MuiButton-outlined').and('have.text', mockedContent.text);
-        // cy.percySnapshot();
       });
 
       it('renders text as a button when variant is button-text', () => {
         mount(<Link {...mockedContent} variant="button-text" />);
         cy.get('a button').should('exist').and('have.class', 'MuiButton-text').and('have.text', mockedContent.text);
-        // cy.percySnapshot();
       });
     });
 
@@ -113,7 +109,6 @@ describe('Link', () => {
       it('renders a link without an icon if one is not provided', () => {
         mount(<Link {...mockedContent} icon={undefined} />);
         cy.get('.MuiIcon-root').should('not.exist');
-        // cy.percySnapshot();
       });
 
       it('renders a link with an icon on the right if iconPosition is Right', () => {
@@ -124,7 +119,6 @@ describe('Link', () => {
       it('renders a link with an icon on the left if iconPosition is Left', () => {
         mount(<Link {...mockedContent} iconPosition="Left" />);
         cy.get('.MuiButton-startIcon').should('exist');
-        // cy.percySnapshot();
       });
     });
 
@@ -132,19 +126,16 @@ describe('Link', () => {
       it('renders a small button when size is small', () => {
         mount(<Link {...mockedContent} size="small" />);
         cy.get('a button').should('have.class', 'MuiButton-sizeSmall');
-        // cy.percySnapshot();
       });
 
       it('renders a medium button when size is medium', () => {
         mount(<Link {...mockedContent} size="medium" />);
         cy.get('a button').should('have.class', 'MuiButton-sizeMedium');
-        // cy.percySnapshot();
       });
 
       it('renders a large button when size is large', () => {
         mount(<Link {...mockedContent} size="large" />);
         cy.get('a button').should('have.class', 'MuiButton-sizeLarge');
-        // cy.percySnapshot();
       });
     });
 
