@@ -40,6 +40,7 @@ export interface PageBlogProps {
   header: any;
   footer: any;
   landingPageSummary?: string;
+  seo: any;
 }
 
 export const PageBlog = ({
@@ -55,19 +56,28 @@ export const PageBlog = ({
   tags,
   relatedLinks,
   sidekickLookup,
-  contents
+  contents,
+  seo
 }: PageBlogProps) => {
+  // Transforms date to expected format for schema
+  // -> Ex. from 02/12/2023 to 2023-12-02
+  const regex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+  const dateCreated = creationDate && regex.test(creationDate) ? creationDate.replace(regex, '$3-$2-$1') : creationDate;
+
   const schemaData = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
-    'headline': `${title}`,
-    'image': featuredMedia ? `${featuredMedia[0]?.file?.url}` : null,
-    'keywords': `${tags}`,
+    'headline': title,
+    'image': featuredMedia
+      ? featuredMedia[0]?.file?.url
+      : 'https://images.ctfassets.net/imglmb3xms7o/1VUPTATYD3ZMlFk4KQDJxl/12006d2bc2c51df42430a4765aff7042/Lastrev_logotype_trimmed.svg',
+    'keywords': `${seo?.keywords.value ?? tags ?? 'Technology'}`,
     'url': `https://www.lastrev.com/blog/${slug}`,
     'author': {
       '@type': 'Person',
-      'name': `${author || 'LastRev'}`
-    }
+      'name': author ?? 'LastRev'
+    },
+    'dateCreated': dateCreated
   };
 
   return (
