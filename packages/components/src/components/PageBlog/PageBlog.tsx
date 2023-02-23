@@ -263,6 +263,39 @@ export const PageBlog = ({
                             <Link {...(link as any)} variant="text" />
                           </li>
                         ))}
+                        {/* remove this later */}
+                        {topics ? (
+                          <ListItem>
+                            <ListItemText
+                              primary="Topics"
+                              primaryTypographyProps={{
+                                fontWeight: 'bold',
+                                variant: 'h3',
+                                color: 'white'
+                              }}
+                            />
+                            <ul
+                              style={{
+                                listStyle: 'none',
+                                display: 'flex',
+                                flexWrap: 'wrap',
+                                padding: '0'
+                              }}
+                              {...sidekick(sidekickLookup?.topics)}>
+                              {topics.map((topic: Topic, i: React.Key | null | undefined) => (
+                                <li
+                                  key={i}
+                                  style={{
+                                    whiteSpace: 'nowrap',
+                                    marginRight: i !== topics.length - 1 ? 5 : undefined
+                                  }}>
+                                  <Link href={`/blogs/${topic?.slug}`}>{topic?.title}</Link>
+                                  {i !== topics.length - 1 ? ', ' : ''}
+                                </li>
+                              ))}
+                            </ul>
+                          </ListItem>
+                        ) : null}
                       </ul>
                     </ListItem>
                   ) : null}
