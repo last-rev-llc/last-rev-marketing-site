@@ -36,8 +36,12 @@ fragment CollectionItems_OptionsFragment on CollectionOptions {
   # Collection options that get exposed to the UI
   # These are the same as the options in the Collection extension
   # i.e
-  # topics {
-  #   label
-  #   value
-  # }
+  topics {
+    label
+    value
+  }
+  tags {
+    label
+    value
+  }
 }

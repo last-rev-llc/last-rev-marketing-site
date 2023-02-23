@@ -10,8 +10,10 @@ const preview = !!process.env.CONTENTFUL_USE_PREVIEW;
 
 const withFetchItems = (Wrapped: any) => (props: any) => {
   const fetchItems = async ({ filter, limit, offset }: { filter: any; limit?: number; offset?: number }) => {
+    console.log({ filter, limit, offset });
     const client = await import('@last-rev-marketing-site/utils').then((module) => module.client);
     const { data } = await client.CollectionItems({ id: props.id, limit, offset, filter, preview });
+    console.log({ data });
     if (data?.content?.__typename == 'Collection') {
       const items = data?.content?.itemsConnection?.items;
       const options = data?.content?.itemsConnection?.pageInfo?.options;
@@ -20,7 +22,12 @@ const withFetchItems = (Wrapped: any) => (props: any) => {
     }
     return null;
   };
-  return <Wrapped fetchItems={fetchItems} loadMoreText={'VIEW MORE POSTS'} {...props} />;
+  return (
+    <div>
+      <p> hola</p>
+      <Wrapped fetchItems={fetchItems} loadMoreText={'VIEW MORE POSTS'} {...props} />
+    </div>
+  );
 };
 
 export default withFetchItems(CollectionFiltered);

@@ -5,7 +5,6 @@ import { typeDefs as algoliaTypeDefs } from '@last-rev/graphql-algolia-integrati
 
 import {
   Card,
-  Collection,
   Header,
   Hero,
   Link,
@@ -21,6 +20,7 @@ import * as Footer from './Footer';
 import * as Section from './Section';
 import * as Page from './Page';
 import * as PageBlog from './PageBlog';
+import * as Collection from './Collection';
 
 // Uncomment if using Algolia, else delete the related file
 // import * as Algolia from './Algolia';

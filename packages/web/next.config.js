@@ -62,6 +62,19 @@ const sentryWebpackPluginOptions = {
 };
 
 const nextConfig = {
+  // async rewrites() {
+  //   return {
+  //     beforeFiles: [
+  //       // These rewrites are checked after headers/redirects
+  //       // and before all files including _next/public files which
+  //       // allows overriding page files
+  //       {
+  //         source: '/api/graphql',
+  //         destination: 'http://localhost:5000/graphql'
+  //       }
+  //     ]
+  //   };
+  // },
   ...(process.env.NODE_ENV === 'production' && {
     async headers() {
       return [

@@ -2,7 +2,14 @@ import gql from 'graphql-tag';
 import { getDefaultFieldValue, getLocalizedField, createRichText } from '@last-rev/graphql-contentful-core';
 import { ContentfulPathsGenerator, ApolloContext } from '@last-rev/types';
 import { Page } from '@last-rev/graphql-contentful-extensions';
+import kebabCase from 'lodash/kebabCase';
 import createType from './utils/createType';
+
+const getSlug = (topic: any, ctx: ApolloContext) => {
+  const title = getLocalizedField(topic.fields, 'title', ctx);
+  const slug = getLocalizedField(topic.fields, 'slug', ctx);
+  return slug ?? kebabCase(title);
+};
 
 export const createPath = (...slug: string[]) => {
   let path = slug.join('/').replace(/\/\//g, '/');
@@ -15,6 +22,7 @@ export const typeDefs = gql`
   extend type PageBlog {
     relatedLinks: [Link]
     featuredMedia: [Media]
+    topics: [Topic]
     header: Header
     footer: Content
   }
@@ -160,6 +168,25 @@ export const mappers: any = {
         return body;
       },
       actions: async (blog: any, _args: any, ctx: ApolloContext) => {
+        // Get all topics from this blog and convert them into links
+        const topicsLinks: any = getLocalizedField(blog.fields, 'topics', ctx);
+        if (topicsLinks) {
+          const topics = await ctx.loaders.entryLoader.loadMany(
+            topicsLinks?.map((topic: any) => ({ id: topic?.sys?.id, preview: !!ctx.preview }))
+          );
+
+          const actions = topics?.map((topic: any) =>
+            !!topic
+              ? createType('Link', {
+                  id: topic?.sys?.id,
+                  text: getLocalizedField(topic.fields, 'title', ctx),
+                  href: `/blogs/${getSlug(topic, ctx)}`
+                })
+              : null
+          ) as any; // any used to allow adding __fieldName__
+          actions.__fieldName__ = 'topics';
+          return actions;
+        }
         const slug = createPath('blog', getLocalizedField(blog.fields, 'slug', ctx));
         const link = createType('Link', {
           href: slug,
