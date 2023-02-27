@@ -24,7 +24,6 @@ const withFetchItems = (Wrapped: any) => (props: any) => {
   };
   return (
     <div>
-      <p> hola</p>
       <Wrapped fetchItems={fetchItems} loadMoreText={'VIEW MORE POSTS'} {...props} />
     </div>
   );
