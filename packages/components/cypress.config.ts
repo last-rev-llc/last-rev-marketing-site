@@ -11,7 +11,7 @@ export default defineConfig({
       // Only run video recording in CI
       // if we have a Cypress project id
       if (!config.projectId) {
-        config.projectId = process.env.CYPRESS_PROJECT_ID;
+        config.projectId = process.env.CYPRESS_PROJECT_ID || null;
         config.video = !!process.env.CYPRESS_PROJECT_ID;
       }
       return config;

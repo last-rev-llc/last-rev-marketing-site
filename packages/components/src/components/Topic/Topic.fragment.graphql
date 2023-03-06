@@ -3,16 +3,4 @@ fragment Topic_BaseFragment on Topic {
   title
   seo
   slug
-  # header {
-  #   ...ContentModule_BaseFragment
-  # }
-  # footer {
-  #   ...ContentModule_BaseFragment
-  # }
-  # hero {
-  #   ...ContentModule_BaseFragment
-  # }
-  # contents {
-  #   ...ContentModule_BaseFragment
-  # }
 }
