@@ -1,0 +1,6 @@
+fragment Topic_BaseFragment on Topic {
+  ...Content_BaseFragment
+  title
+  seo
+  slug
+}

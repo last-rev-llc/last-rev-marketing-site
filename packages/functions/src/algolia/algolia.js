@@ -8,6 +8,6 @@ const maxRecords = process.env.ALGOLIA_MAX_RECORDS ? parseInt(process.env.ALGOLI
 
 module.exports.handler = createAlgoliaSyncHandler(
   config,
-  process.env.GRAPHQL_SERVER_URL || 'http://localhost:5000/graphql',
+  process.env.GRAPHQL_SERVER_URL || 'http://localhost:3000/api/graphql',
   maxRecords
 );

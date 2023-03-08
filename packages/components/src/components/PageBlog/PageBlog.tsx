@@ -39,6 +39,7 @@ export interface PageBlogProps {
   contents?: any;
   header: any;
   footer: any;
+  topics?: any;
   landingPageSummary?: string;
 }
 
@@ -53,6 +54,7 @@ export const PageBlog = ({
   body,
   quote,
   tags,
+  topics,
   relatedLinks,
   sidekickLookup,
   contents
@@ -259,6 +261,35 @@ export const PageBlog = ({
                               marginBottom: i !== relatedLinks.length - 1 ? 16 : undefined
                             }}>
                             <Link {...(link as any)} variant="text" />
+                          </li>
+                        ))}
+                      </ul>
+                    </ListItem>
+                  ) : null}
+                  {topics ? (
+                    <ListItem>
+                      <ListItemText
+                        primary="Topics"
+                        primaryTypographyProps={{
+                          fontWeight: 'bold',
+                          variant: 'h3',
+                          color: 'white'
+                        }}
+                      />
+                      <ul
+                        style={{
+                          listStyle: 'none',
+                          display: 'flex',
+                          flexWrap: 'wrap',
+                          padding: '0'
+                        }}
+                        {...sidekick(sidekickLookup?.topics)}>
+                        {topics.map((topic: any, i: React.Key | null | undefined) => (
+                          <li
+                            key={i}
+                            style={{ whiteSpace: 'nowrap', marginRight: i !== topics.length - 1 ? 5 : undefined }}>
+                            <Link href={`/blogs/${topic?.slug}`}>{topic?.title}</Link>
+                            {i !== topics.length - 1 ? ', ' : ''}
                           </li>
                         ))}
                       </ul>

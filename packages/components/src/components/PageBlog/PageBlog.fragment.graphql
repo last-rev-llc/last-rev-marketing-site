@@ -23,4 +23,9 @@ fragment PageBlog_BaseFragment on PageBlog {
   relatedLinks {
     ...Link_BaseFragment
   }
+  topics {
+    id
+    slug
+    title
+  }
 }

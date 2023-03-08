@@ -331,7 +331,6 @@ type PageBlog implements Content {
   animation: JSON
   slug: String
   lr__path__: String
-  internalTitle: String
   title: String
   landingPageSummary: String
   creationDate: String
@@ -341,6 +340,7 @@ type PageBlog implements Content {
   seo: JSON
   relatedLinks: [Link]
   featuredMedia: [Media]
+  topics: [Topic]
   header: Header
   footer: Content
 }
@@ -358,6 +358,16 @@ type Person implements Content {
   phone: String
   linkedIn: String
   calendlyUrl: String
+}
+type Topic implements Content {
+  sidekickLookup: JSON
+  id: String
+  theme: [Theme]
+  animation: JSON
+  slug: String
+  lr__path__: String
+  title: String
+  seo: JSON
 }
 type AlgoliaObject {
   index: String!
