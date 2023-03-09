@@ -288,7 +288,7 @@ export const PageBlog = ({
                           <li
                             key={i}
                             style={{ whiteSpace: 'nowrap', marginRight: i !== topics.length - 1 ? 5 : undefined }}>
-                            <Link href={`/blogs/${topic?.slug}`}>{topic?.title}</Link>
+                            <Link href={`/blog/${topic?.slug}`}>{topic?.title}</Link>
                             {i !== topics.length - 1 ? ', ' : ''}
                           </li>
                         ))}
@@ -317,7 +317,7 @@ export const PageBlog = ({
                           <li
                             key={i}
                             style={{ whiteSpace: 'nowrap', marginRight: i !== topics.length - 1 ? 5 : undefined }}>
-                            <Link href={`/blogs/${topic?.slug}`}>{topic?.title}</Link>
+                            <Link href={`/blog/${topic?.slug}`}>{topic?.title}</Link>
                             {i !== topics.length - 1 ? ', ' : ''}
                           </li>
                         ))}

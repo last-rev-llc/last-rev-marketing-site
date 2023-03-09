@@ -4,14 +4,7 @@ import BackToTop from '@last-rev/component-library/dist/components/BackToTop/Bac
 import styled from '@mui/system/styled';
 import { Topic } from '@last-rev-marketing-site/graphql-sdk/dist';
 
-const TopicGeneral = ({
-  header,
-  hero,
-  contents,
-  footer,
-  mailchimpForm,
-  disableBackToTop
-}: Topic & { __typename: string }) => {
+const TopicGeneral = ({ header, hero, contents, footer, disableBackToTop }: Topic & { __typename: string }) => {
   return (
     <>
       {header ? <ContentModule {...(header as any)} /> : null}
@@ -22,7 +15,6 @@ const TopicGeneral = ({
         ))}
       </Contents>
       {!disableBackToTop ? <BackToTop /> : null}
-      {mailchimpForm ? <ContentModule {...(mailchimpForm as any)} /> : null}
       {footer ? <ContentModule {...(footer as any)} /> : null}
     </>
   );

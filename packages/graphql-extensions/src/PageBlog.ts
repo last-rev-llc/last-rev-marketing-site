@@ -180,7 +180,7 @@ export const mappers: any = {
               ? createType('Link', {
                   id: topic?.sys?.id,
                   text: getLocalizedField(topic.fields, 'title', ctx),
-                  href: `/blogs/${getSlug(topic, ctx)}`
+                  href: `/blog/${getSlug(topic, ctx)}`
                 })
               : null
           ) as any; // any used to allow adding __fieldName__

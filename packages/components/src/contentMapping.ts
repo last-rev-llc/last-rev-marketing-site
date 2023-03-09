@@ -33,6 +33,7 @@ const CollectionFiltered = dynamic(() => import('./components/CollectionFiltered
 const Quote = dynamic(() => import('./components/Quote'));
 const Page = dynamic(() => import('./components/Page'));
 const CollectionCarousel = dynamic(() => import('./components/CollectionCarousel'));
+const Topic = dynamic(() => import('./components/PageTopic'));
 
 const contentMapping: {
   [key: string]: any;
@@ -54,7 +55,8 @@ const contentMapping: {
   Hero,
   Quote,
   Footer,
-  PageBlog
+  PageBlog,
+  Topic
 };
 
 export default contentMapping;
