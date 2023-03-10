@@ -7,6 +7,7 @@ let URL =
     : `${process.env.DEPLOY_URL}${process.env.GRAPHQL_SERVER_URL}` ?? 'http://localhost:3000/api/graphql';
 
 if (process.env.NODE_ENV !== 'production') URL = 'http://localhost:3000/api/graphql';
+console.log('URL', URL);
 const sdk = getSdk(new GraphQLClient(URL));
 
 export default sdk;

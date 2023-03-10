@@ -29,7 +29,7 @@
 //         const title = getLocalizedField(blog.fields, 'title', ctx);
 
 //         return objects.map(({ section, content }, objectIndex) => ({
-//           index: 'blogs',
+//           index: 'blog',
 //           data: {
 //             objectID: constructObjectId(blog, ctx, objectIndex),
 //             locale: ctx.locale || ctx.defaultLocale,
