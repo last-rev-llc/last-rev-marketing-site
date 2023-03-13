@@ -1753,6 +1753,13 @@
   dependencies:
     regenerator-runtime "^0.13.11"
 
+"@babel/runtime@^7.4.5":
+  version "7.21.0"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.21.0.tgz#5b55c9d394e5fcf304909a8b00c07dc217b56673"
+  integrity sha512-xwII0//EObnq89Ji5AKYQaRYiW/nZ3llSv29d49IuxPhKbtJoLP+9QUUZ4nVragQVtaVGeZrpB+ZtG/Pdy/POw==
+  dependencies:
+    regenerator-runtime "^0.13.11"
+
 "@babel/template@^7.10.4", "@babel/template@^7.12.7", "@babel/template@^7.16.0", "@babel/template@^7.3.3":
   version "7.16.0"
   resolved "https://registry.yarnpkg.com/@babel/template/-/template-7.16.0.tgz#d16a35ebf4cd74e202083356fab21dd89363ddd6"
@@ -3156,6 +3163,13 @@
   dependencies:
     lodash "^4.17.21"
 
+"@last-rev/app-config@^0.5.0":
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@last-rev/app-config/-/app-config-0.5.0.tgz#c0973b8f16ac3d78ae72158a898a88e8fffc087a"
+  integrity sha512-krAXIEdsnGpse9yH0n0MrfJVGAzFSIs1PDLlryFlCQ/ESUmAd3cFqKooo/CIY/E1o58iDu9TZyM5E0j3oe6ejQ==
+  dependencies:
+    lodash "^4.17.21"
+
 "@last-rev/cli@^0.4.1":
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/@last-rev/cli/-/cli-0.4.1.tgz#615118e42ab6303d0bde1e5be342a5878bbaebbd"
@@ -3240,6 +3254,17 @@
     loglevel "^1.7.1"
     tslib "^2.3.0"
 
+"@last-rev/contentful-cms-loader@^0.4.1":
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/@last-rev/contentful-cms-loader/-/contentful-cms-loader-0.4.2.tgz#29afaae63d276fb0dbbe26528ba136b1bf6473c7"
+  integrity sha512-zy3dDhuKTFXHvCsbvVmlWOZ/4EdppPznSY5JLIsUj0/vcSF8u/u9Qbo59eez687R/4eB8EM40SDhgtVj6LBE3Q==
+  dependencies:
+    "@last-rev/logging" "^0.1.2"
+    "@last-rev/timer" "^0.2.0"
+    dataloader "^2.0.0"
+    lodash "^4.17.21"
+    tslib "^2.3.0"
+
 "@last-rev/contentful-dynamodb-loader@^0.1.5":
   version "0.1.5"
   resolved "https://registry.yarnpkg.com/@last-rev/contentful-dynamodb-loader/-/contentful-dynamodb-loader-0.1.5.tgz#5d100404951675e48e315d7b926530839faf9bd6"
@@ -3262,6 +3287,18 @@
     dataloader "^2.0.0"
     lodash "^4.17.21"
     loglevel "^1.7.1"
+    tslib "^2.3.0"
+
+"@last-rev/contentful-dynamodb-loader@^0.3.1":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@last-rev/contentful-dynamodb-loader/-/contentful-dynamodb-loader-0.3.1.tgz#23beb55c699f7b9be4c86435acc7c9e12c1f9aa7"
+  integrity sha512-njrL4VoHdR4coaEZ8MI5yDpIYwxHqGi3oYEYVhCJcBbxgtyq2nW7YhxxdKM2JFrFpEmpXYLkyQjc9B1rYCinBQ==
+  dependencies:
+    "@last-rev/logging" "^0.1.1"
+    "@last-rev/timer" "^0.2.0"
+    aws-sdk "^2.1012.0"
+    dataloader "^2.0.0"
+    lodash "^4.17.21"
     tslib "^2.3.0"
 
 "@last-rev/contentful-fragment-gen@^0.2.1":
@@ -3304,6 +3341,18 @@
     loglevel "^1.7.1"
     tslib "^2.3.0"
 
+"@last-rev/contentful-fs-loader@^0.3.1":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@last-rev/contentful-fs-loader/-/contentful-fs-loader-0.3.1.tgz#fa2b47fd01c17eac89a100fc8c643080ce1f0071"
+  integrity sha512-4tPXREa2m7w1eqVDHz0qUHNny2Z4BTSoDcwzGxcYpDfIlrA/Iy/olnAagx6wBIOgbh67+PkVwUAy7A70b48PEA==
+  dependencies:
+    "@last-rev/logging" "^0.1.1"
+    "@last-rev/timer" "^0.2.0"
+    dataloader "^2.0.0"
+    fs-extra "^10.0.0"
+    lodash "^4.17.21"
+    tslib "^2.3.0"
+
 "@last-rev/contentful-import-export@^0.1.4":
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/@last-rev/contentful-import-export/-/contentful-import-export-0.1.4.tgz#dac89790252bb139b56cacf4e60d88f23b741ebf"
@@ -3319,6 +3368,13 @@
   integrity sha512-5oryBXqaxjtCQORA6H+lCtJKkM94iGMFhu7RZ9JX3+/DTl1Yx8ZJ89fQX/ii80Z9WH8N59AKO7reUH95BkKYKg==
   dependencies:
     loglevel "^1.7.1"
+
+"@last-rev/contentful-path-rules-engine@^0.1.5":
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/@last-rev/contentful-path-rules-engine/-/contentful-path-rules-engine-0.1.5.tgz#eefe69d52dd2c724770d59a41398699158758af2"
+  integrity sha512-FyN6p2/sAyuoGXxhnvVyfKXY3grzl0DERy7At59dAM9uG+8DE5H4HlG2di5hIAVO+4GgLPUNa01oewbGFEWh/g==
+  dependencies:
+    "@last-rev/logging" "^0.1.2"
 
 "@last-rev/contentful-path-util@^0.1.11":
   version "0.1.11"
@@ -3351,6 +3407,22 @@
     loglevel "^1.7.1"
     tslib "^2.3.0"
 
+"@last-rev/contentful-path-util@^0.1.22":
+  version "0.1.22"
+  resolved "https://registry.yarnpkg.com/@last-rev/contentful-path-util/-/contentful-path-util-0.1.22.tgz#c9a580083e0837e8bc5705da815e6188014795a6"
+  integrity sha512-3arMO/SLlpX2koRfqgjHlXq/ERbM/umYvLMCWV+JDRjhVycHNgu3I61bkbp7HEYBefSgJZatzvtmSHdd8chdxA==
+  dependencies:
+    "@last-rev/contentful-path-rules-engine" "^0.1.5"
+    "@last-rev/logging" "^0.1.2"
+    "@last-rev/timer" "^0.2.0"
+    async-lock "^1.3.0"
+    aws-sdk "^2.1012.0"
+    contentful "^8.4.2"
+    fs-extra "^10.0.0"
+    ioredis "^5.0.4"
+    lodash "^4.17.21"
+    tslib "^2.3.0"
+
 "@last-rev/contentful-redis-loader@^0.3.3":
   version "0.3.3"
   resolved "https://registry.yarnpkg.com/@last-rev/contentful-redis-loader/-/contentful-redis-loader-0.3.3.tgz#1899abe2574d52babcea009cd7304c921d46da24"
@@ -3370,6 +3442,16 @@
     dataloader "^2.0.0"
     ioredis "^5.0.4"
     loglevel "^1.7.1"
+
+"@last-rev/contentful-redis-loader@^0.5.3":
+  version "0.5.3"
+  resolved "https://registry.yarnpkg.com/@last-rev/contentful-redis-loader/-/contentful-redis-loader-0.5.3.tgz#0abf12ea9f37e16412de50403243fe979ef5062d"
+  integrity sha512-4Muy6IeS5ZH01CJee9y1VD9ryfhB5dN0YMJN89SsiFfKO0DNbzTJRCzAPimYEfjqz0zP4NhGQqNRtEyBRpk4qA==
+  dependencies:
+    "@last-rev/logging" "^0.1.1"
+    "@last-rev/timer" "^0.2.0"
+    dataloader "^2.0.0"
+    ioredis "^5.0.4"
 
 "@last-rev/contentful-s3-sync@^0.1.2":
   version "0.1.2"
@@ -3408,23 +3490,31 @@
     ora "^5.4.1"
     tslib "^2.3.0"
 
-"@last-rev/contentful-webhook-handler@^0.4.3":
-  version "0.4.3"
-  resolved "https://registry.yarnpkg.com/@last-rev/contentful-webhook-handler/-/contentful-webhook-handler-0.4.3.tgz#8a707c7b04ac0fa96a0c3f8e23ce9de88055bc15"
-  integrity sha512-0WnBL9l1sJE16iLyUfbwh43VNzVDkQnpQAEOpw3xdCOP0UuzAzD0uqB3qegA5MPhVg764PIn/zrqkh2afnKklA==
+"@last-rev/contentful-webhook-handler@^0.4.14":
+  version "0.4.14"
+  resolved "https://registry.yarnpkg.com/@last-rev/contentful-webhook-handler/-/contentful-webhook-handler-0.4.14.tgz#995126a238f94f2206a0de5fcd07a7c0b9a2d437"
+  integrity sha512-nlJY7L0EHkNGxsZ8AmJ/mOYWdfTuii6VBV8c7qIcI49qfaDKW0tM7u9WTXoITVIhAN47U9eXlcjOenBUUmou0Q==
   dependencies:
-    "@last-rev/contentful-path-util" "^0.1.11"
-    "@last-rev/contentful-webhook-parser" "^0.1.1"
-    "@last-rev/graphql-contentful-helpers" "^0.2.5"
+    "@last-rev/contentful-path-util" "^0.1.22"
+    "@last-rev/contentful-webhook-parser" "^0.1.3"
+    "@last-rev/graphql-contentful-helpers" "^0.4.7"
     aws-sdk "^2.1012.0"
     contentful "^9.0.0"
     ioredis "^5.0.4"
+    jsonwebtoken "^9.0.0"
     lodash "^4.17.21"
 
 "@last-rev/contentful-webhook-parser@^0.1.1":
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/@last-rev/contentful-webhook-parser/-/contentful-webhook-parser-0.1.1.tgz#6ce47f1335fc56b334497e087a23b1c55aa720ae"
   integrity sha512-PLBUg8hjYAsMPLyCH9FXd5n+l2BLuvuItKyKgrslZ6gzaDZLZWym/FIWQ9bZx69Bk/6MkQ2X2riWmjC/G4uBEg==
+  dependencies:
+    contentful "^9.0.0"
+
+"@last-rev/contentful-webhook-parser@^0.1.3":
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/@last-rev/contentful-webhook-parser/-/contentful-webhook-parser-0.1.3.tgz#080158a114ef82a77dc6456f0d7e78424eec25ec"
+  integrity sha512-OdeS+NzycUL0HNL8JaQs9geZ2ooXgaozWcRstYvLG/pJrTrWRZbBEyG6C1LLVRra4mmjfAqQEyU7mZ7sHNK7rw==
   dependencies:
     contentful "^9.0.0"
 
@@ -3559,6 +3649,24 @@
     contentful "^8.4.2"
     lodash "^4.17.21"
 
+"@last-rev/graphql-contentful-helpers@^0.4.7":
+  version "0.4.7"
+  resolved "https://registry.yarnpkg.com/@last-rev/graphql-contentful-helpers/-/graphql-contentful-helpers-0.4.7.tgz#00f6e65b7516217eaafe69779df83bad04d47f9c"
+  integrity sha512-qgJ/D4Z2CaQDMNrY3NIs/gFRthQ1TzxjG1noH8NAWyXCNbFF8K82Y1QxJ9NIl496axVyx/PDFcCuvBhhzPSexA==
+  dependencies:
+    "@last-rev/app-config" "^0.5.0"
+    "@last-rev/contentful-cms-loader" "^0.4.1"
+    "@last-rev/contentful-dynamodb-loader" "^0.3.1"
+    "@last-rev/contentful-fs-loader" "^0.3.1"
+    "@last-rev/contentful-path-rules-engine" "^0.1.5"
+    "@last-rev/contentful-path-util" "^0.1.22"
+    "@last-rev/contentful-redis-loader" "^0.5.3"
+    "@last-rev/testing-library" "^0.1.10"
+    "@last-rev/timer" "^0.2.0"
+    "@last-rev/types" "^0.3.6"
+    contentful "^8.4.2"
+    lodash "^4.17.21"
+
 "@last-rev/graphql-schema-gen@^0.2.1":
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/@last-rev/graphql-schema-gen/-/graphql-schema-gen-0.2.1.tgz#7438e10baa2a5c64ff2d02cfbff5753b5955d897"
@@ -3570,6 +3678,16 @@
     lodash "^4.17.21"
     loglevel "^1.7.1"
     tslib "^2.3.0"
+
+"@last-rev/logging@^0.1.1", "@last-rev/logging@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@last-rev/logging/-/logging-0.1.2.tgz#fa435eddcebec30d5420f3eae5e2a962cdab377d"
+  integrity sha512-wEohyCO+7fgrEQaMnp6busi0a39i6X1ZiiSoLm4jZpeF38f+YXTL/2wMFGsXQg88Ayu2ZXC0qx9SIwuTIe66UA==
+  dependencies:
+    "@last-rev/app-config" "^0.5.0"
+    datadog-winston "^1.5.1"
+    dotenv "^10.0.0"
+    winston "^3.8.2"
 
 "@last-rev/rollup-config@^0.1.4":
   version "0.1.4"
@@ -3629,6 +3747,11 @@
   resolved "https://registry.yarnpkg.com/@last-rev/timer/-/timer-0.1.3.tgz#1bdb46dddbc55644c22c54cdd444dfc28be6c7d8"
   integrity sha512-Ps7+r/Ukqn0mXTgldwwXx8Uq2qCA1GpTl9+ZVSUdpDKQ1/yxJIbcxvjPi6c7o2lTeJf2uyiz8X/YKIofOOD1GQ==
 
+"@last-rev/timer@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@last-rev/timer/-/timer-0.2.0.tgz#e2b2d6ff02ba40322ce5e3ad2760c68de9c65345"
+  integrity sha512-NzKyfRQJ2+YFe8SGe2xUtk6JGcwoE5wwKT+SYJa8RhYLQ7SlBY80a5DXmCAZ76znCBha9VcOBLGLbddvC1CxbA==
+
 "@last-rev/types@^0.1.4", "@last-rev/types@^0.1.7":
   version "0.1.7"
   resolved "https://registry.yarnpkg.com/@last-rev/types/-/types-0.1.7.tgz#fa36a31b2dc390be179f301c265ff64bc3ad9698"
@@ -3638,6 +3761,11 @@
   version "0.3.2"
   resolved "https://registry.yarnpkg.com/@last-rev/types/-/types-0.3.2.tgz#fdb953280cdcaaf166c166e79b14123f51438ded"
   integrity sha512-5sZuVTbM2Bbyd9PqIonFvlC2IRsMDMu1bkw5dfXaurJJl2NaQ/AgjMDxWuTs200AWlkfBNL8GjlrYmf6JWr4ZA==
+
+"@last-rev/types@^0.3.6":
+  version "0.3.6"
+  resolved "https://registry.yarnpkg.com/@last-rev/types/-/types-0.3.6.tgz#dd54557a1c18a1dbc51343482683623472d36f1f"
+  integrity sha512-jX6F+lXsmdaNeg48N2KzBVveDpA9MeM2R5WJdbvXGYgw+zOWjuQLE05xKHsI7GGjBTLXwlUSXJGsSWQmwRSpvQ==
 
 "@lerna/add@3.21.0":
   version "3.21.0"
@@ -8127,6 +8255,11 @@
   integrity sha512-FvnCJljyxhPM3gkRgWmxmDZyAQSiBQQWLI0A0VFL0K7W1oRUrPJSqNO0NvTnLkBcotdlp3lKvaT0JrnyRDkzOg==
   dependencies:
     "@types/node" "*"
+
+"@types/triple-beam@^1.3.2":
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/@types/triple-beam/-/triple-beam-1.3.2.tgz#38ecb64f01aa0d02b7c8f4222d7c38af6316fef8"
+  integrity sha512-txGIh+0eDFzKGC25zORnswy+br1Ha7hj5cMVwKIU7+s0U2AxxJru/jZSMU6OC9MJWP6+pc/hc6ZjyZShpsyY2g==
 
 "@types/uglify-js@*":
   version "3.13.1"
@@ -12828,6 +12961,15 @@ data-urls@^2.0.0:
     abab "^2.0.3"
     whatwg-mimetype "^2.3.0"
     whatwg-url "^8.0.0"
+
+datadog-winston@^1.5.1:
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/datadog-winston/-/datadog-winston-1.5.1.tgz#27586a18a0333e6e58970e4654734cc31628cc0e"
+  integrity sha512-dkMFYTZp0gdF5ThKKsZUPyHrjUyAsp7ITKaoP3l61DXUqnMRUb3kMlvoI7zB+jEBBTsd/RnO+pDoOcuudo7VJA==
+  dependencies:
+    "@babel/runtime" "^7.4.5"
+    node-fetch "^2.6.0"
+    winston-transport "^4.3.0"
 
 dataloader@2.0.0, dataloader@^2.0.0:
   version "2.0.0"
@@ -19014,6 +19156,16 @@ jsonwebtoken@^8.5.1:
     ms "^2.1.1"
     semver "^5.6.0"
 
+jsonwebtoken@^9.0.0:
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/jsonwebtoken/-/jsonwebtoken-9.0.0.tgz#d0faf9ba1cc3a56255fe49c0961a67e520c1926d"
+  integrity sha512-tuGfYXxkQGDPnLJ7SibiQgVgeDgfbPq2k2ICcbgqW8WxWLBAxKQM/ZCu/IT8SOSwmaYl4dpTFCW5xZv7YbbWUw==
+  dependencies:
+    jws "^3.2.2"
+    lodash "^4.17.21"
+    ms "^2.1.1"
+    semver "^7.3.8"
+
 jsprim@^1.2.2:
   version "1.4.2"
   resolved "https://registry.yarnpkg.com/jsprim/-/jsprim-1.4.2.tgz#712c65533a15c878ba59e9ed5f0e26d5b77c5feb"
@@ -20002,6 +20154,18 @@ logform@^2.3.2:
   integrity sha512-CPSJw4ftjf517EhXZGGvTHHkYobo7ZCc0kvwUoOYcjfR2UVrI66RHj8MCrfAdEitdmFqbu2BYdYs8FHHZSb6iw==
   dependencies:
     "@colors/colors" "1.5.0"
+    fecha "^4.2.0"
+    ms "^2.1.1"
+    safe-stable-stringify "^2.3.1"
+    triple-beam "^1.3.0"
+
+logform@^2.4.0:
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/logform/-/logform-2.5.1.tgz#44c77c34becd71b3a42a3970c77929e52c6ed48b"
+  integrity sha512-9FyqAm9o9NKKfiAKfZoYo9bGXXuwMkxQiQttkT4YjjVtQVIQtK6LmVtlxmCaFswo6N4AfEkHqZTV0taDtPotNg==
+  dependencies:
+    "@colors/colors" "1.5.0"
+    "@types/triple-beam" "^1.3.2"
     fecha "^4.2.0"
     ms "^2.1.1"
     safe-stable-stringify "^2.3.1"
@@ -26494,6 +26658,13 @@ semver@^7.3.7:
   dependencies:
     lru-cache "^6.0.0"
 
+semver@^7.3.8:
+  version "7.3.8"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-7.3.8.tgz#07a78feafb3f7b32347d725e33de7e2a2df67798"
+  integrity sha512-NB1ctGL5rlHrPJtFDVIVzTyQylMLu9N9VICA6HSFJo8MCGVTMW6gfpicwKmmK/dAjTOrqu5l63JJOpDSrAis3A==
+  dependencies:
+    lru-cache "^6.0.0"
+
 semver@~7.2.0:
   version "7.2.3"
   resolved "https://registry.yarnpkg.com/semver/-/semver-7.2.3.tgz#3641217233c6382173c76bf2c7ecd1e1c16b0d8a"
@@ -30233,6 +30404,15 @@ windows-release@^4.0.0:
   dependencies:
     execa "^4.0.2"
 
+winston-transport@^4.3.0, winston-transport@^4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/winston-transport/-/winston-transport-4.5.0.tgz#6e7b0dd04d393171ed5e4e4905db265f7ab384fa"
+  integrity sha512-YpZzcUzBedhlTAfJg6vJDlyEai/IFMIVcaEZZyl3UXIl4gmqRpU7AE89AHLkbzLUsv0NVmw7ts+iztqKxxPW1Q==
+  dependencies:
+    logform "^2.3.2"
+    readable-stream "^3.6.0"
+    triple-beam "^1.3.0"
+
 winston-transport@^4.4.2:
   version "4.4.2"
   resolved "https://registry.yarnpkg.com/winston-transport/-/winston-transport-4.4.2.tgz#554efe3fce229d046df006e0e3c411d240652e51"
@@ -30257,6 +30437,23 @@ winston@^3.2.1, winston@^3.3.3:
     stack-trace "0.0.x"
     triple-beam "^1.3.0"
     winston-transport "^4.4.2"
+
+winston@^3.8.2:
+  version "3.8.2"
+  resolved "https://registry.yarnpkg.com/winston/-/winston-3.8.2.tgz#56e16b34022eb4cff2638196d9646d7430fdad50"
+  integrity sha512-MsE1gRx1m5jdTTO9Ld/vND4krP2To+lgDoMEHGGa4HIlAUyXJtfc7CxQcGXVyz2IBpw5hbFkj2b/AtUdQwyRew==
+  dependencies:
+    "@colors/colors" "1.5.0"
+    "@dabh/diagnostics" "^2.0.2"
+    async "^3.2.3"
+    is-stream "^2.0.0"
+    logform "^2.4.0"
+    one-time "^1.0.0"
+    readable-stream "^3.4.0"
+    safe-stable-stringify "^2.3.1"
+    stack-trace "0.0.x"
+    triple-beam "^1.3.0"
+    winston-transport "^4.5.0"
 
 word-wrap@^1.2.3, word-wrap@~1.2.3:
   version "1.2.3"
