@@ -80,6 +80,7 @@
     },
     "@last-rev-marketing-site/web#build": {
       "dependsOn": ["@last-rev-marketing-site/graphql-runner#start", "^build"],
+      "cache": false,
       "outputs": ["out/**", ".next/**"]
     }
   }
