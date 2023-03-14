@@ -28,7 +28,6 @@ export const queryContentful = async ({
         {}
       ))
   };
-  console.log('queryContentful', { filter, filters, contentType, contentfulQuery });
   let items;
   if (ctx.preview) {
     items = (await ctx.contentful.preview.getEntries(contentfulQuery)).items;

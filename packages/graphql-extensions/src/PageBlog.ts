@@ -194,6 +194,13 @@ export const mappers: any = {
           variant: 'text'
         });
         return [link];
+      },
+      link: async (blog: any, _args: any, ctx: ApolloContext) => {
+        const slug = createPath('blog', getLocalizedField(blog.fields, 'slug', ctx));
+        const link = createType('Link', {
+          href: slug
+        });
+        return link;
       }
     }
   }
