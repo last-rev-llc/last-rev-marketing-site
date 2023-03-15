@@ -72,7 +72,6 @@ export const mappers: any = {
             (getLocalizedField(collection.fields, 'settings', ctx) as CollectionSettings) || {};
           if (contentType) {
             items = await queryContentful({ contentType, ctx, order, filter, limit, skip: offset });
-            console.log({ filter });
             return ctx.loaders.entryLoader.loadMany(
               items?.map((x: any) => ({ id: x?.sys?.id, preview: !!ctx.preview }))
             );
@@ -87,8 +86,6 @@ export const mappers: any = {
         try {
           const { contentType, filters } =
             (getLocalizedField(collection.fields, 'settings', ctx) as CollectionSettings) || {};
-          console.log({ itemsConnectionFilters: filters });
-          console.log({ itemsConnectionContentType: contentType });
           // Get all possible items from Contentful
           // Need all to generate the possible options for all items. Not just the current page.
           if (contentType) {

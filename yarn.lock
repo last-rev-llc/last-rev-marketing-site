@@ -3208,16 +3208,16 @@
     tar "^6.1.0"
     uuid "^8.3.2"
 
-"@last-rev/component-library@^0.5.9":
-  version "0.5.9"
-  resolved "https://registry.yarnpkg.com/@last-rev/component-library/-/component-library-0.5.9.tgz#b828f8f88d525978b76210b840f0c587fcc337b7"
-  integrity sha512-pO9Nqk4CDZRDvXyEmv/leGjfWmJRghkJCNCIR5wmBrX4dGTyKtuPPTUtDa5PVV/pBir99W355/O/v8XOganlgQ==
+"@last-rev/component-library@^0.5.15":
+  version "0.5.15"
+  resolved "https://registry.yarnpkg.com/@last-rev/component-library/-/component-library-0.5.15.tgz#1dfe66d5328eb0ea0b0c33ece5568178d638718d"
+  integrity sha512-JrIuGGTyPcBk243tg5tQW5khrIYtA268ewy/JXmycwJn0vUN4ge2OnLWPLZuRX+aqjEYFwwk8vmN8qOsTTM6oA==
   dependencies:
     "@contentful/rich-text-react-renderer" "^15.0.0"
     "@contentful/rich-text-types" "^15.0.0"
     "@emotion/react" "^11.4.1"
     "@emotion/styled" "^11.3.0"
-    "@last-rev/contentful-sidekick-util" "^0.1.1"
+    "@last-rev/contentful-sidekick-util" "^0.1.2"
     "@last-rev/rollup-config" "^0.1.4"
     "@last-rev/testing-library" "0.1.10"
     "@rollup/plugin-typescript" "^8.3.0"
@@ -3473,6 +3473,13 @@
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/@last-rev/contentful-sidekick-util/-/contentful-sidekick-util-0.1.1.tgz#8526ec906dec48b93f7ec19750512ed0d74ce8d0"
   integrity sha512-PSU0sMIdWBGM1JbeCexK4RUIX5U6rAiyJKfbaqIJalVHmGzUVr6geH4qkh2+5QleQ3mDFIQDZiXc6WmCt1Bolw==
+  dependencies:
+    lodash "^4.17.20"
+
+"@last-rev/contentful-sidekick-util@^0.1.2":
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/@last-rev/contentful-sidekick-util/-/contentful-sidekick-util-0.1.3.tgz#59b911cd80a0d21d6e4ba0b9d9323331a7f59e55"
+  integrity sha512-+z7QSICvZ7VdLKPb/O7W2iq3k30CLAooqNooNoJfrY/TN4uQpsAsCfSDZ8Df6q0oB/yqNqen8cEx0O6+y5Nytw==
   dependencies:
     lodash "^4.17.20"
 
