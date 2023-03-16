@@ -4,7 +4,8 @@ const path = require('path');
 const withPlugins = require('next-compose-plugins');
 const withTM = require('next-transpile-modules')([
   '@last-rev-marketing-site/components',
-  '@last-rev/component-library'
+  '@last-rev/component-library',
+  '@last-rev/contentful-app-components'
 ]);
 // const { withSentryConfig } = require('@sentry/nextjs');
 

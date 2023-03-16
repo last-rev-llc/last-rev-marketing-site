@@ -142,6 +142,15 @@ type Collection implements Content {
   introText: Text
   itemsConnection(limit: Int, offset: Int, filter: CollectionFilterInput): CollectionItemConnection
 }
+type ContentfulAppSettings implements Content {
+  sidekickLookup: JSON
+  id: String
+  theme: [Theme]
+  animation: JSON
+  variant: String
+  internalTitle: String
+  settings: JSON
+}
 type Footer implements Content {
   sidekickLookup: JSON
   id: String
