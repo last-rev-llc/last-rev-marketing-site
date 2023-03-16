@@ -1,12 +1,7 @@
 import { getSdk } from '@last-rev-marketing-site/graphql-sdk';
 import { GraphQLClient } from 'graphql-request';
+import graphqlEndpoint from './graphqlEndpoint';
 
-let URL =
-  process.env.STAGE === 'build' || !process.env.DEPLOY_URL
-    ? 'http://localhost:5000/graphql'
-    : `${process.env.DEPLOY_URL}${process.env.GRAPHQL_SERVER_URL}` ?? 'http://localhost:3000/api/graphql';
-
-if (process.env.NODE_ENV !== 'production') URL = 'http://localhost:3000/api/graphql';
-const sdk = getSdk(new GraphQLClient(URL));
+const sdk = getSdk(new GraphQLClient(graphqlEndpoint));
 
 export default sdk;
