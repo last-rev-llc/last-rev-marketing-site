@@ -6,6 +6,8 @@ import { createVercelHandler } from '@last-rev/graphql-contentful-core';
 
 import lrConfig from '../../../../lrconfig';
 
+console.log('envs', process.env.DEPLOY_URL, process.env.STAGE);
+
 function initMiddleware(middleware: any) {
   return (req: NextApiRequest, res: NextApiResponse<any>) =>
     new Promise((resolve, reject) => {
