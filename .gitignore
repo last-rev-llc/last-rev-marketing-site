@@ -10,7 +10,6 @@ node_modules
 .netlify
 *.code-workspace
 .DS_Store
-.yarn/**
 
 **/coverage
 
