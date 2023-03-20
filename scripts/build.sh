@@ -7,7 +7,11 @@ function cleanup() {
     bash "$PWD/scripts/post_build.sh"
     if [[ "$rv" != "0" ]]; then
         echo "Build failed."
-        yarn pm2 logs --nostream --lines=1000
+        # if node env is buprodild do this
+        if [[ "$NODE_ENV" == "prod" ]]; then
+            yarn pm2 logs --nostream --lines=1000
+        fi
+        
     fi
     exit $rv
 }

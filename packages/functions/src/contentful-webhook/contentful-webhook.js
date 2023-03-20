@@ -1,11 +1,17 @@
 require('dotenv').config();
 
 const handleWebhook = require('@last-rev/contentful-webhook-handler');
-const config = require('../../shared/config');
+const config = require('../../../../lrconfig');
 
 module.exports.handler = async (event) => {
   try {
-    await handleWebhook(config, JSON.parse(event.body), event.headers);
+    await handleWebhook(
+      config.clone({
+        contentStrategy: 'cms'
+      }),
+      JSON.parse(event.body),
+      event.headers
+    );
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'text/plain' },
