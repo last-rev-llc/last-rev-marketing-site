@@ -18,6 +18,7 @@
   "dependencies": {
     "@babel/plugin-transform-runtime": "^7.16.5",
     "@contentful/rich-text-from-markdown": "^15.10.0",
+    "@contentful/rich-text-plain-text-renderer": "^16.0.3",
     "@contentful/rich-text-types": "^15.11.1",
     "@graphql-tools/merge": "^6.2.14",
     "@last-rev/graphql-contentful-core": "^0.5.14",

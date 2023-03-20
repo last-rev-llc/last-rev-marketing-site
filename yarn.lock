@@ -1981,6 +1981,13 @@
     remark-parse "^6.0.3"
     unified "^7.1.0"
 
+"@contentful/rich-text-plain-text-renderer@^16.0.3":
+  version "16.0.3"
+  resolved "https://registry.yarnpkg.com/@contentful/rich-text-plain-text-renderer/-/rich-text-plain-text-renderer-16.0.3.tgz#2c8128efe0cf3d90fc6634b7d282d2724982f0b2"
+  integrity sha512-1h/qlE5PoQ0QTGB7u0P+uEJdYOcctRWDImKkA8w2Dr96rSfXmpuO0AqqgFsX9p8Dk2rk3NJ66t/4I40ntS5e6A==
+  dependencies:
+    "@contentful/rich-text-types" "^16.0.3"
+
 "@contentful/rich-text-react-renderer@^15.0.0":
   version "15.11.1"
   resolved "https://registry.yarnpkg.com/@contentful/rich-text-react-renderer/-/rich-text-react-renderer-15.11.1.tgz#54305dc9561ed5d98bb65e8eb054ba1707d44af0"
@@ -1992,6 +1999,11 @@
   version "15.11.1"
   resolved "https://registry.yarnpkg.com/@contentful/rich-text-types/-/rich-text-types-15.11.1.tgz#755e3efd5e0ac277d554e6f731ba9fdc1c45f6fe"
   integrity sha512-seO8Nl9cp894v7an6R8isX+HqYwVUesviGULTh/rIj2DCv2tXUU1GCqzSkt84XN6c6nbFYow9+Wzezkxx/IdIA==
+
+"@contentful/rich-text-types@^16.0.3":
+  version "16.0.3"
+  resolved "https://registry.yarnpkg.com/@contentful/rich-text-types/-/rich-text-types-16.0.3.tgz#c590268483e07881fb01b6799e837337093e42bf"
+  integrity sha512-BsUtXj93jo5XUt0YeUwfCkMWRoZIzJDPUIY4vMy9SwGIO9olTsMoQKadjA2ktlmK+Gg6710WH3eFKZxj2q39Iw==
 
 "@cspotcode/source-map-consumer@0.8.0":
   version "0.8.0"
