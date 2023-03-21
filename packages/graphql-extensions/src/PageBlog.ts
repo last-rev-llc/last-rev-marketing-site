@@ -2,8 +2,38 @@ import gql from 'graphql-tag';
 import { getDefaultFieldValue, getLocalizedField, createRichText } from '@last-rev/graphql-contentful-core';
 import { ContentfulPathsGenerator, ApolloContext } from '@last-rev/types';
 import { Page } from '@last-rev/graphql-contentful-extensions';
+import getFirstOfArray from '@last-rev/component-library/dist/utils/getFirstOfArray';
 import kebabCase from 'lodash/kebabCase';
 import createType from './utils/createType';
+
+const mediaFieldResolver = async ({ fields, ctx }: any) => {
+  let mediaField: any = null;
+  const featuredImage: any = getFirstOfArray(getLocalizedField(fields, 'featuredMedia', ctx));
+  
+  if (featuredImage) {
+    const featuredImageEntry: any = await ctx.loaders.entryLoader.load({ id: featuredImage.sys?.id, preview: !!ctx.preview });
+
+    if (featuredImageEntry) {
+      const asset: any = getLocalizedField(featuredImageEntry.fields, 'asset', ctx);
+
+      if (asset) {
+        const featuredImageMedia: any = await ctx.loaders.assetLoader.load({ id: asset.sys?.id, preview: !!ctx.preview });
+
+        if (featuredImageMedia) {
+          const imageFile = getLocalizedField(featuredImageMedia.fields, 'file', ctx);
+          const imageTitle = getLocalizedField(featuredImageMedia.fields, 'title', ctx);
+
+          mediaField = {
+            id: asset.sys?.id,
+            url: imageFile?.url?.startsWith('//') ? `https:${imageFile?.url}` : imageFile?.url,
+            title: imageTitle,
+          };
+        }
+      }
+    }
+  }
+  return mediaField;
+};
 
 const getSlug = (topic: any, ctx: ApolloContext) => {
   const title = getLocalizedField(topic.fields, 'title', ctx);
@@ -143,6 +173,10 @@ export const mappers: any = {
             value:
               seo?.canonical?.value ??
               `${'https//lastrev.com'}${createPath('blog', getLocalizedField(blog.fields, 'slug', ctx))}`
+          },
+          'og:image': {
+            name: 'og:image',
+            value: await mediaFieldResolver({ fields: blog.fields, ctx })
           }
         };
       }
