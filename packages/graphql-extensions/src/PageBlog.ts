@@ -35,6 +35,8 @@ const mediaFieldResolver = async ({ fields, ctx }: any) => {
   return mediaField;
 };
 
+const getSeoValue = (value: string | undefined, defaultValue: string) => value && value?.trim() !== '' ? value : defaultValue;
+
 const getSlug = (topic: any, ctx: ApolloContext) => {
   const title = getLocalizedField(topic.fields, 'title', ctx);
   const slug = getLocalizedField(topic.fields, 'slug', ctx);
@@ -146,10 +148,15 @@ export const mappers: any = {
 
         const tags: any = getLocalizedField(blog.fields, 'tags', ctx);
 
-        const seoTitle = seo?.title?.value && seo?.title?.value?.trim() !== '' ? seo?.title?.value : title;
-        const seoDescription =
-          seo?.description && seo?.description?.value?.trim() !== '' ? seo?.description?.value : summary;
+        const seoTitle = getSeoValue(seo?.title?.value, title);
+        const seoDescription = getSeoValue(seo?.description?.value, summary);
         const seoKeywords = seo?.keywords?.value ? `${seo?.keywords?.value}, ${tags}` : tags;
+
+        const ogTitle = getSeoValue(seo?.['og:title']?.value, seoTitle);
+        const ogDescription = getSeoValue(seo?.['og:description']?.value, seoDescription);
+
+        const canonical = seo?.canonical?.value ?? `${'https//lastrev.com'}${createPath('blog', getLocalizedField(blog.fields, 'slug', ctx))}`;
+        const blogDefaultDescription = body.content[0].content[0].value ?? 'Thought leadership on technology, content management and engineering';
 
         return {
           ...seo,
@@ -157,12 +164,18 @@ export const mappers: any = {
             name: 'title',
             value: seoTitle ?? 'Last Rev Blog'
           },
+          'og:title': {
+            name: 'og:title',
+            value: ogTitle ?? 'Last Rev Blog'
+          },
           description: {
             name: 'description',
             value:
-              seoDescription ??
-              body.content[0].content[0].value ??
-              'Thought leadership on technology, content management and engineering'
+              seoDescription ?? blogDefaultDescription
+          },
+          'og:description': {
+            name: 'og:description',
+            value: ogDescription ?? blogDefaultDescription
           },
           keywords: {
             name: 'keywords',
@@ -170,13 +183,19 @@ export const mappers: any = {
           },
           canonical: {
             name: 'canonical',
-            value:
-              seo?.canonical?.value ??
-              `${'https//lastrev.com'}${createPath('blog', getLocalizedField(blog.fields, 'slug', ctx))}`
+            value: canonical
+          },
+          'og:url': {
+            name: 'og:url',
+            value: canonical
+          },
+          'og:type': {
+            name: 'og:type',
+            value: 'article'
           },
           'og:image': {
             name: 'og:image',
-            value: await mediaFieldResolver({ fields: blog.fields, ctx })
+            value: seo?.['og:image']?.value ?? await mediaFieldResolver({ fields: blog.fields, ctx })
           }
         };
       }
