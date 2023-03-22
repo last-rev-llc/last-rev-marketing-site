@@ -13,7 +13,7 @@ export const styleOverrides: ComponentsOverrides<Theme>['Section'] = {
     '[class*="Media-embedRoot"]': {
       minHeight: 368
     },
-    '& img': {
+    '[class*="Section-gridItem"] > img': {
       padding: 8
     }
   }
