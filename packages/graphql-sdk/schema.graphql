@@ -132,7 +132,9 @@ input ContentsFilter {
   preview: Boolean
 }
 
-"""Date custom scalar type"""
+"""
+Date custom scalar type
+"""
 scalar Date
 
 type Footer implements Content {
@@ -158,6 +160,12 @@ type Header implements Content {
   sidekickLookup: JSON
   theme: [Theme]
   variant: String
+}
+
+type Heading {
+  id: String
+  level: Int
+  text: String
 }
 
 type Hero implements Content {
