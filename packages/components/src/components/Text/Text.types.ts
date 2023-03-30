@@ -37,5 +37,3 @@ export interface TextClasses {
 }
 
 export declare type TextClassKey = keyof TextClasses;
-declare const accordionClasses: TextClasses;
-export default accordionClasses;

@@ -1,7 +1,10 @@
-export type TableOfContentsProps = {
-  content: {
-    level: 1 | 2 | 3 | 4 | 5 | 6;
-    text: string;
-    id: string;
-  }[];
-};
+import { TableOfContents_BaseFragmentFragment } from '@last-rev-marketing-site/graphql-sdk/dist';
+
+export interface TableOfContentsProps extends TableOfContents_BaseFragmentFragment {}
+
+export interface TableOfContentsClasses {
+  /** Styles applied to the root element. */
+  root: string;
+}
+
+export declare type TableOfContentsClassKey = keyof TableOfContentsClasses;

@@ -35,8 +35,7 @@ export const mappers = {
             headings.push({ level, text, id });
           }
         });
-
-        return { headings };
+        return headings;
       }
     }
   }

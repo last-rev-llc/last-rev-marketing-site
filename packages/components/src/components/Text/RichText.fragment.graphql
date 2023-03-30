@@ -11,6 +11,7 @@ fragment RichText_BaseFragment on RichText {
       ...Section_RichTextFragment
       ...Text_RichTextFragment
       ...Media_BaseFragment
+      ...TableOfContents_BaseFragment
     }
     assets {
       ...Media_BaseFragment
@@ -63,6 +64,7 @@ fragment RichText_RichTextFragment on RichText {
       ...Collection_RichTextFragment
       ...Section_RichTextFragment
       ...Media_BaseFragment
+      ...TableOfContents_BaseFragment
     }
     assets {
       ...Media_BaseFragment

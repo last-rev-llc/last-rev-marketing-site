@@ -19,7 +19,7 @@ import * as Section from './Section';
 import * as Page from './Page';
 import * as PageBlog from './PageBlog';
 import * as Collection from './Collection';
-import * as Text from './Text';
+import * as RichText from './RichText';
 import * as TableOfContents from './TableOfContents';
 
 // Uncomment if using Algolia, else delete the related file
@@ -42,7 +42,7 @@ const extensions: GraphQlExtension[] = [
   Media,
   NavigationItem,
   Page,
-  Text,
+  RichText,
   Theme,
   Quote,
   Footer,

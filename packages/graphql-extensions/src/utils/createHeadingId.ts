@@ -7,7 +7,7 @@ const createHeadingId = (text: string) => {
       return (accum ? accum + '-' : '') + txt;
     }, '');
 
-  return id ? `#${id}` : '';
+  return id || '';
 };
 
 export default createHeadingId;

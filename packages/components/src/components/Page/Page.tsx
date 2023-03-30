@@ -2,13 +2,11 @@ import React from 'react';
 import Head from 'next/head';
 import dynamic from 'next/dynamic';
 import { styled } from '@mui/material/styles';
-import { Page as PageContent } from '@last-rev-marketing-site/graphql-sdk/dist';
+import { PageProps } from './Page.types';
 import ContentModule from '@last-rev/component-library/dist/components/ContentModule';
 import sidekick from '@last-rev/contentful-sidekick-util';
 
 const BackToTop = dynamic(() => import('@last-rev/component-library/dist/components/BackToTop/BackToTop'));
-
-export interface PageProps extends PageContent {}
 
 const Page = ({ header, hero, contents, footer, disableBackToTop, sidekickLookup, ...props }: PageProps) => {
   const schemaData = {
