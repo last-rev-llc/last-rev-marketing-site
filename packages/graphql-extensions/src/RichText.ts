@@ -9,7 +9,6 @@ export const mappers = {
 
         json.content.forEach((node: any) => {
           if (node.nodeType.startsWith('heading')) {
-            console.log('found heading');
             node.data.id = createHeadingId(node.content?.[0]?.value);
           }
         });
@@ -24,7 +23,6 @@ export const mappers = {
           assets,
           entries: (await Promise.all(entries)).map((e: any) => {
             if (e.sys?.contentType?.sys?.id === 'tableOfContents') {
-              console.log('setting json here');
               e.__richTextJson = json;
             }
             return e;

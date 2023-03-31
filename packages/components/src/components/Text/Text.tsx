@@ -235,7 +235,6 @@ const Root = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'variant',
   overridesResolver: (_, styles) => [styles.root]
 })<{ variant?: string }>(({ theme }) => {
-  console.log('here!', theme.components?.Header?.height);
   return {
     '& :target:before': {
       content: '""',
