@@ -23,6 +23,7 @@ fragment ContentModule_SectionFragment on Content {
   ...Text_BaseFragment
   ...Collection_BaseFragment
   ...Link_BaseFragment
+  ...ModuleIntegration_BaseFragment
   # when path created for the Blog detail works, this can be removed :)
   #...Section_BaseFragment
 }
@@ -34,7 +35,7 @@ fragment ContentModule_RichTextFragment on Content {
   ...NavigationItem_BaseFragment
   ...Text_BaseFragment
   ...Section_BaseFragment
-
+  ...ModuleIntegration_BaseFragment
   ...Collection_RichTextFragment
   ...Card_RichTextFragment
   ...Link_BaseFragment

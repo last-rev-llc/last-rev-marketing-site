@@ -427,6 +427,15 @@ type SitemapPage {
 
 union SubnavigationItem = Link | NavigationItem
 
+type TableOfContents implements Content {
+  animation: JSON
+  id: String
+  internalTitle: String
+  sidekickLookup: JSON
+  theme: [Theme]
+  variant: String
+}
+
 type Template implements Content {
   animation: JSON
   category: String
