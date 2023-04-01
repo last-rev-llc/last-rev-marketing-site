@@ -8,6 +8,13 @@ declare type Optional<T extends object> = {
 export interface CalendlyInlineWidgetProps {
   settings: {
     url: string;
+    pageSettings?: Optional<{
+      backgroundColor: string,
+      hideEventTypeDetails: boolean,
+      hideLandingPageDetails: boolean,
+      primaryColor: string,
+      textColor: string
+    }>;
     prefill?: Optional<{
       name: string;
       email: string;
