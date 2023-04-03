@@ -12,7 +12,8 @@ import TableHead from '@mui/material/TableHead';
 import TableBody from '@mui/material/TableBody';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
-import { BLOCKS, INLINES } from '@contentful/rich-text-types';
+import BLOCKS from './BLOCKS';
+import INLINES from './INLINES';
 
 import ErrorBoundary from '../ErrorBoundary';
 import ContentModule from '../ContentModule';

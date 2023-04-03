@@ -4,6 +4,7 @@ import { BLOCKS } from '@contentful/rich-text-types';
 import mount from '../../../cypress/mount';
 import { TextProps } from './Text.types';
 import Text from './Text';
+import * as Router from 'next/router';
 
 import mockContent, {
   formattedMock,
@@ -16,7 +17,7 @@ import mockContent, {
   hyperlinkNode,
   withLinksMock
 } from './Text.mock';
-import { mediaMock } from '../Media/Media.mock';
+import { assetMock } from '../Media/Media.mock';
 import linkMock from '../Link/Link.mock';
 
 const variantNodeTypeMapper = {
@@ -38,20 +39,35 @@ const testNodeType = (variant: string, nodeType: string) => {
     cy.get(`[data-testid=Text-${variant}]`).each((body, index) => {
       cy.wrap(body).should(
         'have.text',
-        testNode.body.json.content.filter((c) => c.nodeType === nodeType)[index].content[0].value
+        testNode?.body?.json.content.filter((c: any) => c.nodeType === nodeType)[index].content[0].value
       );
     });
   });
 };
 
 describe('Text', () => {
+  let router;
+
+  // stub next/image:
+
+  beforeEach(() => {
+    router = {
+      back: cy.stub().as('routerBack')
+    };
+
+    //mock next/image below
+
+    cy.intercept;
+
+    cy.stub(Router, 'useRouter').returns(router);
+  });
   context('renders correctly', () => {
     it('renders text with correct information', () => {
       const mockedContent: TextProps = mockContent();
       mount(<Text {...mockedContent} />);
       cy.get('[data-testid=Text-root]').should(
         'have.text',
-        mockedContent.body.json.content.map((c) => c.content[0].value).join('')
+        mockedContent?.body?.json.content.map((c: any) => c.content[0].value).join('')
       );
       cy.percySnapshot();
     });
@@ -72,37 +88,38 @@ describe('Text', () => {
         it('renders text with embedded inline entry', () => {
           const mockedEntry = linkMock();
           const mockedContent: TextProps = dynamicMock(
-            [contentNode([embeddedEntryInlineNode(mockedEntry.id)])],
+            [contentNode([embeddedEntryInlineNode(mockedEntry.id!)])],
             [mockedEntry]
           );
           mount(<Text {...mockedContent} />);
-          cy.get('[data-testid=Text-embedded-entry-inline]').contains(mockedEntry.text).should('exist');
+          cy.get('[data-testid=Text-embedded-entry-inline]').contains(mockedEntry.text!).should('exist');
           cy.percySnapshot();
         });
 
         it('renders text with embedded entry block', () => {
           const mockedEntry = linkMock();
-          const mockedContent: TextProps = dynamicMock([embeddedEntryBlockNode(mockedEntry.id)], [mockedEntry]);
+          const mockedContent: TextProps = dynamicMock([embeddedEntryBlockNode(mockedEntry.id!)], [mockedEntry]);
           mount(<Text {...mockedContent} />);
-          cy.get('[data-testid=Text-embedded-entry-block]').contains(mockedEntry.text).should('exist');
+          cy.get('[data-testid=Text-embedded-entry-block]').contains(mockedEntry.text!).should('exist');
           cy.percySnapshot();
         });
 
         it('renders text with embedded asset block', () => {
-          const mockedMedia = mediaMock();
-          const mockedContent: TextProps = dynamicMock([embeddedAssetBlockNode(mockedMedia.id)], [], [mockedMedia]);
+          const mockedMedia = assetMock();
+          const mockedContent: TextProps = dynamicMock([embeddedAssetBlockNode(mockedMedia.id!)], [], [mockedMedia]);
+          console.log(mockedContent);
           mount(<Text {...mockedContent} />);
           cy.get('[data-testid=Text-embedded-asset-block]')
             .should('exist')
-            .and('have.attr', 'src', mockedMedia.file.url);
+            .and('have.attr', 'src', `/_next/image/?url=${encodeURIComponent(mockedMedia.file?.url)}&w=1200&q=75`);
           cy.percySnapshot();
         });
 
         it('renders text with hyperlink', () => {
           const mockedLink = linkMock();
-          const mockedContent: TextProps = dynamicMock([hyperlinkNode(mockedLink.text, mockedLink.href)]);
+          const mockedContent: TextProps = dynamicMock([hyperlinkNode(mockedLink.text!, mockedLink.href!)]);
           mount(<Text {...mockedContent} />);
-          cy.get('[data-testid=Text-hyperlink]').contains(mockedLink.text).should('exist');
+          cy.get('[data-testid=Text-hyperlink]').contains(mockedLink.text!).should('exist');
           cy.percySnapshot();
         });
 
