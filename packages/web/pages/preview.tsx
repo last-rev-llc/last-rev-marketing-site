@@ -10,11 +10,12 @@ import { ContentModuleProvider } from '@last-rev/component-library/dist/componen
 let client;
 
 const fetchPreview = async (id: string, locale: string, environment: string) => {
-  const previewGqlClient = new GraphQLClient(
-    `${
-      process.env.NODE_ENV === 'development' ? 'http://localhost:3000/api/graphql' : '/.netlify/functions/graphql'
-    }?env=${environment}`
-  );
+  // const previewGqlClient = new GraphQLClient(
+  //   `${
+  //     process.env.NODE_ENV === 'development' ? `/api/graphql?env=${environment}` : '/.netlify/functions/graphql'
+  //   }?env=${environment}`
+  // );
+  const previewGqlClient = new GraphQLClient(`/api/graphql?env=${environment}`);
   const sdk = getSdk(previewGqlClient);
   return sdk.Preview({ id, locale });
 };
@@ -37,6 +38,7 @@ export default function Preview({}: any) {
   };
 
   const { data, error, mutate } = useSWR(id ? [id, locale, environment, 'preview', spaceId] : null, fetchPreview);
+  console.log('-----', data, error);
   const content = data?.data?.content;
   const isLoadingInitialData = !data && !error;
 
