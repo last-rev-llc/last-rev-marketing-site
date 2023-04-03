@@ -11,10 +11,8 @@ import { Box } from '@mui/material';
 let client;
 
 const fetchPreview = async (id: string, locale: string, environment: string) => {
-  console.log(process.env.NODE_ENV);
-  const previewGqlClient = new GraphQLClient(
-    `${process.env.NODE_ENV === 'development' ? '/api/graphql' : '/.netlify/functions/graphql'}?env=master`
-  );
+  const previewGqlClient = new GraphQLClient(`/api/graphql?env=${environment}`);
+
   const sdk = getSdk(previewGqlClient);
   return sdk.Preview({ id, locale });
 };
