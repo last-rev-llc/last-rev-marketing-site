@@ -1,5 +1,6 @@
 import React from 'react';
 import { InlineWidget } from 'react-calendly';
+import { Box, styled } from '@mui/material';
 
 declare type Optional<T extends object> = {
   [P in keyof T]?: T[P];
@@ -9,11 +10,11 @@ export interface CalendlyInlineWidgetProps {
   settings: {
     url: string;
     pageSettings?: Optional<{
-      backgroundColor: string,
-      hideEventTypeDetails: boolean,
-      hideLandingPageDetails: boolean,
-      primaryColor: string,
-      textColor: string
+      backgroundColor: string;
+      hideEventTypeDetails: boolean;
+      hideLandingPageDetails: boolean;
+      primaryColor: string;
+      textColor: string;
     }>;
     prefill?: Optional<{
       name: string;
@@ -48,7 +49,16 @@ export interface CalendlyInlineWidgetProps {
 }
 
 function CalendlyInlineWidget({ settings }: CalendlyInlineWidgetProps) {
-  return <InlineWidget {...settings} />;
+  return (
+    <Root>
+      <InlineWidget {...settings} styles={{ height: 740 }} />
+    </Root>
+  );
 }
 
+const Root = styled(Box, {
+  name: 'CalendlyInlineWidget',
+  slot: 'Root',
+  overridesResolver: (_, styles) => [styles.root]
+})``;
 export default CalendlyInlineWidget;

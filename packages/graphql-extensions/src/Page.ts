@@ -99,9 +99,10 @@ export const mappers: Mappers = {
       contents: pageContentsResolver,
       hero: async (page: any, _args: any, ctx: ApolloContext) => {
         const heroRef: any = getLocalizedField(page.fields, 'hero', ctx);
-        const hero = await ctx.loaders.entryLoader.load({ id: heroRef?.sys?.id, preview: !!ctx.preview });
-        if (!hero) return heroRef;
-        return hero;
+        if (heroRef) {
+          return ctx.loaders.entryLoader.load({ id: heroRef?.sys?.id, preview: !!ctx.preview });
+        }
+        return null;
       }
     }
   },
