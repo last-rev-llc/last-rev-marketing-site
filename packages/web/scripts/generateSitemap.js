@@ -15,6 +15,7 @@ const run = async () => {
     site: process.env.SITE
   });
 
+  console.log('Sitemap', data);
   await generateSitemap(data.sitemap, resolve(__dirname, '../public'));
 };
 
