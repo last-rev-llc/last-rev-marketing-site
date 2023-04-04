@@ -12,6 +12,7 @@ const withFetchItems = (Wrapped: any) => (props: any) => {
   const fetchItems = async ({ filter, limit, offset }: { filter: any; limit?: number; offset?: number }) => {
     const client = await import('@last-rev-marketing-site/utils').then((module) => module.client);
     const { data } = await client.CollectionItems({ id: props.id, limit, offset, filter, preview });
+
     if (data?.content?.__typename == 'Collection') {
       const items = data?.content?.itemsConnection?.items;
       const options = data?.content?.itemsConnection?.pageInfo?.options;
@@ -20,7 +21,11 @@ const withFetchItems = (Wrapped: any) => (props: any) => {
     }
     return null;
   };
-  return <Wrapped fetchItems={fetchItems} loadMoreText={'VIEW MORE POSTS'} {...props} />;
+  return (
+    <div>
+      <Wrapped fetchItems={fetchItems} loadMoreText={'VIEW MORE POSTS'} {...props} />
+    </div>
+  );
 };
 
 export default withFetchItems(CollectionFiltered);

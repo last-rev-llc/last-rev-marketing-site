@@ -20,8 +20,6 @@ export const CollectionCarousel = ({
   if (!items?.length) return null;
   const itemsWithVariant = items.map((item: any) => ({ ...item, variant: itemsVariant ?? item?.variant }));
 
-  // const config = CarouselVariantProps[variant];
-
   return (
     <ErrorBoundary>
       <Root {...sidekick(sidekickLookup)} variant={variant} data-testid="CollectionCarousel">
@@ -30,7 +28,7 @@ export const CollectionCarousel = ({
             modules={[Autoplay, A11y]}
             {...{
               loop: true,
-              slidesPerView: 'auto',
+              slidesPerView: 4,
               loopedSlides: items?.length,
               spaceBetween: 80,
               pagination: false,

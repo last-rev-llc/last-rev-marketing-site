@@ -1,11 +1,9 @@
 import { compact, map, merge } from 'lodash';
 import { mergeTypeDefs, mergeResolvers } from '@graphql-tools/merge';
 import { Source, DocumentNode, GraphQLSchema } from 'graphql';
-import { typeDefs as algoliaTypeDefs } from '@last-rev/graphql-algolia-integration';
 
 import {
   Card,
-  Collection,
   Header,
   Hero,
   Link,
@@ -21,6 +19,7 @@ import * as Footer from './Footer';
 import * as Section from './Section';
 import * as Page from './Page';
 import * as PageBlog from './PageBlog';
+import * as Collection from './Collection';
 
 // Uncomment if using Algolia, else delete the related file
 // import * as Algolia from './Algolia';
@@ -34,8 +33,6 @@ export type GraphQlExtension = {
 };
 
 const extensions: GraphQlExtension[] = [
-  { typeDefs: algoliaTypeDefs },
-  // Algolia,
   Card,
   Collection,
   Header,

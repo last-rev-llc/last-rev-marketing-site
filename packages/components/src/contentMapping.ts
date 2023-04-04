@@ -29,10 +29,13 @@ const BackToTop = dynamic(() => import('@last-rev/component-library/dist/compone
 // Custom components
 const CollectionFiltered = dynamic(() => import('./components/CollectionFiltered'));
 
+const CalendlyInlineWidget = dynamic(() => import('./components/CalendlyInlineWidget'));
+
 // Custom components
 const Quote = dynamic(() => import('./components/Quote'));
 const Page = dynamic(() => import('./components/Page'));
 const CollectionCarousel = dynamic(() => import('./components/CollectionCarousel'));
+const Topic = dynamic(() => import('./components/PageTopic'));
 
 const contentMapping: {
   [key: string]: any;
@@ -50,11 +53,13 @@ const contentMapping: {
   Text,
   Media,
   Link,
+  'ModuleIntegration:calendly-inline-widget': CalendlyInlineWidget,
   NavigationItem,
   Hero,
   Quote,
   Footer,
-  PageBlog
+  PageBlog,
+  Topic
 };
 
 export default contentMapping;

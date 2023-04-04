@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { getSdk } from '@last-rev-marketing-site/graphql-sdk';
 import { GraphQLClient } from 'graphql-request';
 import { useRouter } from 'next/dist/client/router';
@@ -8,14 +8,9 @@ import useSWR from 'swr';
 import { ContentModuleProvider } from '@last-rev/component-library/dist/components/ContentModule/ContentModuleContext';
 import { Box } from '@mui/material';
 
-let client;
-
 const fetchPreview = async (id: string, locale: string, environment: string) => {
-  const previewGqlClient = new GraphQLClient(
-    `${
-      process.env.NODE_ENV === 'development' ? 'http://localhost:5000/graphql' : '/.netlify/functions/graphql'
-    }?env=master`
-  );
+  const previewGqlClient = new GraphQLClient(`/api/graphql?env=${environment}`);
+
   const sdk = getSdk(previewGqlClient);
   return sdk.Preview({ id, locale });
 };
