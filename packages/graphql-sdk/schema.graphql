@@ -132,9 +132,7 @@ input ContentsFilter {
   preview: Boolean
 }
 
-"""
-Date custom scalar type
-"""
+"""Date custom scalar type"""
 scalar Date
 
 type Footer implements Content {
@@ -437,6 +435,7 @@ union SubnavigationItem = Link | NavigationItem
 
 type TableOfContents implements Content {
   animation: JSON
+  content: [Heading]
   id: String
   internalTitle: String
   sidekickLookup: JSON
