@@ -118,6 +118,7 @@ const createVariants = (theme: Theme): ComponentsVariants['Card'] => [
       variant: 'blog-featured'
     },
     style: {
+      'background': '#f0f0f0 !important',
       'boxShadow': '0px 0px 0px 0px',
       'borderRadius': 0,
 
@@ -131,7 +132,18 @@ const createVariants = (theme: Theme): ComponentsVariants['Card'] => [
       },
       '& .MuiCardActions-root': {
         marginTop: theme.spacing(1),
-        padding: theme.spacing(2, 0)
+        padding: theme.spacing(2, 0),
+        display: 'flex',
+        alignItems: 'baseline',
+        flexDirection: 'column-reverse'
+      },
+      'a[data-testid="Card-link"]': {
+        zIndex: '-10'
+      },
+      '[class*="Card-tags"]': {
+        flexWrap: 'wrap',
+        paddingBottom: 0,
+        paddingTop: 25
       }
     }
   },

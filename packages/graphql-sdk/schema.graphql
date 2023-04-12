@@ -39,6 +39,7 @@ type Card implements Content {
   media: [Media]
   sidekickLookup: JSON
   subtitle: String
+  tags: [Link]
   theme: [Theme]
   title: String
   variant: String
@@ -199,6 +200,7 @@ type Link implements Content {
   internalTitle: String
   manualUrl: String
   sidekickLookup: JSON
+  target: String
   text: String
   theme: [Theme]
   variant: String

@@ -38,3 +38,9 @@ declare module '@mui/material/Typography' {
     heading: true;
   }
 }
+
+declare module '@mui/material/styles' {
+  interface BreakpointOverrides {
+    xxl: true;
+  }
+}

@@ -3,7 +3,6 @@ import { mergeTypeDefs, mergeResolvers } from '@graphql-tools/merge';
 import { Source, DocumentNode, GraphQLSchema } from 'graphql';
 
 import {
-  Card,
   Header,
   Hero,
   Media,
@@ -18,6 +17,8 @@ import * as Section from './Section';
 import * as Page from './Page';
 import * as PageBlog from './PageBlog';
 import * as Collection from './Collection';
+import * as Card from './Card';
+
 import * as RichText from './RichText';
 import * as TableOfContents from './TableOfContents';
 import * as Link from './Link';
@@ -34,7 +35,6 @@ export type GraphQlExtension = {
 };
 
 const extensions: GraphQlExtension[] = [
-  Card,
   Collection,
   Header,
   Hero,
@@ -49,6 +49,7 @@ const extensions: GraphQlExtension[] = [
   LRSection,
   PageBlog,
   Section,
+  Card,
   TableOfContents
 ];
 

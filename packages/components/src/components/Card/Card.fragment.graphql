@@ -17,6 +17,9 @@ fragment Card_FieldsFragment on Card {
   link {
     ...Link_CardFragment
   }
+  tags {
+    ...Link_CardFragment
+  }
 }
 
 # Base fragment used everywhere there's a Card

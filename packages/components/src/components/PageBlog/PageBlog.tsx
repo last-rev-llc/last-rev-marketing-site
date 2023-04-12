@@ -14,6 +14,8 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import EmailIcon from '@mui/icons-material/Email';
 import TwitterIcon from '@mui/icons-material/Twitter';
+import Chip from '@mui/material/Chip';
+import Divider from '@mui/material/Divider';
 // import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ErrorBoundary from '@last-rev/component-library/dist/components/ErrorBoundary';
 import ContentModule from '@last-rev/component-library/dist/components/ContentModule';
@@ -34,7 +36,7 @@ export interface PageBlogProps {
   author?: any;
   body?: any;
   quote?: string;
-  tags?: Array<string>;
+  tagsText?: Array<string>;
   relatedLinks?: LinkProps[];
   contents?: any;
   header: any;
@@ -54,7 +56,7 @@ export const PageBlog = ({
   author,
   body,
   quote,
-  tags,
+  tagsText,
   topics,
   relatedLinks,
   sidekickLookup,
@@ -73,7 +75,7 @@ export const PageBlog = ({
     'image': featuredMedia
       ? featuredMedia[0]?.file?.url
       : 'https://images.ctfassets.net/imglmb3xms7o/1VUPTATYD3ZMlFk4KQDJxl/12006d2bc2c51df42430a4765aff7042/Lastrev_logotype_trimmed.svg',
-    'keywords': `${seo?.keywords.value ?? tags ?? 'Technology'}`,
+    'keywords': `${seo?.keywords.value ?? tagsText ?? 'Technology'}`,
     'url': `https://www.lastrev.com/blog/${slug}`,
     'author': {
       '@type': 'Person',
@@ -94,35 +96,65 @@ export const PageBlog = ({
         <ContentContainer maxWidth={'xl'}>
           <Grid container spacing={5} sx={{ py: { lg: 4 } }} justifyContent="center">
             <Grid component="article" item xs={12} sm={9}>
-              {title ? (
-                <Typography
-                  variant="h1"
-                  component="h1"
-                  sx={{ color: 'primary.main' }}
-                  {...sidekick(sidekickLookup?.title)}>
-                  {title}
-                </Typography>
-              ) : null}
-              {creationDate ? (
-                <Typography
-                  variant="body1"
-                  component="p"
-                  sx={{ color: 'black', paddingTop: 1 }}
-                  {...sidekick(sidekickLookup?.creationDate)}>
-                  {creationDate}
-                </Typography>
-              ) : null}
-              {author ? (
-                <Typography variant="body1" component="p" {...sidekick(sidekickLookup?.author)}>
-                  {author}
-                </Typography>
-              ) : null}
-              {featuredMedia ? (
-                <MediaWrap>
-                  <ContentModule {...featuredMedia[0]} {...sidekick(sidekickLookup?.featuredMedia)} />
-                </MediaWrap>
-              ) : null}
-              {body ? <Text variant="blog" sidekickLookup={sidekickLookup?.body} body={body} /> : null}
+              <BlogHero>
+                <BlogInfo>
+                  {tagsText && (
+                    <div>
+                      {tagsText.map((tag, index) => (
+                        <Chip
+                          key={index}
+                          label={tag}
+                          sx={{ marginRight: 1, marginTop: 1, marginBottom: 1 }}
+                          {...sidekick(sidekickLookup?.tags)}
+                        />
+                      ))}
+                    </div>
+                  )}
+                  {title ? (
+                    <BlogTitle variant="h1" sx={{ color: 'primary.main' }} {...sidekick(sidekickLookup?.title)}>
+                      {title}
+                    </BlogTitle>
+                  ) : null}
+
+                  {creationDate ? (
+                    <Typography
+                      variant="body1"
+                      component="p"
+                      sx={{ color: 'black', paddingTop: 1 }}
+                      {...sidekick(sidekickLookup?.creationDate)}>
+                      {creationDate}
+                    </Typography>
+                  ) : null}
+                  {author ? (
+                    <Typography
+                      variant="body1"
+                      component="p"
+                      sx={{ fontWeight: 'bold' }}
+                      {...sidekick(sidekickLookup?.author)}>
+                      {author}
+                    </Typography>
+                  ) : null}
+                  <Divider
+                    style={{
+                      margin: '16px 0px 40px 0px',
+                      height: '1px',
+                      width: '400px',
+                      marginTop: 2,
+                      marginBottom: 2,
+                      borderBottomWidth: 'unset',
+                      borderColor: '#EBEBEB'
+                    }}
+                  />
+                </BlogInfo>
+
+                {featuredMedia ? (
+                  <MediaWrap>
+                    <ContentModule {...featuredMedia[0]} {...sidekick(sidekickLookup?.featuredMedia)} />
+                  </MediaWrap>
+                ) : null}
+              </BlogHero>
+
+              {body ? <BodyText variant="blog" sidekickLookup={sidekickLookup?.body} body={body} /> : null}
               {contents ? (
                 <ContentsWrapper sx={{ py: 3 }}>
                   {contents?.map((content: any) => (
@@ -334,7 +366,7 @@ export const PageBlog = ({
                       </ul>
                     </ListItem>
                   ) : null}
-                  {tags ? (
+                  {tagsText ? (
                     <ListItem>
                       <ListItemText
                         primary="Tags"
@@ -352,12 +384,12 @@ export const PageBlog = ({
                           padding: '0'
                         }}
                         {...sidekick(sidekickLookup?.tags)}>
-                        {tags.map((tag: string, i: React.Key | null | undefined) => (
+                        {tagsText.map((tag: string, i: React.Key | null | undefined) => (
                           <li
                             key={tag}
-                            style={{ whiteSpace: 'nowrap', marginRight: i !== tags.length - 1 ? 5 : undefined }}>
+                            style={{ whiteSpace: 'nowrap', marginRight: i !== tagsText.length - 1 ? 5 : undefined }}>
                             <Link text={tag} href={`/blog?tags=${kebabCase(tag.toLowerCase())}`} />
-                            {i !== tags.length - 1 ? ', ' : ''}
+                            {i !== tagsText.length - 1 ? ', ' : ''}
                           </li>
                         ))}
                       </ul>
@@ -407,6 +439,34 @@ const Root = styled(Box, {
   }
 }));
 
+const BlogHero = styled(Box, {
+  name: 'PageBlog',
+  slot: 'BlogHero',
+  overridesResolver: (_, styles) => [styles.blogHero]
+})<{ variant?: string }>(({ theme }) => ({
+  [theme.breakpoints.up('md')]: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    margin: '50px 0px 50px 0px',
+    [theme.breakpoints.up('xxl')]: {
+      margin: '70px 0px 70px 0px'
+    }
+  }
+}));
+
+const BlogInfo = styled(Box, {
+  name: 'PageBlog',
+  slot: 'BlogInfo',
+  overridesResolver: (_, styles) => [styles.blogInfo]
+})<{ variant?: string }>(() => ({
+  marginRight: 50,
+  display: 'flex',
+  justifyContent: 'center',
+  flexDirection: 'column',
+  height: '100%'
+}));
+
 const ContentContainer = styled(Container, {
   name: 'PageBlog',
   slot: 'ContentContainer',
@@ -426,9 +486,15 @@ const MediaWrap = styled(Box, {
 })<{ variant?: string }>(({ theme }) => ({
   'paddingTop': theme.spacing(4),
   'paddingBottom': theme.spacing(4),
+  'width': '100%',
   '& img': {
     'width': '100%',
-    'min-height': '50vh'
+    'height': 'auto',
+    'max-width': '60vh',
+    'objectFit': 'contain',
+    [theme.breakpoints.up('xxl')]: {
+      'max-width': '45vh'
+    }
   },
   '& iframe': {
     'width': '100%',
@@ -452,5 +518,30 @@ const ContentsWrapper = styled(Box, {
   slot: 'ContentsWrapper',
   overridesResolver: (_, styles) => [styles.contentsWrapper]
 })<{ variant?: string }>(() => ({}));
+
+const BlogTitle = styled(Typography, {
+  name: 'PageBlog',
+  slot: 'BlogTitle',
+  overridesResolver: (_, styles) => [styles.blogTitle]
+})<{ variant?: string }>(({ theme }) => ({
+  [theme.breakpoints.up('md')]: {
+    maxWidth: '400px'
+  }
+}));
+
+const BodyText = styled(Text, {
+  name: 'PageBlog',
+  slot: 'BodyText',
+  overridesResolver: (_, styles) => [styles.bodyText]
+})<{ variant?: string }>(({ theme }) => ({
+  '& .MuiTypography-body1': {
+    fontSize: '18px'
+  },
+  [theme.breakpoints.up('xxl')]: {
+    '& .MuiTypography-body1': {
+      fontSize: '22px'
+    }
+  }
+}));
 
 export default PageBlog;

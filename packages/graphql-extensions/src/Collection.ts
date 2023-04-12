@@ -37,7 +37,7 @@ export const typeDefs = gql`
 
   input CollectionFilterInput {
     topics: [String]
-    tags: [String]
+    tags: [String] 
     body: String
   }
 
