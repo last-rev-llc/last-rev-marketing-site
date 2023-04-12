@@ -28,7 +28,7 @@ export const CollectionCarousel = ({
             modules={[Autoplay, A11y]}
             {...{
               loop: true,
-              slidesPerView: 4,
+              slidesPerView: 1,
               loopedSlides: items?.length,
               spaceBetween: 80,
               pagination: false,
