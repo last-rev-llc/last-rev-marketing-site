@@ -4,7 +4,7 @@ import { Theme, ThemeOptions, ComponentsOverrides, ComponentsVariants } from '@m
 export const defaultProps = {};
 
 // https://mui.com/customization/theme-components/#global-style-overrides
-export const styleOverrides: ComponentsOverrides<Theme>['CollectionCarousel'] = {
+export const styleOverrides: ComponentsOverrides<Theme>['CollectionCarousel1'] = {
   // Set some static styles
   // root: {
   //   backgroundColor: 'red'
@@ -19,7 +19,7 @@ export const styleOverrides: ComponentsOverrides<Theme>['CollectionCarousel'] = 
 };
 
 // https://mui.com/customization/theme-components/#adding-new-component-variants
-const createVariants = (_theme: Theme): ComponentsVariants['CollectionCarousel'] => [
+const createVariants = (_theme: Theme): ComponentsVariants['CollectionCarousel1'] => [
   {
     props: {
       variant: 'carousel'

@@ -1,6 +1,9 @@
+import React from 'react';
 import { lorem } from 'faker';
-import { capitalize } from 'lodash';
-import { TextProps, RichText } from './Text';
+import BLOCKS from './BLOCKS';
+import MARKS from './MARKS';
+
+import { TextProps, RichText } from './Text.types';
 
 export const valueNode = (type: string = 'text') => ({
   data: {},
@@ -230,6 +233,85 @@ export const richTextMock = (): RichText => ({
   }
 });
 
+export const withLinksMock = (): TextProps => ({
+  __typename: 'Text',
+  body: {
+    json: {
+      nodeType: 'document',
+      data: {},
+      content: [
+        {
+          nodeType: 'heading-5',
+          data: {},
+          marks: [],
+          content: [
+            {
+              nodeType: 'hyperlink',
+              data: {
+                uri: '/blog?category=1'
+              },
+              marks: [],
+              content: [
+                {
+                  nodeType: 'text',
+                  value: 'Example Project',
+                  data: {},
+                  marks: []
+                }
+              ]
+            },
+            {
+              nodeType: 'text',
+              value: ' • June 2022',
+              data: {},
+              marks: []
+            }
+          ]
+        },
+        {
+          nodeType: 'heading-6',
+          data: {},
+          marks: [],
+          content: [
+            {
+              nodeType: 'hyperlink',
+              data: {
+                uri: '/blog/a-blog-link'
+              },
+              marks: [],
+              content: [
+                {
+                  nodeType: 'text',
+                  value: 'Project grows and expands with customer success',
+                  data: {},
+                  marks: []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          nodeType: 'paragraph',
+          data: {},
+          marks: [],
+          content: [
+            {
+              nodeType: 'text',
+              value: 'Senior hires assume critical roles in marketing, finance, and compliance.',
+              data: {},
+              marks: []
+            }
+          ]
+        }
+      ]
+    },
+    links: {
+      entries: [],
+      assets: []
+    }
+  }
+});
+
 export const staticRichTextMock = (): RichText => ({
   json: {
     nodeType: 'document',
@@ -252,6 +334,26 @@ export const staticRichTextMock = (): RichText => ({
   links: {
     entries: [],
     assets: []
+  }
+});
+
+export const formattedMock = () => ({
+  ...complexMock(),
+  renderNode: {
+    [BLOCKS.UL_LIST]: (_: any, children: any) => {
+      return <ul style={{ color: 'red' }}>{children}</ul>;
+    },
+    [BLOCKS.LIST_ITEM]: (_: any, children: any) => {
+      return <li>{children}</li>;
+    }
+  },
+  renderMark: {
+    [MARKS.BOLD]: (text: string) => <b style={{ color: 'red' }}>{text}</b>,
+    [MARKS.ITALIC]: (text: string) => <i>{text}</i>,
+    [MARKS.UNDERLINE]: (text: string) => <u>{text}</u>,
+    [MARKS.CODE]: (text: string) => <code>{text}</code>,
+    [MARKS.SUPERSCRIPT]: (text: string) => <sup>{text}</sup>,
+    [MARKS.SUBSCRIPT]: (text: string) => <sub>{text}</sub>
   }
 });
 
@@ -282,33 +384,33 @@ export const paragraphMock = (): TextProps => ({
     }
   }
 });
-
-export default (): TextProps => ({
+export const baseMock = (): TextProps => ({
   __typename: 'Text',
   body: {
     json: {
       nodeType: 'document',
       data: {},
       content: [
-        {
-          nodeType: 'heading-2',
+        ...[1, 2, 3, 4, 5, 6].map((level) => ({
+          nodeType: `heading-${level}`,
           data: {},
           content: [
             {
               nodeType: 'text',
-              value: capitalize(lorem.words(2)),
+              value: `Heading ${level}`,
               marks: [],
               data: {}
             }
           ]
-        },
+        })),
+
         {
           nodeType: 'paragraph',
           data: {},
           content: [
             {
               nodeType: 'text',
-              value: lorem.sentences(2),
+              value: `Paragraph`,
               marks: [],
               data: {}
             }
@@ -329,7 +431,7 @@ export default (): TextProps => ({
           content: [
             {
               nodeType: 'text',
-              value: 'Heyo',
+              value: 'Hyperlink',
               marks: [],
               data: {}
             }
@@ -339,3 +441,5 @@ export default (): TextProps => ({
     }
   }
 });
+
+export default baseMock;

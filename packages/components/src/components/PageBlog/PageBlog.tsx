@@ -17,7 +17,7 @@ import TwitterIcon from '@mui/icons-material/Twitter';
 // import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ErrorBoundary from '@last-rev/component-library/dist/components/ErrorBoundary';
 import ContentModule from '@last-rev/component-library/dist/components/ContentModule';
-import Text from '@last-rev/component-library/dist/components/Text';
+import Text from '../Text';
 import { MediaProps } from '@last-rev/component-library/dist/components/Media';
 import { LinkProps } from '@last-rev/component-library/dist/components/Link';
 import sidekick from '@last-rev/contentful-sidekick-util';

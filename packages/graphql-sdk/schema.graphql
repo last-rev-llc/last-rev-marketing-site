@@ -160,6 +160,12 @@ type Header implements Content {
   variant: String
 }
 
+type Heading {
+  id: String
+  level: Int
+  text: String
+}
+
 type Hero implements Content {
   actions: [Link]
   animation: JSON
@@ -429,6 +435,7 @@ union SubnavigationItem = Link | NavigationItem
 
 type TableOfContents implements Content {
   animation: JSON
+  content: [Heading]
   id: String
   internalTitle: String
   sidekickLookup: JSON

@@ -8,20 +8,12 @@ import Box from '@mui/material/Box';
 import { Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import sidekick from '@last-rev/contentful-sidekick-util';
-import Media, { MediaProps } from '../Media';
+import Media from '../Media';
 import Link from '../Link';
-import { CollectionProps } from '../Collection';
 import ContentModule from '../ContentModule';
 import ErrorBoundary from '../ErrorBoundary';
 import theme from '../../theme';
-
-export interface FooterProps {
-  logo?: MediaProps;
-  logoUrl?: string;
-  navigationItems?: CollectionProps[];
-  sidekickLookup: any;
-  brandAndYear?: string;
-}
+import { FooterProps } from './Footer.types';
 
 export const Footer = ({ logo, logoUrl, navigationItems, brandAndYear, sidekickLookup }: FooterProps) => {
   return (
