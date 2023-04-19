@@ -1,5 +1,5 @@
 {
-  "name": "lastrev-next-starter",
+  "name": "lastrev-marketing-site",
   "version": "0.1.0",
   "main": "index.js",
   "author": "LastRev",
@@ -39,7 +39,8 @@
     "test:e2e": "turbo run test:e2e",
     "version-packages": "changeset version && yarn prettier",
     "posttest": "yarn combine:reports",
-    "combine:reports": "node scripts/combineCoverage.js"
+    "combine:reports": "node scripts/combineCoverage.js",
+    "docubot": "docubot"
   },
   "private": true,
   "resolutions": {
@@ -63,6 +64,7 @@
     "@last-rev/eslint-plugin-last-rev": "^0.1.1",
     "@manypkg/cli": "^0.19.1",
     "cross-env": "^7.0.2",
+    "docubot": "0.1.10",
     "eslint": "^8.4.0",
     "eslint-config-airbnb": "^18.2.1",
     "eslint-config-google": "^0.14.0",
