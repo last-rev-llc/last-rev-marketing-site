@@ -149,7 +149,6 @@ Some components may have `createComponentVariants` file being used. This variant
 
 # Schema generation
 
-- Run `yarn propagate:env` to update the packages `.env` file
 - Run `yarn sync:cms` to sync the content from the CMS to the local file system
 - Run `yarn gql:dev` to get the grapqhl server running, generate the schema and the sdk.
 - Check the `schema.graphql` to see the new changes

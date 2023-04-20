@@ -18,8 +18,6 @@ function cleanup() {
 
 trap "cleanup" EXIT
 
-yarn propagate:env
-
 bash "$PWD/scripts/pre_build.sh"
 
 # Run build and cleanup pm2 if it fails
