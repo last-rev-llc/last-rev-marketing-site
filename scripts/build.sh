@@ -1,13 +1,10 @@
 #!/bin/bash
-set -a
-source .env || echo "No .env file found"
-set +a
 function cleanup() {
     rv=$?
     bash "$PWD/scripts/post_build.sh"
     if [[ "$rv" != "0" ]]; then
         echo "Build failed."
-        # if node env is buprodild do this
+        # if node env is build prod do this
         if [[ "$NODE_ENV" == "prod" ]]; then
             yarn pm2 logs --nostream --lines=1000
         fi
