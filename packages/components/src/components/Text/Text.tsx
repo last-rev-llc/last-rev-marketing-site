@@ -58,7 +58,7 @@ const renderTypography =
       return (
         <>
           {variant?.startsWith('h') && node?.data?.id ? <a id={node?.data?.id} className="jumplink" /> : null}
-          // Use div as Typograph to use the correct styles and avoid invalid DOM nesting when there embedded entries
+          {/* Use div as Typograph to use the correct styles and avoid invalid DOM nesting when there embedded entries */}
           <Typography variant={variant} {...(hasEmbed && { component: 'span' })} data-testid={`Text-${variant}`}>
             {children.map((child: any) => {
               if (isHTML(child)) {
