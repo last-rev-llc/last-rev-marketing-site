@@ -56,33 +56,35 @@ const renderTypography =
     if (containsHTML(children)) {
       const hasEmbed = node?.content?.some((child: any) => child.nodeType?.includes('embedded'));
       return (
-        // Use div as Typograph to use the correct styles and avoid invalid DOM nesting when there embedded entries
-        <Typography
-          id={node?.data?.id}
-          variant={variant}
-          {...(hasEmbed && { component: 'span' })}
-          data-testid={`Text-${variant}`}>
-          {children.map((child: any) => {
-            if (isHTML(child)) {
-              return (
-                <Typography
-                  component="span"
-                  variant={variant}
-                  data-testid={`Text-html-${variant}`}
-                  dangerouslySetInnerHTML={{ __html: child }}
-                />
-              );
-            }
-            return child;
-          })}
-        </Typography>
+        <>
+          {variant?.startsWith('h') && node?.data?.id ? <a id={node?.data?.id} className="jumplink" /> : null}
+          {/* Use div as Typograph to use the correct styles and avoid invalid DOM nesting when there embedded entries */}
+          <Typography variant={variant} {...(hasEmbed && { component: 'span' })} data-testid={`Text-${variant}`}>
+            {children.map((child: any) => {
+              if (isHTML(child)) {
+                return (
+                  <Typography
+                    component="span"
+                    variant={variant}
+                    data-testid={`Text-html-${variant}`}
+                    dangerouslySetInnerHTML={{ __html: child }}
+                  />
+                );
+              }
+              return child;
+            })}
+          </Typography>
+        </>
       );
     }
 
     return (
-      <Typography id={node?.data?.id} variant={variant} data-testid={`Text-${variant}`}>
-        {children}
-      </Typography>
+      <>
+        {variant?.startsWith('h') && node?.data?.id ? <a id={node?.data?.id} className="jumplink" /> : null}
+        <Typography variant={variant} data-testid={`Text-${variant}`}>
+          {children}
+        </Typography>
+      </>
     );
   };
 
@@ -237,11 +239,11 @@ const Root = styled(Box, {
   overridesResolver: (_, styles) => [styles.root]
 })<{ variant?: string }>(({ theme }) => {
   return {
-    '& :target:before': {
-      content: '""',
+    '& a.jumplink': {
       display: 'block',
-      height: `${theme.components?.Header?.height || 0}px`,
-      margin: `-${theme.components?.Header?.height || 0}px 0 0`
+      position: 'relative',
+      visibility: 'hidden',
+      top: `-${theme.components?.Header?.height || 0}px`
     },
     '&': `white-space: pre-wrap`
   };
