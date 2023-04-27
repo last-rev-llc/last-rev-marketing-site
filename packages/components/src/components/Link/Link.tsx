@@ -44,10 +44,10 @@ export const NextLinkComposed = React.forwardRef<HTMLAnchorElement, NextLinkComp
         scroll={scroll}
         shallow={shallow}
         passHref={passHref}
-        locale={locale}
-        onClick={onClick}
-        {...other}>
-        {text || children}
+        locale={locale}>
+        <RootLink ref={ref} {...other} onClick={onClick}>
+          {text || children}
+        </RootLink>
       </NextLink>
     );
   }
