@@ -6,6 +6,7 @@ import {
   Card,
   Header,
   Hero,
+  Link,
   Media,
   NavigationItem,
   Section as LRSection,
@@ -20,7 +21,6 @@ import * as PageBlog from './PageBlog';
 import * as Collection from './Collection';
 import * as RichText from './RichText';
 import * as TableOfContents from './TableOfContents';
-import * as Link from './Link';
 
 // Uncomment if using Algolia, else delete the related file
 // import * as Algolia from './Algolia';

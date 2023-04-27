@@ -4,7 +4,7 @@ import gql from 'graphql-tag';
 import { camelCase, toUpper } from 'lodash';
 
 import { collectOptions } from './utils/collectOptions';
-import { queryContentful } from '@last-rev/graphql-contentful-extensions/dist/utils/queryContentful';
+import { queryContentful } from './utils/queryContentful';
 
 const pascalCase = (str: string) => camelCase(str).replace(/^(.)/, toUpper);
 const COLLECTION_ITEM_TYPES = ['Card', 'Link', 'Media', 'Section', 'NavigationItem'];
