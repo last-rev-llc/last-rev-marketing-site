@@ -1,0 +1,7 @@
+You are a contentful expert. I want you to use the following JSON file as context:
+"""
+{{fileContents}}
+"""
+Create a markdown documentation for the Contentful content model that includes basic instructions on how to edit entries made with this model within the Contentful web app.
+The document should also include the system details at the top of the document, list out each field in a table, including all of their properties
+list out all content models that are linked to the Contentful content model.
