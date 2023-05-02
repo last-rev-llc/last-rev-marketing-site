@@ -1,6 +1,6 @@
 [build]
   publish = "packages/web/.next"
-  command = "yarn build"
+  command = "VERSION=envkey-source_2.3.0_linux_amd64.tar.gz (curl https://envkey-releases.s3.amazonaws.com/latest/envkeysource-version.txt) && curl -s https://envkey-releases.s3.amazonaws.com/envkeysource/release_artifacts/$VERSION/install.sh | yarn build"
 
 [dev]
   command = "yarn dev"
