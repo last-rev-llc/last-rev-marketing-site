@@ -25,6 +25,7 @@
     "@last-rev/rollup-config": "^0.1.4",
     "@last-rev/testing-library": "^0.1.10",
     "@rollup/plugin-typescript": "^8.3.0",
+    "envkey": "^2.3.2",
     "framer-motion": "^4.1.17",
     "lodash": "^4.17.21",
     "react-calendly": "^4.1.1",
