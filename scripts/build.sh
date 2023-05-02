@@ -4,12 +4,12 @@ source .env || echo "No .env file found"
 set +a
 function cleanup() {
     rv=$?
-    bash "es -- $PWD/scripts/post_build.sh"
+    bash "$PWD/scripts/post_build.sh"
     if [[ "$rv" != "0" ]]; then
         echo "Build failed."
         # if node env is buprodild do this
         if [[ "$NODE_ENV" == "prod" ]]; then
-            es -- yarn pm2 logs --nostream --lines=1000
+            yarn pm2 logs --nostream --lines=1000
         fi
         
     fi
@@ -18,9 +18,9 @@ function cleanup() {
 
 trap "cleanup" EXIT
 
-es -- yarn propagate:env
+yarn propagate:env
 
-bash "es -- $PWD/scripts/pre_build.sh"
+bash "$PWD/scripts/pre_build.sh"
 
 # Run build and cleanup pm2 if it fails
 echo "Building..."
