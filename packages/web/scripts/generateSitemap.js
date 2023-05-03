@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-require('dotenv').config();
+require('envkey').config();
 
 const { generateSitemap } = require('@last-rev/sitemap-generator');
 const { resolve } = require('path');
