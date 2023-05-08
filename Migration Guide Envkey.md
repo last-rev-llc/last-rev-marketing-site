@@ -13,14 +13,11 @@ Remove:
 
 ## Update gitignore file(s) with the following
 
+```
 ## Ignore .envkey in all directories except root directory
-
 \*\*/.envkey
 !.envkey
-
-## Update build scripts after copy to be executable again
-
-chmod +x script.sh
+```
 
 ## ADD the .envkey file!!
 
@@ -60,7 +57,12 @@ With:
 "envkey": "^2.3.2",
 ```
 
-## Yarn on Root - Update the yarn.lock file on root
+## Add fs-extra to dependencies
+
+```
+nvm use
+yarn add fs-extra -W
+```
 
 # Check the contents of the files in build.sh and dev.sh and see if they can be updated directly
 
@@ -69,13 +71,11 @@ With:
 ```
 #!/bin/bash
 
-# Installing Envkey on Server, skips if it assume it's running locally.
-bash $PWD/scripts/installEnvkey.sh
+# Installing Envkey on Server, skips if it assumes it's running locally.
+yarn installEnvkey
 
-# Load the environment variables from EnvKey
-set -a
-eval $(envkey-source)
-set +a
+# Load the environment variables into all packages for the monorepo
+yarn copyEnvkey
 
 # Function to run on exit, runs post-build script and handles build failure
 function cleanup() {
@@ -97,8 +97,6 @@ function cleanup() {
 # Run cleanup function on exit
 trap "cleanup" EXIT
 
-# Load the environment variables into all packages for the monorepo
-yarn copyEnvkey
 
 # Run pre-build script
 bash "$PWD/scripts/pre_build.sh"
@@ -106,6 +104,7 @@ bash "$PWD/scripts/pre_build.sh"
 # Run build and cleanup pm2 if it fails
 echo "Building..."
 STAGE=build yarn turbo:build --output-logs=new-only $1 || echo "Build failed. Please check logs for more information."
+
 ```
 
 # END of Updated build.sh Script
@@ -115,13 +114,11 @@ STAGE=build yarn turbo:build --output-logs=new-only $1 || echo "Build failed. Pl
 ```
 #!/bin/bash
 
-# Installing Envkey on Server, skips if it assume it's running locally.
-bash $PWD/scripts/installEnvkey.sh
+# Installing Envkey on Server, skips if it assumes it's running locally.
+yarn installEnvkey
 
-# Load the environment variables from EnvKey, and fail the script if it fails
-set -a
-eval $(envkey-source) || { echo "Error: Failed to load environment variables from EnvKey. Please make sure EnvKey is set up properly and try again."; exit 1; }
-set +a
+# Load the environment variables into all packages for the monorepo
+yarn copyEnvkey
 
 # Function to run on exit, kills pm2 process and exits with the same exit code as the previous command
 function cleanup() {
@@ -132,9 +129,6 @@ function cleanup() {
 
 # Run cleanup function on exit
 trap "cleanup" EXIT
-
-# Load the environment variables into all packages for the monorepo
-yarn copyEnvkey
 
 # Start the develop server
 echo "Starting develop server..."
@@ -147,6 +141,7 @@ fi
 
 # Start the develop server and output logs
 turbo run dev --output-logs=new-only || { echo "Error: Failed to start develop server. Please check logs for more information."; exit 1; }
+
 ```
 
 # END of Updated dev.sh Script
@@ -210,3 +205,58 @@ run();
 ```
 
 # End of NEW File called copyEnvkey.js Script
+
+# Start of NEW File called installEnvkey.sh Script
+
+```
+#!/bin/bash
+
+# Function to install envkey-source
+# Parameters:
+#   $1 - A string representing the sed command to modify the installation script
+install_envkey_source() {
+  # Get the latest version of envkey-source
+  local version=$(curl -s https://envkey-releases.s3.amazonaws.com/latest/envkeysource-version.txt)
+
+  # Modify the installation script using the sed command passed as a parameter
+  local install_cmd=$1
+
+  # Execute the modified installation script and check if the installation was successful
+  if curl -s https://envkey-releases.s3.amazonaws.com/envkeysource/release_artifacts/$version/install.sh | sed "$install_cmd" | bash > /dev/null 2>&1; then
+    echo -e "\033[32m\033[1menvkey-source installed successfully.\033[0m"
+  else
+    echo -e "\033[31m\033[1m\033[5menvkey-source installation failed.\033[0m"
+  fi
+}
+
+# Check if the script is running on Netlify
+if [[ ! -z "${NETLIFY_BUILD_BASE}" ]]; then
+  # Get the current working directory
+  current_dir=$(pwd)
+
+  # Call the install_envkey_source function with a sed command to adjust the installation directory
+  install_envkey_source "s|/usr/local/bin|$current_dir/node_modules/.bin|g"
+
+# Check if the script is running on Vercel
+elif [[ ! -z "${VERCEL_ENV}" ]]; then
+  # Call the install_envkey_source function with a sed command to remove the sudo command for Vercel
+  install_envkey_source 's/sudo mv/mv/g'
+
+# If not running on Netlify or Vercel, assume it's running locally and skip the installation
+else
+  echo "Install Skipped, assuming it's running locally."
+fi
+
+```
+
+# End of NEW File called installEnvkey.sh Script
+
+## Update all build scripts to be executable again
+
+`chmod +x script.sh`
+
+```
+chmod +x scripts/installEnvkey.sh
+chmod +x scripts/build.sh
+chmod +x scripts/dev.sh
+```

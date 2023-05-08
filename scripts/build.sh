@@ -1,12 +1,10 @@
 #!/bin/bash
 
-# Installing Envkey on Server, skips if it assume it's running locally.
-bash $PWD/scripts/installEnvkey.sh
+# Installing Envkey on Server, skips if it assumes it's running locally.
+yarn installEnvkey
 
-# Load the environment variables from EnvKey
-set -a
-eval $(envkey-source)
-set +a
+# Load the environment variables into all packages for the monorepo
+yarn copyEnvkey
 
 # Function to run on exit, runs post-build script and handles build failure
 function cleanup() {
@@ -28,8 +26,6 @@ function cleanup() {
 # Run cleanup function on exit
 trap "cleanup" EXIT
 
-# Load the environment variables into all packages for the monorepo
-yarn copyEnvkey
 
 # Run pre-build script
 bash "$PWD/scripts/pre_build.sh"

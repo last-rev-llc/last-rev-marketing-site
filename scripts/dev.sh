@@ -1,12 +1,10 @@
 #!/bin/bash
 
-# Installing Envkey on Server, skips if it assume it's running locally.
-bash $PWD/scripts/installEnvkey.sh
+# Installing Envkey on Server, skips if it assumes it's running locally.
+yarn installEnvkey
 
-# Load the environment variables from EnvKey, and fail the script if it fails
-set -a
-eval $(envkey-source) || { echo "Error: Failed to load environment variables from EnvKey. Please make sure EnvKey is set up properly and try again."; exit 1; }
-set +a
+# Load the environment variables into all packages for the monorepo
+yarn copyEnvkey
 
 # Function to run on exit, kills pm2 process and exits with the same exit code as the previous command
 function cleanup() {
@@ -17,9 +15,6 @@ function cleanup() {
 
 # Run cleanup function on exit
 trap "cleanup" EXIT
-
-# Load the environment variables into all packages for the monorepo
-yarn copyEnvkey
 
 # Start the develop server
 echo "Starting develop server..."
