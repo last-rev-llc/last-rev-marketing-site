@@ -3,6 +3,7 @@ ADD:
 
 ```
     "copyEnvkey": "node scripts/copyEnvkey.js",
+    "installEnvkey": "node scripts/installEnvkey.sh",
 ```
 
 Remove:
@@ -64,9 +65,11 @@ nvm use
 yarn add fs-extra -W
 ```
 
+---
+
 # Check the contents of the files in build.sh and dev.sh and see if they can be updated directly
 
-# Start of Updated build.sh Script
+### Start of Updated build.sh Script
 
 ```
 #!/bin/bash
@@ -107,9 +110,11 @@ STAGE=build yarn turbo:build --output-logs=new-only $1 || echo "Build failed. Pl
 
 ```
 
-# END of Updated build.sh Script
+### END of Updated build.sh Script
 
-# Start of Updated dev.sh Script
+---
+
+### Start of Updated dev.sh Script
 
 ```
 #!/bin/bash
@@ -144,9 +149,11 @@ turbo run dev --output-logs=new-only || { echo "Error: Failed to start develop s
 
 ```
 
-# END of Updated dev.sh Script
+### END of Updated dev.sh Script
 
-# Start of NEW File called copyEnvkey.js Script
+---
+
+### Start of NEW File called copyEnvkey.js Script
 
 ```
 /* eslint-disable no-console */
@@ -204,9 +211,11 @@ const run = async () => {
 run();
 ```
 
-# End of NEW File called copyEnvkey.js Script
+### End of NEW File called copyEnvkey.js Script
 
-# Start of NEW File called installEnvkey.sh Script
+---
+
+### Start of NEW File called installEnvkey.sh Script
 
 ```
 #!/bin/bash
@@ -249,7 +258,9 @@ fi
 
 ```
 
-# End of NEW File called installEnvkey.sh Script
+### End of NEW File called installEnvkey.sh Script
+
+---
 
 ## Update all build scripts to be executable again
 
