@@ -13,7 +13,7 @@ jobs:
       provider: 'netlify'
       parallel-jobs: 5
       preview-max-timeout: 10000
-      working-directory: '.'
+      # working-directory: '.'
     secrets:
       CYPRESS_PROJECT_ID: ${{ secrets.CYPRESS_PROJECT_ID }}
       CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
