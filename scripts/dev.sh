@@ -19,7 +19,7 @@ function cleanup() {
 trap "cleanup" EXIT
 
 # Load the environment variables into all packages for the monorepo
-node $PWD/scripts/copyEnvkey.js 
+yarn copyEnvkey
 
 # Start the develop server
 echo "Starting develop server..."

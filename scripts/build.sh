@@ -29,7 +29,7 @@ function cleanup() {
 trap "cleanup" EXIT
 
 # Load the environment variables into all packages for the monorepo
-node $PWD/scripts/copyEnvkey.js 
+yarn copyEnvkey
 
 # Run pre-build script
 bash "$PWD/scripts/pre_build.sh"
