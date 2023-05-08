@@ -18,9 +18,11 @@ function cleanup() {
 # Run cleanup function on exit
 trap "cleanup" EXIT
 
+# Load the environment variables into all packages for the monorepo
+node $PWD/scripts/copyEnvkey.js 
+
 # Start the develop server
 echo "Starting develop server..."
-yarn copy:envkey
 
 # If using the fs runner strategy, sync the CMS data
 if [[ "${GRAPHQL_RUNNER_STRATEGY}" == "fs" ]] || [[ -z "${GRAPHQL_RUNNER_STRATEGY}" ]]; then
