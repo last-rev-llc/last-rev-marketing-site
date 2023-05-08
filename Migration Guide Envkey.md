@@ -15,7 +15,7 @@ Remove:
 
 ```
 ## Ignore .envkey in all directories except root directory
-\*\*/.envkey
+**/.envkey
 !.envkey
 ```
 
