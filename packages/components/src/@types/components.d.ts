@@ -70,6 +70,14 @@ declare module '@mui/material/styles' {
        */
       variants?: ComponentsVariants['NavigationItem'];
     };
+    TableOfContents?: {
+      defaultProps?: ComponentsProps['TableOfContents'];
+      styleOverrides?: ComponentsOverrides<Theme>['TableOfContents'];
+      /**
+       * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
+       */
+      variants?: ComponentsVariants['TableOfContents'];
+    };
     Text?: {
       defaultProps?: ComponentsProps['Text'];
       styleOverrides?: ComponentsOverrides<Theme>['Text'];

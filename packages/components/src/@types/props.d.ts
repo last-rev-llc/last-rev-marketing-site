@@ -19,34 +19,37 @@ import { CollectionAccordionProps } from '../components/CollectionAccordion';
 import { NavigationBarProps } from '../components/NavigationBar';
 import { QuoteProps } from '../components/Quote';
 import { PageProps } from '../components/Page';
+import { TableOfContentsProps } from '../components/TableOfContents';
+import { FooterProps } from '../components/Footer';
 
 declare module '@mui/material/styles' {
   export interface ComponentsPropsList {
+    // BackToTop: BackToTopProps;
+    // Custom components
+    // FormMarketoEmbed: FormMarketoEmbedProps;
+    // MailchimpForm: MailchimpFormProps;
     Accordion: AccordionProps;
     Card: CardProps;
+    Collection: CollectionProps;
+    CollectionAccordion: CollectionAccordionProps;
+    CollectionCarousel1: CollectionCarouselProps;
+    CollectionFiltered: CollectionFilteredProps;
     ContentModule: ContentModuleProps;
-    ErrorBoundary: ErrorBoundaryProps;
-    SEO: SEOProps;
     ContentPreview: ContentPreviewProps;
-    NavigationItem: NavigationItemProps;
-    Text: TextProps;
-    Image: ImageProps;
-    Link: LinkProps;
+    ErrorBoundary: ErrorBoundaryProps;
+    Footer: FooterProps;
     Header: HeaderProps;
     Hero: HeroProps;
+    Image: ImageProps;
+    Link: LinkProps;
     Media: MediaProps;
-    Section: SectionProps;
-    Collection: CollectionProps;
-    CollectionFiltered: CollectionFilteredProps;
-    CollectionAccordion: CollectionAccordionProps;
     NavigationBar: NavigationBarProps;
+    NavigationItem: NavigationItemProps;
     Page: PageProps;
-    // MailchimpForm: MailchimpFormProps;
-    CollectionCarousel: CollectionCarouselProps;
-    // BackToTop: BackToTopProps;
-    // FormMarketoEmbed: FormMarketoEmbedProps;
-
-    // Custom components
     Quote: QuoteProps;
+    Section: SectionProps;
+    SEO: SEOProps;
+    TableOfContents: TableOfContentsProps;
+    Text: TextProps;
   }
 }

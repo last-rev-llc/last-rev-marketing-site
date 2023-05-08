@@ -10,7 +10,7 @@ import Section from '@last-rev/component-library/dist/components/Section/Section
 import Collection from '@last-rev/component-library/dist/components/Collection/Collection';
 import Link from '@last-rev/component-library/dist/components/Link/Link';
 import Hero from '@last-rev/component-library/dist/components/Hero/Hero';
-import Text from '@last-rev/component-library/dist/components/Text/Text';
+import Text from '../src/components/Text';
 import Media from '@last-rev/component-library/dist/components/Media/Media';
 import NavigationItem from '@last-rev/component-library/dist/components/NavigationItem/NavigationItem';
 import Quote from '../src/components/Quote';

@@ -24,5 +24,3 @@ export interface CollectionCarouselClasses {
 }
 
 export declare type CollectionCarouselClassKey = keyof CollectionCarouselClasses;
-declare const accordionClasses: CollectionCarouselClasses;
-export default accordionClasses;

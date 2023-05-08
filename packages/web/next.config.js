@@ -7,7 +7,12 @@ const withTM = require('next-transpile-modules')([
   '@last-rev/component-library',
   '@last-rev/contentful-app-components'
 ]);
-// const { withSentryConfig } = require('@sentry/nextjs');
+const { getWinstonLogger } = require('@last-rev/logging');
+
+const logger = getWinstonLogger({
+  package: 'web',
+  module: 'next.config'
+});
 
 // Allow bundle analysis via ANALYZE_BUNDLE env variable
 const enableAnalyzer = !!(process.env.ANALYZE_BUNDLE && process.env.ANALYZE_BUNDLE.toLowerCase() === 'true');
@@ -20,7 +25,7 @@ const ContentSecurityPolicy = `
   style-src 'self' 'unsafe-inline' *.sentry.io fonts.googleapis.com;
   script-src 'self' 'unsafe-inline' *.sentry.io app.netlify.com *.netlify.app analytics.google.com *.google-analytics.com *.googletagmanager.com *.googleoptimize.com ;
   font-src 'self' *.sentry.io fonts.gstatic.com data:;
-  frame-src https://calendly.com;
+  frame-src https://calendly.com *.youtube.com;
   img-src * data:;
   media-src * data:;
   object-src 'none';
@@ -52,6 +57,18 @@ const securityHeaders = [
     value: 'camera=(), microphone=(), geolocation=()'
   }
 ];
+
+const hasAllSentryVars = !!(
+  process.env.SENTRY_PROJECT &&
+  process.env.SENTRY_AUTH_TOKEN &&
+  process.env.SENTRY_URL &&
+  process.env.SENTRY_ORG &&
+  process.env.NEXT_PUBLIC_SENTRY_DSN
+);
+
+if (!hasAllSentryVars) {
+  logger.warn('Sentry is disabled.  Please check your environment variables.');
+}
 
 const sentryWebpackPluginOptions = {
   // Additional config options for the Sentry Webpack plugin. Keep in mind that
@@ -121,12 +138,12 @@ const nextConfig = {
     loader: 'custom',
     loaderFile: './src/contentfulLoader.ts'
   },
-  ...((!process.env.SENTRY_PROJECT || process.env.NODE_ENV !== 'production') && {
-    sentry: {
-      disableServerWebpackPlugin: true,
-      disableClientWebpackPlugin: true
-    }
-  }),
+  sentry: {
+    disableServerWebpackPlugin: !hasAllSentryVars,
+    disableClientWebpackPlugin: !hasAllSentryVars,
+    hideSourceMaps: true,
+    widenClientFileUpload: true
+  },
   webpack: (config, { webpack }) => {
     // Important: return the modified config
     config.resolve.alias = {

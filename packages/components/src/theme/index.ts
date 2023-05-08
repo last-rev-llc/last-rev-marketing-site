@@ -6,6 +6,7 @@ import Quote from '../components/Quote/Quote.theme';
 import Header from '../components/Header/Header.theme';
 import Section from '../components/Section/Section.theme';
 import Link from '../components/Link/Link.theme';
+import TableOfContents from '../components/TableOfContents/TableOfContents.theme';
 import Text from '../components/Text/Text.theme';
 import NavigationBar from '../components/NavigationBar/NavigationBar.theme';
 import NavigationItem from '../components/NavigationItem/NavigationItem.theme';
@@ -172,7 +173,8 @@ const createSchemeTheme = (schemeKey?: string) => {
         Link(baseSchemeTheme),
         Section(baseSchemeTheme),
         Collection(baseSchemeTheme),
-        CollectionCarousel(baseSchemeTheme)
+        CollectionCarousel(baseSchemeTheme),
+        TableOfContents(baseSchemeTheme)
       ],
       {
         createSchemeTheme,
@@ -415,6 +417,11 @@ const createSchemeTheme = (schemeKey?: string) => {
             }
           },
           Quote: {
+            styleOverrides: {
+              root: {}
+            }
+          },
+          TableOfContents: {
             styleOverrides: {
               root: {}
             }

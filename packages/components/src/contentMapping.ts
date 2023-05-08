@@ -26,6 +26,8 @@ const Footer = dynamic(() => import('./components/Footer'));
 
 const BackToTop = dynamic(() => import('@last-rev/component-library/dist/components/BackToTop'));
 
+const TableOfContents = dynamic(() => import('./components/TableOfContents'));
+
 // Custom components
 const CollectionFiltered = dynamic(() => import('./components/CollectionFiltered'));
 
@@ -59,7 +61,8 @@ const contentMapping: {
   Quote,
   Footer,
   PageBlog,
-  Topic
+  Topic,
+  TableOfContents
 };
 
 export default contentMapping;
