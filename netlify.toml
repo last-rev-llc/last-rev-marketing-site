@@ -1,9 +1,9 @@
 [build]
   publish = "packages/web/.next"
-  command = "yarn installEnvkey && es -- yarn build"
+  command = "yarn installEnvkey && yarn build"
 
 [dev]
-  command = "yarn installEnvkey && es -- yarn dev"
+  command = "yarn installEnvkey && yarn dev"
 
 [functions]
   directory = "packages/functions/src"
