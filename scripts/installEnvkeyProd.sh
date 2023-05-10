@@ -36,4 +36,4 @@ else
   echo "Install Skipped, assuming it's running locally."
 fi
 
-es -- yarn build
+es -- yarn build:Prod
