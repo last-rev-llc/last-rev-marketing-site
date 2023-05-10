@@ -1,6 +1,6 @@
 #!/bin/bash
 set -a
-source .env || echo "No .env file found"
+source .env || echo "Now using Envkey"
 set +a
 function cleanup() {
     rv=$?
@@ -17,8 +17,6 @@ function cleanup() {
 }
 
 trap "cleanup" EXIT
-
-yarn propagate:env
 
 bash "$PWD/scripts/pre_build.sh"
 
