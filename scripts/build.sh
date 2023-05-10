@@ -1,4 +1,6 @@
 #!/bin/bash
+yarn installEnvkey
+
 function cleanup() {
     rv=$?
     bash "$PWD/scripts/post_build.sh"

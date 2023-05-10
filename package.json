@@ -12,8 +12,9 @@
   "scripts": {
     "algolia:update": "lr-algolia-updater https://starter.lastrev.com/.netlify/functions/algolia-background",
     "algolia:update:local": "lr-algolia-updater http://localhost:8888/.netlify/functions/algolia-background",
-    "dev": "./scripts/installEnvkey.sh && es -w -- ./scripts/dev.sh",
-    "build": "./scripts/installEnvkey.sh && es -w --  ./scripts/build.sh",
+    "dev": "yarn installEnvkey && es -- ./scripts/dev.sh",
+    "build": "yarn installEnvkey && es -- ./scripts/build.sh",
+    "installEnvkey": "./scripts/installEnvkey.sh",
     "turbo:sync:cms": "turbo run sync:cms",
     "turbo:build": "turbo run build",
     "build:storybook": "turbo run build-storybook; status=$?; pm2 kill; exit $status",
