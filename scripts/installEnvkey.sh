@@ -35,5 +35,3 @@ elif [[ ! -z "${VERCEL_ENV}" ]]; then
 else
   echo "Install Skipped, assuming it's running locally."
 fi
-
-es -- yarn build:Dev
