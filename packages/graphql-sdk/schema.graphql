@@ -199,6 +199,7 @@ type Link implements Content {
   internalTitle: String
   manualUrl: String
   sidekickLookup: JSON
+  target: String
   text: String
   theme: [Theme]
   variant: String
