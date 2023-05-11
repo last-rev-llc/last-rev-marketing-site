@@ -30,7 +30,6 @@ export const CollectionCarousel = ({
               loop: true,
               slidesPerView: 4,
               loopedSlides: items?.length,
-              spaceBetween: 80,
               pagination: false,
               navigation: false,
               speed: 10000,
@@ -40,10 +39,12 @@ export const CollectionCarousel = ({
               },
               breakpoints: {
                 684: {
-                  slidesPerView: 1
+                  slidesPerView: 1,
+                  spaceBetween: 40
                 },
                 780: {
-                  slidesPerView: 2
+                  slidesPerView: 2,
+                  spaceBetween: 80
                 },
                 1024: {
                   slidesPerView: 3
@@ -91,8 +92,10 @@ const CarouselContainer = styled(Swiper, {
   overridesResolver: (_, styles) => [styles.carouselContainer]
 })<{ variant?: string }>(({ theme }) => ({
   'width': '100%',
-
   'overflow': 'hidden',
+  [theme.breakpoints.down('sm')]: {
+    minWidth: 'calc(200vw - 20%)'
+  },
   '--swiper-theme-color': theme.palette.primary.main,
   '& > .swiper-pagination-bullets span.swiper-pagination-bullet': {
     margin: '0 10px'
@@ -105,6 +108,9 @@ const CarouselContainer = styled(Swiper, {
     [theme.breakpoints.down('lg')]: {
       display: 'none'
     }
+  },
+  '& .swiper-wrapper': {
+    alignItems: 'center'
   }
 }));
 
