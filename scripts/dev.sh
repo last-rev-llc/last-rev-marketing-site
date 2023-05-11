@@ -1,7 +1,5 @@
 #!/bin/bash
-set -a
-source .env || echo "No .env file found"
-set +a
+
 function cleanup() {
     rv=$?
     yarn gql:pm2:kill

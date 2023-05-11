@@ -1,5 +1,17 @@
 # Migration Guide to Envkey
 
+## Appropriate Permissions Required or IT Help
+
+In order to start you'll need to make sure that you have all of the environment variables copied over to Envkey and have initalized / created the .envkey file on your branch. If you do not have the permissions but are attempting to add a new app/repo to Envkey just submit a request through ISD. I can provide you with a new .envkey as necessary.
+
+If the app exists already within your Envkey account but you do not have the .envkey file yet. You will need to use the following command and following the easy to use prompts for it to 'intialize' your project.
+
+```
+envkey init
+```
+
+---
+
 ## Update the scripts within the package.json file
 
 We need to provide additional build command(s). See the standard/example below, we change the old build commands to include the name of the new script and prefix with `es -- `after installing Envkey. It's also necessary to create the installEnvkey as it's own build script and invoke it use `yarn installEnvkey` before injecting the new/old command with `es -- `. I had issues doing it other ways so felt this would be the best way to accomplish this.
@@ -15,16 +27,6 @@ Quick Reference Example: `"yarn installEnvkey && es -- yarn new-build-command"`
     "build:prod": "./scripts/build.sh",
     "installEnvkey": "./scripts/installEnvkey.sh",
 ```
-
----
-
-## Add Envkey to the root package.json
-
-```
-yarn add envkey -W
-```
-
-Sometimes I've noticed that the yarn.lock file isn't updated, go ahead and run a `yarn` after install just in case so that the yarn.lock file gets update on your PR.
 
 ---
 
