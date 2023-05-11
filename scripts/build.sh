@@ -1,7 +1,5 @@
 #!/bin/bash
-set -a
-source .env || echo "Now using Envkey"
-set +a
+
 function cleanup() {
     rv=$?
     bash "$PWD/scripts/post_build.sh"

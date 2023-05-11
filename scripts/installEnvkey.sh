@@ -33,5 +33,6 @@ elif [[ ! -z "${VERCEL_ENV}" ]]; then
 
 # If not running on Netlify or Vercel, assume it's running locally and skip the installation
 else
-  echo "Install Skipped, assuming it's running locally."
+  echo "$(tput setaf 6)$(tput bold)Envkey Install Skipped, we're assuming it's running locally.$(tput sgr0)"
+
 fi
