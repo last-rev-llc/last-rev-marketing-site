@@ -29,6 +29,7 @@ export const CollectionCarousel = ({
             {...{
               loop: true,
               slidesPerView: 4,
+              spaceBetween: 80,
               loopedSlides: items?.length,
               pagination: false,
               navigation: false,
