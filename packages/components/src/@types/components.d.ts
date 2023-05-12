@@ -216,5 +216,13 @@ declare module '@mui/material/styles' {
        */
       variants?: ComponentsVariants['Quote'];
     };
+    PageBlog?: {
+      defaultProps?: ComponentsProps['PageBlog'];
+      styleOverrides?: ComponentsOverrides<Theme>['PageBlog'];
+      /**
+       * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
+       */
+      variants?: ComponentsVariants['PageBlog'];
+    };
   }
 }

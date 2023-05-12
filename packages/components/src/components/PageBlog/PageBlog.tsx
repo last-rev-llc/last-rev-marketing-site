@@ -7,6 +7,8 @@ import Grid from '@mui/material/Grid';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
+import Chip from '@mui/material/Chip';
+import Divider from '@mui/material/Divider';
 import Container from '@mui/material/Container';
 import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
@@ -14,40 +16,17 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import EmailIcon from '@mui/icons-material/Email';
 import TwitterIcon from '@mui/icons-material/Twitter';
-import Chip from '@mui/material/Chip';
-import Divider from '@mui/material/Divider';
-// import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ErrorBoundary from '@last-rev/component-library/dist/components/ErrorBoundary';
 import ContentModule from '@last-rev/component-library/dist/components/ContentModule';
-import Text from '../Text';
-import { MediaProps } from '@last-rev/component-library/dist/components/Media';
-import { LinkProps } from '@last-rev/component-library/dist/components/Link';
 import sidekick from '@last-rev/contentful-sidekick-util';
 
+import { PageBlogProps } from './PageBlog.types';
 import Link from '../Link';
-
-export interface PageBlogProps {
-  __typename?: string;
-  sidekickLookup?: any;
-  title?: string;
-  creationDate?: string;
-  slug?: string;
-  featuredMedia?: Array<MediaProps>;
-  author?: any;
-  body?: any;
-  quote?: string;
-  tagsText?: Array<string>;
-  relatedLinks?: LinkProps[];
-  contents?: any;
-  header: any;
-  footer: any;
-  topics?: any;
-  landingPageSummary?: string;
-  seo: any;
-}
+import Text from '../Text';
 
 export const PageBlog = ({
   header,
+  variant = 'default',
   footer,
   slug,
   title,
@@ -92,13 +71,13 @@ export const PageBlog = ({
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }} />
       </Head>
       {header ? <ContentModule {...(header as any)} /> : null}
-      <Root {...sidekick(sidekickLookup)} itemScope itemType="https://schema.org/Blog">
+      <Root {...sidekick(sidekickLookup)} itemScope itemType="https://schema.org/Blog" variant={variant}>
         <ContentContainer maxWidth={'xl'}>
           <Grid container spacing={5} sx={{ py: { lg: 4 } }} justifyContent="center">
             <Grid component="article" item xs={12} sm={9}>
               <BlogHero>
                 <BlogInfo>
-                  {tagsText && (
+                  {tagsText && variant === 'text-image' && (
                     <div>
                       {tagsText.map((tag, index) => (
                         <Chip
@@ -115,7 +94,6 @@ export const PageBlog = ({
                       {title}
                     </BlogTitle>
                   ) : null}
-
                   {creationDate ? (
                     <Typography
                       variant="body1"
@@ -126,25 +104,24 @@ export const PageBlog = ({
                     </Typography>
                   ) : null}
                   {author ? (
-                    <Typography
-                      variant="body1"
-                      component="p"
-                      sx={{ fontWeight: 'bold' }}
-                      {...sidekick(sidekickLookup?.author)}>
+                    <AuthorTypography variant="body1" {...sidekick(sidekickLookup?.author)}>
                       {author}
-                    </Typography>
+                    </AuthorTypography>
                   ) : null}
-                  <Divider
-                    style={{
-                      margin: '16px 0px 40px 0px',
-                      height: '1px',
-                      width: '400px',
-                      marginTop: 2,
-                      marginBottom: 2,
-                      borderBottomWidth: 'unset',
-                      borderColor: '#EBEBEB'
-                    }}
-                  />
+
+                  {variant === 'text-image' && (
+                    <Divider
+                      style={{
+                        margin: '20px 0px 80px 0px',
+                        height: '1px',
+                        width: '400px',
+                        marginTop: 2,
+                        marginBottom: 3,
+                        borderBottomWidth: 'unset',
+                        borderColor: '#EBEBEB'
+                      }}
+                    />
+                  )}
                 </BlogInfo>
 
                 {featuredMedia ? (
@@ -443,29 +420,13 @@ const BlogHero = styled(Box, {
   name: 'PageBlog',
   slot: 'BlogHero',
   overridesResolver: (_, styles) => [styles.blogHero]
-})<{ variant?: string }>(({ theme }) => ({
-  [theme.breakpoints.up('md')]: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    margin: '50px 0px 50px 0px',
-    [theme.breakpoints.up('xxl')]: {
-      margin: '70px 0px 70px 0px'
-    }
-  }
-}));
+})<{ variant?: string }>();
 
 const BlogInfo = styled(Box, {
   name: 'PageBlog',
   slot: 'BlogInfo',
   overridesResolver: (_, styles) => [styles.blogInfo]
-})<{ variant?: string }>(() => ({
-  marginRight: 50,
-  display: 'flex',
-  justifyContent: 'center',
-  flexDirection: 'column',
-  height: '100%'
-}));
+})<{ variant?: string }>();
 
 const ContentContainer = styled(Container, {
   name: 'PageBlog',
@@ -482,19 +443,14 @@ const ContentContainer = styled(Container, {
 
 const MediaWrap = styled(Box, {
   name: 'PageBlog',
-  slot: 'MediaWrap'
+  slot: 'MediaWrap',
+  overridesResolver: (_, styles) => [styles.mediaWrap]
 })<{ variant?: string }>(({ theme }) => ({
   'paddingTop': theme.spacing(4),
   'paddingBottom': theme.spacing(4),
-  'width': '100%',
+
   '& img': {
-    'width': '100%',
-    'height': 'auto',
-    'max-width': '60vh',
-    'objectFit': 'contain',
-    [theme.breakpoints.up('xxl')]: {
-      'max-width': '45vh'
-    }
+    width: '100%'
   },
   '& iframe': {
     'width': '100%',
@@ -523,25 +479,18 @@ const BlogTitle = styled(Typography, {
   name: 'PageBlog',
   slot: 'BlogTitle',
   overridesResolver: (_, styles) => [styles.blogTitle]
-})<{ variant?: string }>(({ theme }) => ({
-  [theme.breakpoints.up('md')]: {
-    maxWidth: '400px'
-  }
-}));
+})<{ variant?: string }>();
+
+const AuthorTypography = styled(Typography, {
+  name: 'PageBlog',
+  slot: 'AuthorTypography',
+  overridesResolver: (_, styles) => [styles.authorTypography]
+})<{ variant?: string }>();
 
 const BodyText = styled(Text, {
   name: 'PageBlog',
   slot: 'BodyText',
   overridesResolver: (_, styles) => [styles.bodyText]
-})<{ variant?: string }>(({ theme }) => ({
-  '& .MuiTypography-body1': {
-    fontSize: '18px'
-  },
-  [theme.breakpoints.up('xxl')]: {
-    '& .MuiTypography-body1': {
-      fontSize: '22px'
-    }
-  }
-}));
+})<{ variant?: string }>();
 
 export default PageBlog;

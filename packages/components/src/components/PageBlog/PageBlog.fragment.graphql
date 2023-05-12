@@ -6,6 +6,7 @@ fragment PageBlog_BaseFragment on PageBlog {
   footer {
     ...ContentModule_BaseFragment
   }
+  variant
   seo
   title
   slug

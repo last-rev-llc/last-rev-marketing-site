@@ -141,9 +141,13 @@ const createVariants = (theme: Theme): ComponentsVariants['Card'] => [
         zIndex: '-10'
       },
       '[class*="Card-tags"]': {
+        order: 3,
         flexWrap: 'wrap',
-        paddingBottom: 0,
-        paddingTop: 25
+        paddingTop: 0,
+        paddingBottom: 40
+      },
+      '& h3': {
+        paddingTop: 20
       }
     }
   },

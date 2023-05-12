@@ -21,6 +21,7 @@ import { SectionClassKey } from '../components/Section';
 import { SEOClassKey } from '../components/SEO';
 import { TableOfContentsClassKey } from '../components/TableOfContents';
 import { TextClassKey } from '../components/Text';
+import { PageBlogClassKey } from '../components/PageBlog';
 // import { MailchimpFormClassKey } from '../components/MailchimpForm';
 // import { BackToTopClassKey } from '../components/BackToTop';
 // import { FormMarketoEmbedClassKey } from '../components/FormMarketoEmbed';
@@ -48,6 +49,7 @@ declare module '@mui/material/styles' {
     NavigationBar: NavigationBarClassKey;
     NavigationItem: NavigationItemClassKey;
     Page: PageClassKey;
+    PageBlog: PageBlogClassKey;
     Quote: QuoteClassKey;
     Section: SectionClassKey;
     SEO: SEOClassKey;

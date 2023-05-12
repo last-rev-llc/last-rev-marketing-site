@@ -21,6 +21,7 @@ import { QuoteProps } from '../components/Quote';
 import { PageProps } from '../components/Page';
 import { TableOfContentsProps } from '../components/TableOfContents';
 import { FooterProps } from '../components/Footer';
+import { PageBlogProps } from '../components/PageBlog';
 
 declare module '@mui/material/styles' {
   export interface ComponentsPropsList {
@@ -51,5 +52,6 @@ declare module '@mui/material/styles' {
     SEO: SEOProps;
     TableOfContents: TableOfContentsProps;
     Text: TextProps;
+    PageBlog: PageBlogProps;
   }
 }

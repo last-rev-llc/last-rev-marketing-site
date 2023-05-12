@@ -12,6 +12,7 @@ import NavigationBar from '../components/NavigationBar/NavigationBar.theme';
 import NavigationItem from '../components/NavigationItem/NavigationItem.theme';
 import Collection from '../components/Collection/Collection.theme';
 import CollectionCarousel from '../components/CollectionCarousel/CollectionCarousel.theme';
+import PageBlog from '../components/PageBlog/PageBlog.theme';
 import merge from 'lodash/merge';
 import camelCase from 'lodash/camelCase';
 
@@ -175,7 +176,8 @@ const createSchemeTheme = (schemeKey?: string) => {
         Section(baseSchemeTheme),
         Collection(baseSchemeTheme),
         CollectionCarousel(baseSchemeTheme),
-        TableOfContents(baseSchemeTheme)
+        TableOfContents(baseSchemeTheme),
+        PageBlog(baseSchemeTheme)
       ],
       {
         createSchemeTheme,
