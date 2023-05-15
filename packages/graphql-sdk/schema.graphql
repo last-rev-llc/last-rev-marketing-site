@@ -303,6 +303,7 @@ type PageBlog implements Content {
   theme: [Theme]
   title: String
   topics: [Topic]
+  variant: String
 }
 
 type PagePathParam {

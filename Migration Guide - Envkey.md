@@ -14,18 +14,25 @@ envkey init
 
 ## Update the scripts within the package.json file
 
-We need to provide additional build command(s). See the standard/example below, we change the old build commands to include the name of the new script and prefix with `es -- `after installing Envkey. It's also necessary to create the installEnvkey as it's own build script and invoke it use `yarn installEnvkey` before injecting the new/old command with `es -- `. I had issues doing it other ways so felt this would be the best way to accomplish this.
+We need to modify current build command(s). See the standard/example below, we change the old build commands to prefix with `es -- `after installing Envkey. Also, note the new installEnvkey script for use in Netlify and Vercel and other servers.
 
-Quick Reference Example: `"yarn installEnvkey && es -- yarn new-build-command"`
+Quick Reference Example: `"es -- build-command"`
 
-### Full Example to be Used
+### Full Example to be Used in package.json
 
 ```
-    "dev": "yarn installEnvkey && es -- yarn build:dev",
-    "build": "yarn installEnvkey && es -- yarn build:prod",
-    "build:dev": "./scripts/dev.sh",
-    "build:prod": "./scripts/build.sh",
+    "dev": "es -- yarn build:dev",
+    "build": "es -- yarn build:prod",
     "installEnvkey": "./scripts/installEnvkey.sh",
+```
+
+---
+### Modify Netlify.toml or Vercel Json Build file(s)
+
+```
+   "Prod:" -- "yarn installEnvkey && es -- yarn build"
+
+   "Dev:" -- "yarn installEnvkey && es -- yarn dev"
 ```
 
 ---
