@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Container, Box } from '@mui/material';
 import styled from '@mui/system/styled';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -17,12 +17,22 @@ export const CollectionCarousel = ({
   itemsVariant,
   sidekickLookup
 }: CollectionCarouselProps) => {
+  const [carouselLoaded, setCarouselLoaded] = useState(false);
+
+  useEffect(() => {
+    setCarouselLoaded(true);
+  }, []);
+
   if (!items?.length) return null;
   const itemsWithVariant = items.map((item: any) => ({ ...item, variant: itemsVariant ?? item?.variant }));
 
   return (
     <ErrorBoundary>
-      <Root {...sidekick(sidekickLookup)} variant={variant} data-testid="CollectionCarousel">
+      <Root
+        {...sidekick(sidekickLookup)}
+        variant={variant}
+        style={!carouselLoaded ? { opacity: 0 } : undefined}
+        data-testid="CollectionCarousel">
         <ContentContainer maxWidth={itemsWidth} disableGutters>
           <CarouselContainer
             modules={[Autoplay, A11y]}
@@ -83,9 +93,7 @@ const ContentContainer = styled(Container, {
   name: 'CollectionCarousel',
   slot: 'ContentContainer',
   overridesResolver: (_, styles) => [styles.contentContainer]
-})<{ variant?: string }>(() => ({
-  // display: 'flex'
-}));
+})<{ variant?: string }>(() => ({}));
 
 const CarouselContainer = styled(Swiper, {
   name: 'CollectionCarousel',
