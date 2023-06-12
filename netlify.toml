@@ -3,6 +3,7 @@
   command = "yarn installEnvkey && es -- yarn build"
 
 [dev]
+  publish = "packages/web/.next"
   command = "yarn installEnvkey && es -- yarn dev"
 
 [functions]
