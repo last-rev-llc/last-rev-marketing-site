@@ -43,7 +43,7 @@ Frameworks Used
 
 1. Clone this repo
 2. Ensure that you have the correct version of node installed. We use [`nvm`](https://github.com/nvm-sh/nvm) to mange different versions of node. If you have that installed you can simply type:
- 
+
 ```bash
 nvm use
 ```
