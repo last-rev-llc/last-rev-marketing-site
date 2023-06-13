@@ -1,6 +1,6 @@
 [build]
   publish = "packages/web/.next"
-  command = "yarn installEnvkey && yarn build"
+  command = "yarn installEnvkey && es -- yarn build"
 
 [dev]
   publish = "packages/web/.next"
