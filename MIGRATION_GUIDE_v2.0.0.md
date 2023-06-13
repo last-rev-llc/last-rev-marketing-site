@@ -11,7 +11,7 @@
       .../src/components/Page/Page.stories.tsx      |    44 +
       ```
     - diff file patches (todo: update with correct name)
-      ```
+      ``` 
       diff --git a/examples/lastrev-next-starter/packages/components/src/components/Page/Page.stories.tsx b/examples/lastrev-next-starter/packages/components/src/components/Page/Page.stories.tsx
       new file mode 100644
       index 0000000..b646db7
