@@ -1,4 +1,4 @@
-require('envkey').config();
+require('dotenv').config({ path: '.envkey' });
 const URL = `${(process.env.GRAPHQL_SERVER || 'http://localhost:5000/graphql').replace(
   /^http:/,
   'http-get:'

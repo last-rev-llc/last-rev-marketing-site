@@ -1,4 +1,4 @@
-require('envkey').config();
+require('dotenv').config({ path: '.envkey' });
 
 const LastRevAppConfig = require('@last-rev/app-config');
 const extensions = require('./packages/graphql-extensions/dist');
