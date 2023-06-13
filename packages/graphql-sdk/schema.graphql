@@ -199,7 +199,6 @@ type Link implements Content {
   internalTitle: String
   manualUrl: String
   sidekickLookup: JSON
-  target: String
   text: String
   theme: [Theme]
   variant: String
@@ -303,7 +302,6 @@ type PageBlog implements Content {
   theme: [Theme]
   title: String
   topics: [Topic]
-  variant: String
 }
 
 type PagePathParam {
