@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('envkey').config();
 
 const path = require('path');
 

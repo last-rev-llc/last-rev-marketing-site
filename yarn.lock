@@ -13952,6 +13952,11 @@ envinfo@^7.3.1:
   resolved "https://registry.yarnpkg.com/envinfo/-/envinfo-7.8.1.tgz#06377e3e5f4d379fea7ac592d5ad8927e0c4d475"
   integrity sha512-/o+BXHmB7ocbHEAs6F2EnG0ogybVVUdkRunTT2glZU9XAaGmhqskrvKwqXuDfNjEO0LZKWdejEEpnq8aM0tOaw==
 
+envkey@^2.4.0:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/envkey/-/envkey-2.4.0.tgz#847a09dd33370b30172d136a911f09fc8a8ca4e1"
+  integrity sha512-psCGBfB6UR2FMVPhZzhlwQTG5oTdZNb26nP1wYKzolVjE1t2k3n2eS2WR895l1mYbwM/WCmpIrSLgBhMsPFSPA==
+
 err-code@^1.0.0:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/err-code/-/err-code-1.1.2.tgz#06e0116d3028f6aef4806849eb0ea6a748ae6960"
