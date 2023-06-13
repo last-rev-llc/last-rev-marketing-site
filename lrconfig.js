@@ -1,8 +1,4 @@
 require('dotenv').config();
-require('envkey').load();
-
-//remove, just using for testing
-console.log('Redis Port:', process.env.REDIS_PORT);
 
 const LastRevAppConfig = require('@last-rev/app-config');
 const extensions = require('./packages/graphql-extensions/dist');
