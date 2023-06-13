@@ -1,4 +1,4 @@
-require('dotenv').config({ path: '.envkey' });
+require('envkey').load();
 
 const path = require('path');
 

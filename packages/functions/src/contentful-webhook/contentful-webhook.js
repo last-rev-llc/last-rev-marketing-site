@@ -1,4 +1,4 @@
-require('dotenv').config({ path: '.envkey' });
+require('envkey').load();
 
 const handleWebhook = require('@last-rev/contentful-webhook-handler');
 const config = require('../../../../lrconfig');
