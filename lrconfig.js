@@ -52,9 +52,9 @@ const config = new LastRevAppConfig({
     port: process.env.REDIS_PORT,
     host: process.env.REDIS_HOST,
     password: process.env.REDIS_PASSWORD,
-    username: process.env.REDIS_USERNAME,
+    // username: process.env.REDIS_USERNAME,
     tls: {},
-    maxBatchSize: parseNumberEnvVar(process.env.REDIS_MAX_BATCH_SIZE)
+    // maxBatchSize: parseNumberEnvVar(process.env.REDIS_MAX_BATCH_SIZE)
   },
   fs: { contentDir: resolve(__dirname, './packages/graphql-runner/cms-sync') },
   logLevel: 'debug'
