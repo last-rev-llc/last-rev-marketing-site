@@ -29,7 +29,7 @@ const createVariants = (_theme: Theme): ComponentsVariants['Collection'] => [
         'display': 'grid',
         'gridTemplateColumns': '1fr',
         [_theme.breakpoints.up('md')]: {
-          gridTemplateColumns: 'repeat(2, 1fr)'
+          gridTemplateColumns: 'repeat(2, minmax(0, 1fr))'
         },
 
         ' > [class*="Section-gridItem"]': {
@@ -48,10 +48,10 @@ const createVariants = (_theme: Theme): ComponentsVariants['Collection'] => [
         'display': 'grid',
         'gridTemplateColumns': '1fr',
         [_theme.breakpoints.up('md')]: {
-          gridTemplateColumns: 'repeat(2, 1fr)'
+          gridTemplateColumns: 'repeat(2,  minmax(0, 1fr))'
         },
         [_theme.breakpoints.up('lg')]: {
-          gridTemplateColumns: 'repeat(3, 1fr)'
+          gridTemplateColumns: 'repeat(3,  minmax(0, 1fr))'
         },
         ' > [class*="Section-gridItem"]': {
           maxWidth: '100%',
@@ -69,10 +69,10 @@ const createVariants = (_theme: Theme): ComponentsVariants['Collection'] => [
         'display': 'grid',
         'gridTemplateColumns': '1fr',
         [_theme.breakpoints.up('md')]: {
-          gridTemplateColumns: 'repeat(2, 1fr)'
+          gridTemplateColumns: 'repeat(2,  minmax(0, 1fr))'
         },
         [_theme.breakpoints.up('lg')]: {
-          gridTemplateColumns: 'repeat(4, 1fr)'
+          gridTemplateColumns: 'repeat(4,  minmax(0, 1fr))'
         },
         ' > [class*="Section-gridItem"]': {
           maxWidth: '100%',

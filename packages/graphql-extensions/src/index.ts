@@ -21,6 +21,7 @@ import * as Collection from './Collection';
 import * as RichText from './RichText';
 import * as TableOfContents from './TableOfContents';
 import * as Link from './Link';
+import * as CardCustom from './Card';
 
 // Uncomment if using Algolia, else delete the related file
 // import * as Algolia from './Algolia';
@@ -35,6 +36,7 @@ export type GraphQlExtension = {
 
 const extensions: GraphQlExtension[] = [
   Card,
+  CardCustom,
   Collection,
   Header,
   Hero,

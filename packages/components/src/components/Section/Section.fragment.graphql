@@ -1,6 +1,7 @@
 # This will go 3 levels deep recursive
 fragment Section_BaseFragment on Section {
   ...Section_BaseFieldsFragment
+  hasBackground
   introText {
     ...Text_IntroTextFragment
   }

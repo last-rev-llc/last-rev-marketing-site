@@ -161,7 +161,7 @@ const Main = styled('main', {
         transition: 'margin 0.2s ease'
       },
 
-      '&:hover:after': {
+      '&:hover::after': {
         marginLeft: '0.4rem',
         transition: 'margin 0.2s ease'
       }

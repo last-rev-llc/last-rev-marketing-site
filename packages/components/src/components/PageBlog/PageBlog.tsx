@@ -103,6 +103,7 @@ export const PageBlog = ({
                   {title}
                 </Typography>
               ) : null}
+
               {creationDate ? (
                 <Typography
                   variant="body1"
@@ -112,17 +113,21 @@ export const PageBlog = ({
                   {creationDate}
                 </Typography>
               ) : null}
+
               {author ? (
                 <Typography variant="body1" component="p" {...sidekick(sidekickLookup?.author)}>
                   {author}
                 </Typography>
               ) : null}
+
               {featuredMedia ? (
                 <MediaWrap>
                   <ContentModule {...featuredMedia[0]} {...sidekick(sidekickLookup?.featuredMedia)} />
                 </MediaWrap>
               ) : null}
+
               {body ? <Text variant="blog" sidekickLookup={sidekickLookup?.body} body={body} /> : null}
+
               {contents ? (
                 <ContentsWrapper sx={{ py: 3 }}>
                   {contents?.map((content: any) => (
@@ -173,6 +178,7 @@ export const PageBlog = ({
                   </Typography>
                 </Box>
               ) : null}
+
               <Box
                 sx={{
                   padding: { xs: 2, md: 2, xl: 4 },
@@ -247,7 +253,8 @@ export const PageBlog = ({
                       </li>
                     </ul>
                   </ListItem>
-                  {relatedLinks ? (
+
+                  {!!relatedLinks?.length ? (
                     <ListItem>
                       <ListItemText
                         primary="Learn more"
@@ -276,7 +283,8 @@ export const PageBlog = ({
                       </ul>
                     </ListItem>
                   ) : null}
-                  {topics ? (
+
+                  {!!topics?.length ? (
                     <ListItem>
                       <ListItemText
                         primary="Topics"
@@ -305,7 +313,8 @@ export const PageBlog = ({
                       </ul>
                     </ListItem>
                   ) : null}
-                  {topics ? (
+
+                  {!!topics?.length ? (
                     <ListItem>
                       <ListItemText
                         primary="Topics"
@@ -334,7 +343,8 @@ export const PageBlog = ({
                       </ul>
                     </ListItem>
                   ) : null}
-                  {tags ? (
+
+                  {!!tags?.length ? (
                     <ListItem>
                       <ListItemText
                         primary="Tags"
@@ -363,6 +373,7 @@ export const PageBlog = ({
                       </ul>
                     </ListItem>
                   ) : null}
+
                   <Box my={4}>
                     <form name="email-subscribe" method="POST" data-netlify="true">
                       <InputLabel htmlFor="email-input" sx={{ py: 1 }}>
@@ -412,11 +423,10 @@ const ContentContainer = styled(Container, {
   slot: 'ContentContainer',
   overridesResolver: (_, styles) => [styles.contentContainer]
 })<{ variant?: string }>(({ theme }) => ({
-  [theme.breakpoints.down('xl')]: {
+  padding: theme.spacing(0, 2),
+
+  [theme.breakpoints.up('lg')]: {
     padding: theme.spacing(0, 4)
-  },
-  [theme.breakpoints.down('md')]: {
-    padding: theme.spacing(0, 2)
   }
 }));
 
@@ -424,22 +434,27 @@ const MediaWrap = styled(Box, {
   name: 'PageBlog',
   slot: 'MediaWrap'
 })<{ variant?: string }>(({ theme }) => ({
-  'paddingTop': theme.spacing(4),
-  'paddingBottom': theme.spacing(4),
+  'marginTop': theme.spacing(4),
+  'marginBottom': theme.spacing(4),
+
   '& img': {
     'width': '100%',
     'min-height': '50vh'
   },
+
   '& iframe': {
     'width': '100%',
     'min-height': '50vh'
   },
+
   [theme.breakpoints.down('md')]: {
-    'paddingTop': theme.spacing(2),
-    'paddingBottom': theme.spacing(2),
+    'marginTop': theme.spacing(2),
+    'marginBottom': theme.spacing(2),
+
     '& img': {
       'min-height': 'auto'
     },
+
     '& iframe': {
       'width': '100%',
       'min-height': '50vh'

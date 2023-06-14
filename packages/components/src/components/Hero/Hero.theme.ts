@@ -9,22 +9,40 @@ export const defaultProps: ComponentsProps['Hero'] = {
 // https://mui.com/customization/theme-components/#global-style-overrides
 export const styleOverrides: ComponentsOverrides<Theme>['Hero'] = {
   // Set some static styles
-  root: {
-    'minHeight': '60vh',
-    'h1': {
-      paddingBottom: 16
-    },
-    '& [class*="Hero-contentContainer"]': {
-      '& .MuiGrid-container': {
-        '@media (max-width: 800px)': {
-          flexDirection: 'column-reverse',
-          textAlign: 'center'
+  root: ({ theme }) => {
+    return {
+      'minHeight': '60vh',
+
+      'h1': {
+        marginBottom: theme.spacing(2)
+      },
+
+      '& [class*="Hero-contentContainer"]': {
+        '& .MuiGrid-container': {
+          '@media (max-width: 800px)': {
+            flexDirection: 'column-reverse',
+            textAlign: 'center'
+          }
         }
       }
-    }
+    };
   },
-  mediaRoot: {
-    width: '100%'
+  mediaRoot: ({ theme }) => {
+    return {
+      width: '100%',
+
+      img: {
+        'transition': 'all 0.5s ease-in-out',
+        'willChange': 'transform',
+        'transform': 'translateZ(0)',
+        'borderRadius': theme.spacing(4),
+
+        '&:hover': {
+          borderRadius: theme.spacing(8),
+          transform: 'scale(1.05)'
+        }
+      }
+    };
   }
   //
   // Use the ownerState to set dynamic styles

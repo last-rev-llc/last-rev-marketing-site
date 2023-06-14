@@ -35,34 +35,40 @@ const baseTheme: ThemeOptions = {
     // fontFamily: "'Open Sans', 'sans-serif'",
     h1: {
       fontSize: '2.65rem',
-      fontWeight: 600,
-      lineHeight: 1.25
+      fontWeight: 100,
+      lineHeight: 1.25,
+      letterSpacing: '.025em'
     },
     h2: {
       fontSize: '2.25rem',
-      fontWeight: 600,
+      fontWeight: 100,
       lineHeight: 1.25,
-      paddingBoddom: 16
+      paddingBoddom: 16,
+      letterSpacing: '.025em'
     },
     h3: {
       fontSize: '1.55rem',
-      fontWeight: 600,
-      lineHeight: 1.5
+      fontWeight: 100,
+      lineHeight: 1.5,
+      letterSpacing: '.025em'
     },
     h4: {
       fontSize: '1.25rem',
-      fontWeight: 600,
-      lineHeight: 1.5
+      fontWeight: 100,
+      lineHeight: 1.5,
+      letterSpacing: '.025em'
     },
     h5: {
       fontSize: '1.15rem',
-      fontWeight: 600,
-      lineHeight: 1.5
+      fontWeight: 100,
+      lineHeight: 1.5,
+      letterSpacing: '.025em'
     },
     h6: {
       fontSize: '1.15rem',
-      fontWeight: 600,
-      lineHeight: 1.5555
+      fontWeight: 100,
+      lineHeight: 1.5555,
+      letterSpacing: '.025em'
     },
     body1: {
       fontSize: '1rem',
@@ -334,61 +340,7 @@ const createSchemeTheme = (schemeKey?: string) => {
               }
             }
           },
-          Section: {
-            styleOverrides: {
-              root: {
-                padding: baseSchemeTheme.spacing(4, 0),
-                [baseSchemeTheme.breakpoints.up('xl')]: {
-                  paddingTop: baseSchemeTheme.spacing(5),
-                  paddingBottom: baseSchemeTheme.spacing(5)
-                },
-                [baseSchemeTheme.breakpoints.up('md')]: {
-                  paddingLeft: baseSchemeTheme.spacing(10),
-                  paddingRight: baseSchemeTheme.spacing(10)
-                },
-                [baseSchemeTheme.breakpoints.down('md')]: {
-                  '& > [class*="Section-gridContainer"] > [class*="Section-gridItem"]': {
-                    flex: '0 100%'
-                  }
-                }
-              }
-            }
-          },
-          Card: {
-            styleOverrides: {
-              root: {
-                'width': '100%',
-                'backgroundColor': baseSchemeTheme.palette.background.default,
-                '& .MuiTypography-h3': {
-                  paddingBottom: baseSchemeTheme.spacing(2)
-                },
-                '& .MuiCardMedia-root': {
-                  '& img': {
-                    width: '100%',
-                    maxWidth: '100%',
-                    objectFit: 'cover'
-                  },
-                  '& svg': {
-                    width: '100%',
-                    maxWidth: '100%',
-                    objectFit: 'cover'
-                  }
-                },
-                '& .MuiCard-root': {
-                  height: '100%'
-                },
-                '& .MuiCardContent-root': {
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'flex-start',
-                  height: '100%'
-                },
-                '& .MuiCardActions-root': {
-                  marginTop: 'auto'
-                }
-              }
-            }
-          },
+
           Collection: {
             styleOverrides: {
               root: {

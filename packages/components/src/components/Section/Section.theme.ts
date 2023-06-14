@@ -5,17 +5,48 @@ export const defaultProps: ComponentsProps['Section'] = {};
 
 // https://mui.com/customization/theme-components/#global-style-overrides
 export const styleOverrides: ComponentsOverrides<Theme>['Section'] = {
-  // Set some static styles
-  root: {
-    '[class*="Section-introText"]': {
-      marginBottom: '2rem'
-    },
-    '[class*="Media-embedRoot"]': {
-      minHeight: 368
-    },
-    '[class*="Section-gridItem"] > img': {
-      padding: 8
-    }
+  root: ({ theme, hasBackground }) => {
+    return {
+      '&': {
+        'marginTop': hasBackground ? 0 : theme.spacing(10),
+        'marginBottom': hasBackground ? 0 : theme.spacing(10),
+        'paddingTop': hasBackground ? theme.spacing(10) : 0,
+        'paddingBottom': hasBackground ? theme.spacing(10) : 0,
+        'overflow': hasBackground ? 'hidden' : 'visible',
+
+        '& &': {
+          marginTop: theme.spacing(5),
+          marginBottom: theme.spacing(5)
+        },
+
+        'main > &:last-of-type': {
+          marginBottom: 0
+        },
+
+        '& [class*=backgroundMedia]': {
+          height: 'auto !important',
+          width: '100% !important'
+        },
+
+        '[class*="Section-introText"]': {
+          marginBottom: '2rem'
+        },
+        '[class*="Media-embedRoot"]': {
+          minHeight: 368
+        },
+        '[class*="Section-gridItem"] > img': {
+          'transition': 'all 0.5s ease-in-out',
+          'willChange': 'transform',
+          'transform': 'translateZ(0)',
+          'borderRadius': theme.spacing(4),
+
+          '&:hover': {
+            borderRadius: theme.spacing(8),
+            transform: 'scale(1.05)'
+          }
+        }
+      }
+    };
   }
 
   // Use the ownerState to set dynamic styles
@@ -78,10 +109,10 @@ const createVariants = (_theme: Theme): ComponentsVariants['Section'] => [
         'display': 'grid',
         'gridTemplateColumns': '1fr',
         [_theme.breakpoints.up('md')]: {
-          gridTemplateColumns: 'repeat(2, 1fr)'
+          gridTemplateColumns: 'repeat(2, minmax(0, 1fr))'
         },
         [_theme.breakpoints.up('lg')]: {
-          gridTemplateColumns: 'repeat(3, 1fr)'
+          gridTemplateColumns: 'repeat(3,  minmax(0, 1fr))'
         },
         ' > [class*="Section-gridItem"]': {
           'maxWidth': '100%',
@@ -108,10 +139,10 @@ const createVariants = (_theme: Theme): ComponentsVariants['Section'] => [
         'display': 'grid',
         'gridTemplateColumns': '1fr',
         [_theme.breakpoints.up('md')]: {
-          gridTemplateColumns: 'repeat(2, 1fr)'
+          gridTemplateColumns: 'repeat(2,  minmax(0, 1fr))'
         },
         [_theme.breakpoints.up('lg')]: {
-          gridTemplateColumns: 'repeat(4, 1fr)'
+          gridTemplateColumns: 'repeat(4,  minmax(0, 1fr))'
         },
         ' > [class*="Section-gridItem"]': {
           'maxWidth': '100%',

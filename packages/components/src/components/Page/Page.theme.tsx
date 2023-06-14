@@ -6,9 +6,7 @@ export const defaultProps: ComponentsProps['Page'] = {};
 // https://mui.com/customization/theme-components/#global-style-overrides
 export const styleOverrides: ComponentsOverrides<Theme>['Page'] = {
   // Set some static styles
-  // root: {
-  //   backgroundColor: 'red'
-  // }
+  root: {}
   //
   // Use the ownerState to set dynamic styles
   // root: ({ ownerState, theme }) => {

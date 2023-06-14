@@ -5,17 +5,72 @@ export const defaultProps = {};
 
 // https://mui.com/customization/theme-components/#global-style-overrides
 export const styleOverrides: ComponentsOverrides<Theme>['Card'] = {
-  // Set some static styles
-  // root: {
-  //   backgroundColor: 'red'
-  // }
-  //
-  // Use the ownerState to set dynamic styles
-  // root: ({ ownerState, theme }) => {
-  //   return {
-  //     backgroundColor: ownerState.variant === 'example' ? 'red' : theme.palette.background.paper
-  //   };
-  // }
+  root: ({ theme }) => {
+    return {
+      '&': {
+        'width': '100%',
+        'position': 'relative',
+        'boxShadow': `0 0 0 1px ${theme.palette.secondary.main}, 0 0 0 1px ${theme.palette.secondary.main}`,
+        'border': `solid 1px transparent`,
+        'backgroundColor': theme.palette.text.secondary,
+        'transition': 'all 0.25s ease-in-out',
+        'willChange': 'transform',
+        'transform': 'translateZ(0)',
+
+        '&:hover': {
+          'transform': 'scale(1.05)',
+          'backgroundColor': 'transparent',
+          'border': `solid 1px ${theme.palette.text.secondary}`,
+
+          '& .MuiCardMedia-root > *': {
+            transform: 'scale(1.25)'
+          }
+        },
+
+        '& .MuiTypography-h3': {
+          ...theme.typography.h1,
+          paddingBottom: theme.spacing(2)
+        },
+
+        '& .MuiCardMedia-root': {
+          'overflow': 'hidden',
+          'position': 'relative',
+
+          '& > *': {
+            transition: 'all 0.25s ease-in-out',
+            willChange: 'transform',
+            transform: 'translateZ(0)',
+            width: '100%',
+            maxWidth: '100%',
+            objectFit: 'cover'
+          }
+        },
+
+        '& .MuiCard-root': {
+          height: '100%'
+        },
+
+        '& .MuiCardContent-root': {
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-start',
+          height: '100%'
+        },
+
+        '& .MuiCardActions-root': {
+          'marginTop': 'auto',
+          'display': 'flex',
+          'flexDirection': 'column',
+          'alignItems': 'flex-start',
+
+          '& *': {
+            ...theme.typography.body3,
+            marginLeft: 0
+          }
+        }
+      }
+    };
+  }
 };
 
 // https://mui.com/customization/theme-components/#adding-new-component-variants
@@ -91,24 +146,19 @@ const createVariants = (theme: Theme): ComponentsVariants['Card'] => [
     },
     style: {
       'textAlign': 'center',
+
       '& .MuiCardMedia-root': {
-        'maxHeight': theme.spacing(12),
+        // 'maxHeight': theme.spacing(12),
+        'border': 'solid 10px blue !important',
         'marginBottom': theme.spacing(2),
+
         [theme.breakpoints.up('sm')]: {
           minHeight: theme.spacing(14),
           marginBottom: theme.spacing(4)
         },
 
-        '& img': {
-          [theme.breakpoints.down('md')]: {
-            aspectRatio: '1'
-          }
-        },
-
-        '& svg': {
-          [theme.breakpoints.down('md')]: {
-            aspectRatio: '1'
-          }
+        '& > *': {
+          aspectRatio: '1/1'
         }
       }
     }
@@ -122,10 +172,7 @@ const createVariants = (theme: Theme): ComponentsVariants['Card'] => [
       'borderRadius': 0,
 
       '& .MuiCardMedia-root': {
-        '& img': {
-          aspectRatio: '16/9'
-        },
-        '& svg': {
+        '& > *': {
           aspectRatio: '16/9'
         }
       },
@@ -169,11 +216,9 @@ const createVariants = (theme: Theme): ComponentsVariants['Card'] => [
       [theme.breakpoints.down('md')]: {
         flexDirection: 'column'
       },
+
       'color': theme.palette.text.primary,
       'display': 'flex',
-      '& .MuiTypography-h4': {
-        fontSize: '1.1rem'
-      },
 
       '& .MuiCardContent-root': {
         height: 'auto',
@@ -184,23 +229,18 @@ const createVariants = (theme: Theme): ComponentsVariants['Card'] => [
       '& .MuiCardMedia-root': {
         'display': 'flex',
         'justifyContent': 'center',
-        'width': 'max-content',
-        'height': 'auto',
-        'margin': '0 auto',
+        'aspectRatio': '1/1',
+        'maxWidth': '20%',
 
         [theme.breakpoints.down('md')]: {
           justifyContent: 'center',
           textAlign: 'center'
         },
-        '& img': {
-          paddingLeft: 20,
-          paddingRight: 20,
+
+        '& > *': {
           width: '100%',
-          height: 'auto',
-          objectFit: 'contain',
-          minWidth: 250,
-          maxWidth: 250,
-          aspectRatio: '1'
+          height: '100%',
+          objectFit: 'contain'
         }
       },
       '& .MuiTypography-root': {

@@ -1,19 +1,18 @@
-fragment Link_BaseFragment on Link {
-  ...Content_BaseFragment
+fragment Link_BaseFieldsFragment on Link {
   text
-  href
   variant
+  href
   icon
   iconPosition
   color
 }
 
+fragment Link_BaseFragment on Link {
+  ...Content_BaseFragment
+  ...Link_BaseFieldsFragment
+}
+
 fragment Link_CardFragment on Link {
   ...Content_BaseFragment
-  text
-  href
-  variant
-  icon
-  iconPosition
-  color
+  ...Link_BaseFieldsFragment
 }

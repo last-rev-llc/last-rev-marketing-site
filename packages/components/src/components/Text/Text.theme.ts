@@ -7,18 +7,53 @@ export const defaultProps: ComponentsProps['Text'] = {};
 export const styleOverrides: ComponentsOverrides<Theme>['Text'] = {
   // Set some static styles
   root: {
-    'ol, ul, li': {
-      /* Revert padding reset is what gives the indentation to list */
+    '& > *:not(:first-child)': {
+      '&:not(:is(ul, ol, li))': {
+        marginTop: '1em',
+        marginBottom: '.5em',
+        padding: 0
+      },
 
-      padding: 'revert'
+      '&:is(ul, ol)': {
+        'marginTop': '1em',
+        'marginBottom': '2em',
+
+        'li *': {
+          fontSize: 'inherit'
+        },
+
+        'li': {
+          fontSize: '.9em',
+          fontFamily: 'inherit'
+        }
+      }
     },
-    'h2': {
-      // paddingTop: 16,
-      paddingBottom: 16
+
+    // '& > a': {
+    //   display: 'contents'
+    // },
+
+    '& > *:first-child': {
+      marginTop: '0'
     },
-    'h3': { paddingBottom: 16 },
-    'h4': { paddingBottom: 16 },
-    'p': { paddingBottom: 16 }
+
+    '& > [class*=MuiTypography-h]': {
+      marginBottom: '.5em',
+      marginTop: '2em'
+    }
+
+    // 'ol, ul, li': {
+    //   /* Revert padding reset is what gives the indentation to list */
+
+    //   padding: 'revert'
+    // },
+    // 'h2': {
+    //   // paddingTop: 16,
+    //   paddingBottom: 16
+    // },
+    // 'h3': { paddingBottom: 16 },
+    // 'h4': { paddingBottom: 16 },
+    // 'p': { paddingBottom: 16 }
   }
   //
   // Use the ownerState to set dynamic styles
