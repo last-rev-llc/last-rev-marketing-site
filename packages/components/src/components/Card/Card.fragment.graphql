@@ -1,14 +1,9 @@
 fragment Card_FieldsFragment on Card {
   ...Content_BaseFragment
-  variant
-  theme {
-    id
-    components
-    typography
-  }
   media {
     ...Media_BaseFragment
   }
+  eyebrow
   title
   subtitle
   actions {
@@ -17,6 +12,7 @@ fragment Card_FieldsFragment on Card {
   link {
     ...Link_CardFragment
   }
+  variant
 }
 
 # Base fragment used everywhere there's a Card

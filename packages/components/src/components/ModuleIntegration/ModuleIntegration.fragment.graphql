@@ -1,4 +1,5 @@
 fragment ModuleIntegration_BaseFragment on ModuleIntegration {
+  ...Content_BaseFragment
   variant
   settings
 }

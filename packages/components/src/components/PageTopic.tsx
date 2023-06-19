@@ -1,7 +1,6 @@
 import React from 'react';
-import Router from 'next/router';
 import { ContentModule } from '@last-rev/component-library';
-import { Page } from '../../../graphql-sdk/dist';
+import { Page } from '../../../graphql-sdk';
 import BackToTop from '@last-rev/component-library/dist/components/BackToTop/BackToTop';
 import Head from 'next/head';
 import { styled } from '@mui/material/styles';
@@ -11,8 +10,8 @@ const PageTopic = ({
   header,
   hero,
   contents,
-  id,
-  title,
+  // id,
+  // title,
   footer,
   disableBackToTop,
   sidekickLookup,
@@ -41,44 +40,6 @@ const PageTopic = ({
     }
   };
 
-  // This code asumes there's going to be a Collection in the contents
-  const collectionProps = React.useMemo(
-    () => ({
-      // onFilterChange: (newFilter: any) => {
-      //   // if (!newFilter?.topics?.length) {
-      //   //   Router.push('/blog');
-      //   // }
-      // },
-      options: {
-        topics: [
-          {
-            label: title,
-            value: id
-          }
-        ]
-      },
-      filter: { topics: [id] },
-      onClearFilter: () => Router.push('/blog')
-    }),
-    [id]
-  );
-  const isBlogLanding = `/blog/${slug}`;
-  if (isBlogLanding) {
-    // NOTE: contents is required
-    // @ts-ignore
-    const sections = contents[0]?.contents;
-    if (sections) {
-      const collection = sections
-        ?.find((item: any) => item?.__typename === 'Collection')
-        .items?.filter((card: any) => card?.id !== hero?.id);
-      if (collection) {
-        sections?.forEach((item: any, i: number) => {
-          if (item?.__typename === 'Collection') sections[i].items = collection;
-        });
-      }
-    }
-  }
-
   return (
     <>
       <Head>
@@ -86,132 +47,32 @@ const PageTopic = ({
       </Head>
 
       {header ? <ContentModule {...(header as any)} /> : null}
+
       {hero && <BlogLandingHero {...(hero as any)} />}
-      <Main {...sidekick({ ...sidekickLookup, fieldName: 'contents' })} className={'blogLanding'}>
+
+      <Main {...sidekick(sidekickLookup, 'contents')}>
         {contents?.map((content: any) => (
-          <ContentModule
-            key={content?.id}
-            {...recursiveAddDataToType({ content, data: collectionProps, type: 'Collection' })}
-            component="section"
-          />
+          <ContentModule key={content?.id} {...content} component="section" />
         ))}
         {!disableBackToTop ? <BackToTop /> : null}
       </Main>
+
       {footer ? <ContentModule {...(footer as any)} /> : null}
     </>
   );
-};
-
-//TODO: Improve this, probably by moving into GQL
-// Used to recurse through all the content children and add the data to a matching type
-// DANGER: If there is more than one Collection it will also have this filter
-const recursiveAddDataToType = ({ content, data, type }: { content: any; data: any; type: string }) => {
-  return {
-    ...content,
-    ...(type === content?.__typename ? data : null),
-    contents: content?.contents?.map((item: any) => recursiveAddDataToType({ content: item, data, type }))
-  };
 };
 
 const Main = styled('main', {
   name: 'Page',
   slot: 'Main',
   overridesResolver: (_, styles) => [styles.root]
-  // })``;
-})<{}>(({ theme }) => ({
-  '&.blogLanding': {
-    '[variant=collection_three-per-row_section-wrapper]': {
-      background: '#FFFBFF'
-    },
-    [theme.breakpoints.up('md')]: {
-      '[variant=three-per-row]': {
-        paddingLeft: 0,
-        paddingRight: 0
-      }
-    },
-    [theme.breakpoints.down('md')]: {
-      '[class$=Collection-root]': {
-        paddingLeft: theme.spacing(2),
-        paddingRight: theme.spacing(2)
-      }
-    },
-    '[class*=Section-gridContainer]': {
-      gap: theme.spacing(2)
-    },
-    '[class*=Collection-introText] h2': {
-      padding: `${theme.spacing(4)} 0 0`,
-      fontSize: '3rem',
-      lineHeight: '3.5rem'
-    },
-    '[class$=Card-root]': {
-      'display': 'flex',
-      'flexDirection': 'column',
-      'background': theme.palette.common.white,
-      'borderRadius': theme.shape.borderRadius + 4,
-      'transition': 'background-color 0.25s linear',
-
-      '&:hover': {
-        // @ts-ignore
-        backgroundColor: theme.palette.backgroundOption.light,
-        transition: 'background-color 0.25s linear'
-      },
-
-      'h3': {
-        color: theme.palette.common.black,
-        fontSize: '1.5rem',
-        fontWeight: 400,
-        lineHeight: '2rem'
-      },
-
-      '[class$=Text-root]': {
-        '[class*=MuiTypography-root]': {
-          paddingBottom: 0,
-          color: theme.palette.common.black,
-          fontSize: '0.9rem',
-          fontWeight: 400,
-          lineHeight: '1.25rem'
-        }
-      }
-    },
-
-    '[class*=MuiCardContent-root]:last-child': {
-      paddingBottom: theme.spacing(2)
-    },
-
-    '[class*=MuiCardMedia-root] img': {
-      aspectRatio: '16/9',
-      padding: 0
-    },
-
-    '[class*=MuiCardActions-root] a': {
-      'fontWeight': 600,
-
-      '&:after': {
-        content: '""',
-        display: 'inline-block',
-        width: '0.5em',
-        height: '0.5em',
-        marginLeft: '0.25rem',
-        borderRight: `2px solid ${theme.palette.primary.main}`,
-        borderTop: `2px solid ${theme.palette.primary.main}`,
-        verticalAlign: 'middle',
-        transform: 'rotate(45deg)',
-        transition: 'margin 0.2s ease'
-      },
-
-      '&:hover::after': {
-        marginLeft: '0.4rem',
-        transition: 'margin 0.2s ease'
-      }
-    }
-  }
-}));
+})(() => ({}));
 
 const BlogLandingHero = styled(ContentModule, {
   name: 'Page',
   slot: 'BlogLandingHero'
 })<{ variant?: string }>(({ theme }) => ({
-  'background': theme.palette.primary.dark,
+  'background': `linear-gradient(180deg, ${theme.palette.primary.dark}, ${theme.palette.primary.dark}, ${theme.palette.common.white})`,
   'color': theme.palette.primary.contrastText,
 
   '[class*=MuiTypography-h2]': {

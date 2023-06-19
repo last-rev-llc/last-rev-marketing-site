@@ -20,8 +20,27 @@ type Asset {
   width: String
 }
 
+type Block implements Content {
+  actions: [Link]
+  animation: JSON
+  body: RichText
+  eyebrow: String
+  id: String
+  internalTitle: String
+  introText: Text
+  link: Link
+  mediaItems: [Media]
+  sidekickLookup: JSON
+  subtitle: String
+  theme: [Theme]
+  title: String
+  variant: String
+}
+
 type Blog implements Content {
   animation: JSON
+  footer: Content
+  header: Header
   id: String
   placeholder: String
   sidekickLookup: JSON
@@ -33,6 +52,7 @@ type Card implements Content {
   actions: [Link]
   animation: JSON
   body: RichText
+  eyebrow: String
   id: String
   internalTitle: String
   link: Link
@@ -46,6 +66,10 @@ type Card implements Content {
 
 type CategoryBlog implements Content {
   animation: JSON
+  contents: [Content]
+  footer: Content
+  header: Header
+  hero: Hero
   id: String
   lr__path__: String
   seo: JSON
@@ -58,6 +82,7 @@ type CategoryBlog implements Content {
 type Collection implements Content {
   animation: JSON
   id: String
+  images: [Media]
   internalTitle: String
   introText: Text
   items: [CollectionItem]
@@ -78,7 +103,7 @@ input CollectionFilterInput {
   topics: [String]
 }
 
-union CollectionItem = Card | Link | Media | NavigationItem | Section
+union CollectionItem = Blog | Card | Link | Media | NavigationItem | Section | Topic
 
 type CollectionItemConnection {
   items: [CollectionItem]
@@ -154,7 +179,7 @@ type Header implements Content {
   internalTitle: String
   logo: Media
   logoUrl: String
-  navigationItems: [Collection]
+  navigationItems: [NavigationItem]
   sidekickLookup: JSON
   theme: [Theme]
   variant: String
@@ -226,6 +251,7 @@ type Media implements Content {
   fileTablet: Asset
   id: String
   internalTitle: String
+  link: Link
   mobile: Media
   placeholder: Media
   sidekickLookup: JSON
@@ -247,6 +273,7 @@ type ModuleIntegration implements Content {
 }
 
 type NavigationItem implements Content {
+  actions: [Link]
   animation: JSON
   href: String!
   id: String
@@ -254,6 +281,7 @@ type NavigationItem implements Content {
   internalTitle: String
   manualUrl: String
   media: Media
+  navMedia: [Media]
   sidekickLookup: JSON
   subNavigation: [SubnavigationItem]
   summary: String
@@ -272,14 +300,20 @@ type Page implements Content {
   colorScheme: String
   contents: [Content]
   disableBackToTop: Boolean
-  footer: Footer
+  footer: Content
+  footerOverride: Footer
   header: Header
+  headerOverride: Header
   hero: Hero
   id: String
+  internalTitle: String
+  listImage: Media
   lr__path__: String
+  parentPage: Page
   seo: JSON
   sidekickLookup: JSON
   slug: String
+  summary: String
   theme: [Theme]
   title: String
 }
@@ -287,6 +321,7 @@ type Page implements Content {
 type PageBlog implements Content {
   animation: JSON
   author: String
+  authoredBy: Content
   body: RichText
   creationDate: String
   featuredMedia: [Media]
@@ -317,17 +352,25 @@ type PagePathParams {
 
 type Person implements Content {
   animation: JSON
+  body: RichText
   calendlyUrl: String
   emailAddress: String
+  footer: Content
+  header: Header
   id: String
   image: Media
   jobTitle: String
   linkedIn: String
+  listImage: Media
   lr__path__: String
+  mainImage: Media
   name: String
   phone: String
+  rolloverImage: Media
   sidekickLookup: JSON
   slug: String
+  socialLinks: [Link]
+  summary: String
   theme: [Theme]
 }
 
@@ -462,11 +505,14 @@ type Text implements Content {
   animation: JSON
   body: RichText
   color: String
+  eyebrow: String
   id: String
   internalTitle: String
   sidekickLookup: JSON
   styles: JSON
+  subtitle: String
   theme: [Theme]
+  title: String
   variant: String
 }
 
@@ -486,7 +532,9 @@ type Topic implements Content {
   animation: JSON
   contents: [Content]
   footer: Content
+  footerOverride: Content
   header: Header
+  headerOverride: Header
   hero: Hero
   id: String
   lr__path__: String

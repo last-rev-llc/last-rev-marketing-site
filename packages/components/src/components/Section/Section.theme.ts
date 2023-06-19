@@ -7,48 +7,83 @@ export const defaultProps: ComponentsProps['Section'] = {};
 export const styleOverrides: ComponentsOverrides<Theme>['Section'] = {
   root: ({ theme, hasBackground }) => {
     return {
-      '&': {
-        'marginTop': hasBackground ? 0 : theme.spacing(10),
-        'marginBottom': hasBackground ? 0 : theme.spacing(10),
-        'paddingTop': hasBackground ? theme.spacing(10) : 0,
-        'paddingBottom': hasBackground ? theme.spacing(10) : 0,
-        'overflow': hasBackground ? 'hidden' : 'visible',
+      'marginTop': hasBackground ? 0 : theme.spacing(15),
+      'marginBottom': hasBackground ? 0 : theme.spacing(15),
+      'paddingTop': hasBackground ? theme.spacing(20) : 0,
+      'paddingBottom': hasBackground ? theme.spacing(20) : 0,
+      'overflow': hasBackground ? 'hidden' : 'visible',
 
-        '& &': {
-          marginTop: theme.spacing(5),
-          marginBottom: theme.spacing(5)
-        },
+      '& &': {
+        marginTop: theme.spacing(10),
+        marginBottom: theme.spacing(10)
+      },
 
-        'main > &:last-of-type': {
-          marginBottom: 0
-        },
-
-        '& [class*=backgroundMedia]': {
-          height: 'auto !important',
-          width: '100% !important'
-        },
-
-        '[class*="Section-introText"]': {
-          marginBottom: '2rem'
-        },
-        '[class*="Media-embedRoot"]': {
-          minHeight: 368
-        },
-        '[class*="Section-gridItem"] > img': {
-          'transition': 'all 0.5s ease-in-out',
-          'willChange': 'transform',
-          'transform': 'translateZ(0)',
-          'borderRadius': theme.spacing(4),
-
-          '&:hover': {
-            borderRadius: theme.spacing(8),
-            transform: 'scale(1.05)'
-          }
-        }
+      '& [class*=backgroundMedia]': {
+        height: 'auto !important',
+        width: '100% !important'
       }
     };
-  }
+  },
 
+  introText: ({ theme, align }) => ({
+    'gridColumn': '1 / span 2',
+    'position': 'relative',
+
+    'marginBottom': theme.spacing(4),
+
+    '[class$=Text-title]': {
+      ...theme.typography.h4,
+      textAlign: `${align === 'center' ? 'center' : 'left'}`
+    },
+
+    '[class$=Text-subtitle]': {
+      ...theme.typography.h3,
+      textAlign: `${align === 'center' ? 'center' : 'left'}`,
+      marginTop: theme.spacing(2)
+    },
+
+    '[class$=Text-root]': {
+      marginTop: theme.spacing(3),
+      textAlign: `${align === 'center' ? 'center' : 'left'}`
+    },
+
+    [theme.breakpoints.up('md')]: {
+      'gridColumn': '1 / span 5',
+
+      ...(align === 'center' && {
+        gridColumn: '1 / -1'
+      }),
+
+      '[class$=Text-title]': {
+        ...theme.typography.h3
+      },
+
+      '[class$=Text-root] > *': {
+        ...theme.typography.body2
+      },
+
+      '&::before': {
+        width: 115
+      }
+    },
+
+    [theme.breakpoints.up('md')]: {
+      'gridColumn': '1 / span 8',
+
+      ...(align === 'center' && {
+        gridColumn: '3 / span 8'
+      }),
+
+      '[class$=Text-title]': {
+        ...theme.typography.h2
+      }
+    },
+
+    '& + [class*=contentContainer]': {
+      marginTop: theme.spacing(4)
+    }
+  })
+  //
   // Use the ownerState to set dynamic styles
   // root: ({ ownerState, theme }) => {
   //   return {
@@ -60,114 +95,23 @@ export const styleOverrides: ComponentsOverrides<Theme>['Section'] = {
 // https://mui.com/customization/theme-components/#adding-new-component-variants
 const createVariants = (_theme: Theme): ComponentsVariants['Section'] => [
   // Use prop matching to set variant styles
-  {
-    props: {
-      variant: 'default-responsive'
-    },
-    style: {
-      '& [class*="Section-gridContainer"]': {
-        [_theme.breakpoints.down('md')]: {
-          flexDirection: 'column-reverse'
-        }
-      }
-    }
-  },
-  {
-    props: {
-      variant: 'split-panel'
-    },
-    style: {
-      '& [class*="Section-gridContainer"]': {
-        alignItems: 'center'
-      }
-    }
-  },
-  {
-    props: {
-      variant: 'two-per-row'
-    },
-    style: {
-      '& [class*="Section-gridContainer"]': {
-        'display': 'flex',
-        'alignItems': 'center',
-        '& svg': {
-          maxWidth: 350
-        },
-        '& [class*="Section-gridItem"]': {
-          display: 'flex',
-          justifyContent: 'end'
-        }
-      }
-    }
-  },
-  {
-    props: {
-      variant: 'three-per-row'
-    },
-    style: {
-      '& > [class*="Section-gridContainer"], & div > [class*="Section-gridContainer"]': {
-        'display': 'grid',
-        'gridTemplateColumns': '1fr',
-        [_theme.breakpoints.up('md')]: {
-          gridTemplateColumns: 'repeat(2, minmax(0, 1fr))'
-        },
-        [_theme.breakpoints.up('lg')]: {
-          gridTemplateColumns: 'repeat(3,  minmax(0, 1fr))'
-        },
-        ' > [class*="Section-gridItem"]': {
-          'maxWidth': '100%',
-          'height': '100%',
-          '& .MuiCard-root': {
-            height: '100%'
-          },
-          '& .MuiCardContent-root': {
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'flex-start',
-            height: '100%'
-          }
-        }
-      }
-    }
-  },
-  {
-    props: {
-      variant: 'four-per-row'
-    },
-    style: {
-      '& > [class*="Section-gridContainer"], & div > [class*="Section-gridContainer"]': {
-        'display': 'grid',
-        'gridTemplateColumns': '1fr',
-        [_theme.breakpoints.up('md')]: {
-          gridTemplateColumns: 'repeat(2,  minmax(0, 1fr))'
-        },
-        [_theme.breakpoints.up('lg')]: {
-          gridTemplateColumns: 'repeat(4,  minmax(0, 1fr))'
-        },
-        ' > [class*="Section-gridItem"]': {
-          'maxWidth': '100%',
-          'height': '100%',
-          '& .MuiCard-root': {
-            height: '100%'
-          },
-          '& .MuiCardContent-root': {
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'flex-start',
-            height: '100%'
-          }
-        }
-      }
-    }
-  },
-  {
-    props: {
-      backgroundColor: 'background.dark'
-    },
-    style: {
-      backgroundColor: _theme.palette.backgroundOption?.dark
-    }
-  }
+  // {
+  //   props: {
+  //     variant: 'example'
+  //   },
+  //   style: {
+  //     backgroundColor: theme.palette.primary.main
+  //   }
+  // }
+  // Other props are also valid
+  // {
+  //   props: {
+  //     backgroundColor: 'primary.main',
+  //   },
+  //   style: {
+  //     color: theme.palette.primary.contrastText
+  //   }
+  // }
 ];
 
 export default (theme: Theme): ThemeOptions => ({

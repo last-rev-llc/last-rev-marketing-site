@@ -1,9 +1,10 @@
 import cardLinkResolver from './resolvers/cardLinkResolver';
-// import { ApolloContext } from '@last-rev/types';
+import defaultResolver from './resolvers/defaultResolver';
 
 export const mappers = {
   Card: {
     Card: {
+      variant: defaultResolver('variant'),
       link: cardLinkResolver
     }
   }

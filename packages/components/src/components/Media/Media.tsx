@@ -1,11 +1,12 @@
 import React from 'react';
-import { MediaProps } from '@last-rev/component-library/dist/components/Media';
-import LRMedia from './LRMedia';
 import { styled } from '@mui/system';
 import sidekick from '@last-rev/contentful-sidekick-util';
-export type { MediaProps, MediaClassKey, MediaClasses } from '@last-rev/component-library/dist/components/Media';
+import LRMedia from './LRMedia';
+
+import { MediaProps } from './Media.types';
 
 const isVideo = (src?: string) => src && /mp4|webm/.test(src);
+
 let lazyVideoObserver: IntersectionObserver | null = null;
 
 const Media = (props: MediaProps) => {
@@ -61,7 +62,7 @@ const Media = (props: MediaProps) => {
       </VideoRoot>
     );
   }
-  return <LRMedia {...props} sx={{ maxWidth: `${props?.file?.width}px` }} />;
+  return <LRMedia {...props} sx={{ width: `${props?.file?.width}px` }} />;
 };
 
 const VideoRoot = styled('video', {

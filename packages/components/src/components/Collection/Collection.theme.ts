@@ -5,91 +5,288 @@ export const defaultProps = {};
 
 // https://mui.com/customization/theme-components/#global-style-overrides
 export const styleOverrides: ComponentsOverrides<Theme>['Collection'] = {
-  // Set some static styles
-  // root: {
-  //   backgroundColor: 'red'
-  // }
-  //
-  // Use the ownerState to set dynamic styles
-  // root: ({ ownerState, theme }) => {
-  //   return {
-  //     backgroundColor: ownerState.variant === 'example' ? 'red' : theme.palette.background.paper
-  //   };
-  // }
+  root: () => ({}),
+  contentContainer: ({ theme }) => ({
+    'display': 'grid',
+    'gridTemplateColumns': 'repeat(2,1fr)',
+    'gap': theme.spacing(2, 2),
+
+    'section[id] &': {
+      padding: 0
+    },
+
+    [theme.breakpoints.up('md')]: {
+      gridTemplateColumns: 'repeat(6,1fr)',
+      gap: theme.spacing(8, 3)
+    },
+
+    [theme.breakpoints.up('md')]: {
+      gridTemplateColumns: 'repeat(12,1fr)',
+      gap: theme.spacing(8, 3)
+    }
+  }),
+
+  itemsContainer: ({ theme }) => ({
+    gridColumn: '1 / span 2',
+    display: 'grid',
+    gap: theme.spacing(3, 3),
+
+    [theme.breakpoints.up('md')]: {
+      gridColumn: '1 / span 6'
+      // gap: theme.spacing(6, 3)
+    },
+
+    [theme.breakpoints.up('md')]: {
+      gridColumn: '1 / span 12'
+      // gap: theme.spacing(3, 3)
+    }
+  }),
+
+  introText: ({ theme, align }) => ({
+    'gridColumn': '1 / span 2',
+    'position': 'relative',
+
+    'marginBottom': theme.spacing(4),
+
+    '[class$=Text-title]': {
+      ...theme.typography.h4,
+      textAlign: `${align === 'center' ? 'center' : 'left'}`
+    },
+
+    '[class$=Text-subtitle]': {
+      ...theme.typography.h5,
+      textAlign: `${align === 'center' ? 'center' : 'left'}`,
+      marginTop: theme.spacing(2)
+    },
+
+    '[class$=Text-root]': {
+      marginTop: theme.spacing(3),
+      textAlign: `${align === 'center' ? 'center' : 'left'}`
+    },
+
+    [theme.breakpoints.up('md')]: {
+      'gridColumn': '1 / span 5',
+
+      ...(align === 'center' && {
+        gridColumn: '1 / -1'
+      }),
+
+      '[class$=Text-title]': {
+        ...theme.typography.h3
+      },
+
+      '[class$=Text-root] > *': {
+        ...theme.typography.body2
+      }
+    },
+
+    '& + [class*=contentContainer]': {
+      marginTop: theme.spacing(4)
+    }
+  })
 };
 
 // https://mui.com/customization/theme-components/#adding-new-component-variants
-const createVariants = (_theme: Theme): ComponentsVariants['Collection'] => [
+const createVariants = (theme: Theme): ComponentsVariants['Collection'] => [
   {
     props: {
-      variant: 'two-per-row'
+      variant: 'onePerRow'
     },
     style: {
-      '& > [class*="Section-gridContainer"], & div > [class*="Section-gridContainer"]': {
-        'display': 'grid',
-        'gridTemplateColumns': '1fr',
-        [_theme.breakpoints.up('md')]: {
-          gridTemplateColumns: 'repeat(2, minmax(0, 1fr))'
+      '&': {
+        '[class*="Collection-itemsContainer"]': {
+          display: 'grid',
+          gridTemplateColumns: 'repeat(1, minmax(0, 1fr))'
+        }
+      }
+    }
+  },
+  {
+    props: {
+      variant: 'twoPerRow'
+    },
+    style: {
+      '&': {
+        '[class*="Collection-itemsContainer"]': {
+          display: 'grid',
+          gridTemplateColumns: 'repeat(1, minmax(0, 1fr))',
+
+          [theme.breakpoints.up('md')]: {
+            gridTemplateColumns: 'repeat(2, minmax(0, 1fr))'
+          }
+        }
+      }
+    }
+  },
+  {
+    props: {
+      variant: 'threePerRow'
+    },
+    style: {
+      '&': {
+        '[class*="Collection-itemsContainer"]': {
+          display: 'grid',
+          gridTemplateColumns: 'repeat(1, minmax(0, 1fr))',
+
+          [theme.breakpoints.up('sm')]: {
+            gridTemplateColumns: 'repeat(2, minmax(0, 1fr))'
+          },
+
+          [theme.breakpoints.up('md')]: {
+            gridTemplateColumns: 'repeat(3, minmax(0, 1fr))'
+          }
+        }
+      }
+    }
+  },
+  {
+    props: {
+      variant: 'fourPerRow'
+    },
+    style: {
+      '&': {
+        '[class*="Collection-itemsContainer"]': {
+          display: 'grid',
+          gridTemplateColumns: 'repeat(1, minmax(0, 1fr))',
+
+          [theme.breakpoints.up('md')]: {
+            gridTemplateColumns: 'repeat(3, minmax(0, 1fr))'
+          }
+        }
+      }
+    }
+  },
+  {
+    props: {
+      variant: 'pricing'
+    },
+    style: {
+      '&': {
+        '[class*="Collection-itemsContainer"]': {
+          display: 'grid',
+          gridTemplateColumns: 'repeat(1, minmax(0, 1fr))',
+
+          [theme.breakpoints.up('md')]: {
+            gridTemplateColumns: 'repeat(3, minmax(0, 1fr))'
+          }
+        }
+      }
+    }
+  },
+  {
+    props: {
+      variant: 'customerLogos'
+    },
+    style: {
+      'padding': theme.spacing(4, 2),
+
+      [theme.breakpoints.up('md')]: {
+        padding: theme.spacing(8, 5)
+      },
+
+      [theme.breakpoints.up('md')]: {
+        padding: theme.spacing(8, 3)
+      },
+
+      '[class$=Collection-contentContainer]': {
+        position: 'relative',
+        display: 'grid',
+        gap: theme.spacing(4, 0),
+
+        [theme.breakpoints.up('md')]: {
+          gap: theme.spacing(7, 0)
         },
 
-        ' > [class*="Section-gridItem"]': {
-          maxWidth: '100%',
-          height: '100%'
+        [theme.breakpoints.up('md')]: {
+          gap: theme.spacing(4, 0)
+        }
+      },
+
+      '[class$=Collection-itemsContainer]': {
+        gridColumn: '1 / -1',
+        gridTemplateColumns: 'repeat(2,1fr)',
+        gap: theme.spacing(4, 3),
+        alignItems: 'center',
+        gridRow: '-2',
+
+        [theme.breakpoints.up('sm')]: {
+          gap: theme.spacing(8, 3)
+        },
+
+        [theme.breakpoints.up('md')]: {
+          gridTemplateColumns: 'repeat(3,1fr)',
+          gap: theme.spacing(8, 5)
+        },
+
+        [theme.breakpoints.up('md')]: {
+          gridTemplateColumns: 'repeat(6,1fr)',
+          gridRow: '-1/2'
+        }
+      },
+
+      '[class$=Collection-introText]': {
+        'gridColumn': '1/-1',
+        'gridRow': '-3',
+
+        [theme.breakpoints.up('md')]: {
+          gridColumn: '2/-2',
+          gridRow: '-2/1'
+        },
+
+        '&::before': {
+          display: 'none'
+        },
+
+        '[class$=Text-title]': {
+          ...theme.typography.h4,
+          textAlign: 'center',
+
+          [theme.breakpoints.up('md')]: {
+            ...theme.typography.h3
+          }
         }
       }
     }
   },
   {
     props: {
-      variant: 'three-per-row'
+      variant: 'contentGrid'
     },
     style: {
-      '& > [class*="Section-gridContainer"], & div > [class*="Section-gridContainer"]': {
-        'display': 'grid',
-        'gridTemplateColumns': '1fr',
-        [_theme.breakpoints.up('md')]: {
-          gridTemplateColumns: 'repeat(2,  minmax(0, 1fr))'
+      '&': {
+        '[class*="Collection-contentContainer"]': {
+          gap: theme.spacing(5, 2),
+          [theme.breakpoints.up('md')]: {
+            gap: theme.spacing(8, 3)
+          }
         },
-        [_theme.breakpoints.up('lg')]: {
-          gridTemplateColumns: 'repeat(3,  minmax(0, 1fr))'
-        },
-        ' > [class*="Section-gridItem"]': {
-          maxWidth: '100%',
-          height: '100%'
+        '[class*="Collection-itemsContainer"]': {
+          display: 'grid',
+          gridTemplateColumns: 'repeat(1, minmax(0, 1fr))',
+
+          [theme.breakpoints.up('md')]: {
+            gridTemplateColumns: 'repeat(3, minmax(0, 1fr))'
+          }
         }
       }
     }
   },
+
   {
     props: {
-      variant: 'four-per-row'
+      variant: 'contentGrid',
+      itemsVariant: 'icon'
     },
     style: {
-      '& > [class*="Section-gridContainer"], & div > [class*="Section-gridContainer"]': {
-        'display': 'grid',
-        'gridTemplateColumns': '1fr',
-        [_theme.breakpoints.up('md')]: {
-          gridTemplateColumns: 'repeat(2,  minmax(0, 1fr))'
-        },
-        [_theme.breakpoints.up('lg')]: {
-          gridTemplateColumns: 'repeat(4,  minmax(0, 1fr))'
-        },
-        ' > [class*="Section-gridItem"]': {
-          maxWidth: '100%',
-          height: '100%'
+      '&': {
+        '[class*="Collection-itemsContainer"]': {
+          [theme.breakpoints.up('md')]: {
+            rowGap: theme.spacing(4)
+          }
         }
       }
     }
   }
-  // Other props are also valid
-  // {
-  //   props: {
-  //     backgroundColor: 'primary.main',
-  //   },
-  //   style: {
-  //     color: theme.palette.primary.contrastText
-  //   }
-  // }
 ];
 
 export default (theme: Theme): ThemeOptions => ({

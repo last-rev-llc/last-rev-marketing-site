@@ -9,48 +9,103 @@ export const defaultProps: ComponentsProps['Hero'] = {
 // https://mui.com/customization/theme-components/#global-style-overrides
 export const styleOverrides: ComponentsOverrides<Theme>['Hero'] = {
   // Set some static styles
-  root: ({ theme }) => {
+  root: ({ theme, backgroundColor }: { theme: Theme; backgroundColor?: string }) => {
+    let bgValue;
+    if (backgroundColor) {
+      const [colorKey, shadeKey] = backgroundColor.split('.');
+
+      bgValue = theme.palette?.[colorKey]?.[shadeKey];
+    }
     return {
-      'minHeight': '60vh',
+      'minHeight': 'unset',
+
+      '&&': {
+        paddingTop: '10vh',
+        paddingBottom: '10vh',
+        background: bgValue
+          ? `radial-gradient(circle at top left, ${theme.palette.common.white}, ${bgValue}, ${bgValue})`
+          : 'transparent'
+      },
 
       'h1': {
         marginBottom: theme.spacing(2)
+      }
+    };
+  },
+
+  contentContainer: ({ theme }) => {
+    return {
+      '& > .MuiGrid-container': {
+        alignItems: 'center'
       },
 
-      '& [class*="Hero-contentContainer"]': {
-        '& .MuiGrid-container': {
-          '@media (max-width: 800px)': {
-            flexDirection: 'column-reverse',
-            textAlign: 'center'
+      '& [class*="Hero-actionsRoot"]': {
+        '& a': {
+          textDecoration: 'none'
+        },
+
+        [theme.breakpoints.down('md')]: {
+          'maxWidth': 200,
+          'margin': 'auto',
+          'flexDirection': 'column',
+
+          '& :nth-child(n)': {
+            marginBottom: theme.spacing(2)
+          },
+
+          '& :last-child': {
+            marginBottom: theme.spacing(0)
           }
         }
       }
     };
   },
+
   mediaRoot: ({ theme }) => {
     return {
-      width: '100%',
+      'width': '100%',
+      'maxWidth': '50%',
+      'margin': '0 auto',
 
-      img: {
+      '&&': {
+        paddingLeft: 0
+      },
+
+      'img': {
         'transition': 'all 0.5s ease-in-out',
         'willChange': 'transform',
         'transform': 'translateZ(0)',
-        'borderRadius': theme.spacing(4),
+        'borderRadius': theme.spacing(2),
 
         '&:hover': {
-          borderRadius: theme.spacing(8),
+          borderRadius: theme.spacing(4),
           transform: 'scale(1.05)'
+        }
+      },
+
+      [theme.breakpoints.up('md')]: {
+        paddingLeft: 0,
+        paddingTop: 0,
+        maxWidth: 'unset',
+        maxHeight: '80%',
+        height: '100%',
+        width: 'auto',
+        margin: 'unset',
+
+        img: {
+          'borderRadius': theme.spacing(4),
+          'height': 'auto',
+          'maxHeight': '100%',
+          'width': 'auto',
+          'maxWidth': '100%',
+
+          '&:hover': {
+            borderRadius: theme.spacing(8)
+          }
         }
       }
     };
   }
-  //
-  // Use the ownerState to set dynamic styles
-  // root: ({ ownerState, theme }) => {
-  //   return {
-  //     backgroundColor: ownerState.variant === 'example' ? 'red' : theme.palette.background.paper
-  //   };
-  // }
 };
 
 // https://mui.com/customization/theme-components/#adding-new-component-variants
@@ -86,34 +141,9 @@ const createVariants = (_theme: Theme): ComponentsVariants['Hero'] => [
       '& .MuiGrid-item:nth-child(2)': {
         display: 'flex',
         justifyContent: 'flex-end'
-      },
-      '& img': {
-        maxWidth: 450,
-        [_theme.breakpoints.down('md')]: {
-          margin: 'auto',
-          maxWidth: 300
-        }
-      },
-      [_theme.breakpoints.up('md')]: {
-        padding: _theme.spacing(8, 0)
       }
     }
   }
-
-  //to do: figure out how to make this prop work
-  // {
-  //   props: {
-  //     backgroundColor: 'black'
-  //   },
-  //   style: {
-  //     'display': 'none',
-  //     'backgroundColor': 'cyan',
-  //     '& .MuiGrid-item:nth-child(2)': {
-  //       backgroundColor: 'cyan',
-  //       color: _theme.palette.primary.contrastText
-  //     }
-  //   }
-  // }
 ];
 
 export default (theme: Theme): ThemeOptions => ({

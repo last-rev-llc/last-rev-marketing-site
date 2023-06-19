@@ -1,4 +1,4 @@
-fragment Footer_BaseFragment on Footer {
+fragment GlobalFooter_BaseFragment on Footer {
   ...Content_BaseFragment
   variant
   logo {

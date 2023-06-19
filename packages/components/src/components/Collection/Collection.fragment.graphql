@@ -24,6 +24,7 @@ fragment Collection_BaseFragment on Collection {
     ...Link_BaseFragment
     ...NavigationItem_BaseFragment
     ...Media_BaseFragment
+    ...Topic_CardFragment
   }
 }
 

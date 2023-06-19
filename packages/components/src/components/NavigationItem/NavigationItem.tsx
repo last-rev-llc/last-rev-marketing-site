@@ -48,6 +48,7 @@ export const NavigationItem = ({ subNavigation, sidekickLookup, onRequestClose, 
               <MenuItem key={item.id}>
                 <ContentModule
                   {...item}
+                  legacyBehavior={true}
                   variant={'link'}
                   onClick={handleSubnavClick}
                   {...(item?.__typename == 'NavigationItem'

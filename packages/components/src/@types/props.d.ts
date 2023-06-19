@@ -1,5 +1,7 @@
 import { AccordionProps } from '../components/Accordion';
+import { BlockProps } from '../components/Block';
 import { CardProps } from '../components/Card';
+import { CardMediaProps } from '../components/CardMedia';
 import { ContentModuleProps } from '../components/ContentModule';
 import { ErrorBoundaryProps } from '../components/ErrorBoundary';
 import { SEOProps } from '../components/SEO';
@@ -9,6 +11,9 @@ import { TextProps } from '../components/Text';
 import { ImageProps } from '../components/Image';
 import { LinkProps } from '../components/Link';
 import { HeaderProps } from '../components/Header';
+import { HeaderNavLinkProps } from '../components/Header/HeaderNavLink';
+import { HeaderNavGroupProps } from '../components/Header/HeaderNavGroup';
+import { HeaderNavLinkNestedProps } from '../components/Header/HeaderNavLinkNested';
 import { HeroProps } from '../components/Hero';
 import { MediaProps } from '../components/Media';
 import { SectionProps } from '../components/Section';
@@ -19,8 +24,9 @@ import { CollectionAccordionProps } from '../components/CollectionAccordion';
 import { NavigationBarProps } from '../components/NavigationBar';
 import { QuoteProps } from '../components/Quote';
 import { PageProps } from '../components/Page';
+import { PersonProps } from '../components/Person';
 import { TableOfContentsProps } from '../components/TableOfContents';
-import { FooterProps } from '../components/Footer';
+import { GlobalFooterProps } from '../components/GlobalFooter';
 
 declare module '@mui/material/styles' {
   export interface ComponentsPropsList {
@@ -29,7 +35,9 @@ declare module '@mui/material/styles' {
     // FormMarketoEmbed: FormMarketoEmbedProps;
     // MailchimpForm: MailchimpFormProps;
     Accordion: AccordionProps;
+    Block: BlockProps;
     Card: CardProps;
+    CardMedia: CardMediaProps;
     Collection: CollectionProps;
     CollectionAccordion: CollectionAccordionProps;
     CollectionCarousel1: CollectionCarouselProps;
@@ -37,8 +45,11 @@ declare module '@mui/material/styles' {
     ContentModule: ContentModuleProps;
     ContentPreview: ContentPreviewProps;
     ErrorBoundary: ErrorBoundaryProps;
-    Footer: FooterProps;
+    GlobalFooter: GlobalFooterProps;
     Header: HeaderProps;
+    HeaderNavLink: HeaderNavLinkProps;
+    HeaderNavGroup: HeaderNavGroupProps;
+    HeaderNavLinkNested: HeaderNavLinkNestedProps;
     Hero: HeroProps;
     Image: ImageProps;
     Link: LinkProps;
@@ -46,6 +57,7 @@ declare module '@mui/material/styles' {
     NavigationBar: NavigationBarProps;
     NavigationItem: NavigationItemProps;
     Page: PageProps;
+    Person: PersonProps;
     Quote: QuoteProps;
     Section: SectionProps;
     SEO: SEOProps;

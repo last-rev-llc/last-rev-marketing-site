@@ -1,11 +1,18 @@
 import { responsiveFontSizes, ThemeOptions, createTheme } from '@mui/material/styles';
 import Hero from '../components/Hero/Hero.theme';
 import Card from '../components/Card/Card.theme';
+import CardMedia from '../components/CardMedia/CardMedia.theme';
 import Media from '../components/Media/Media.theme';
 import Quote from '../components/Quote/Quote.theme';
 import Header from '../components/Header/Header.theme';
+import HeaderNavLink from '../components/Header/HeaderNavLink/HeaderNavLink.theme';
+import HeaderNavGroup from '../components/Header/HeaderNavGroup/HeaderNavGroup.theme';
+import HeaderNavLinkNested from '../components/Header/HeaderNavLinkNested/HeaderNavLinkNested.theme';
 import Section from '../components/Section/Section.theme';
 import Link from '../components/Link/Link.theme';
+import Block from '../components/Block/Block.theme';
+import Person from '../components/Person/Person.theme';
+import GlobalFooter from '../components/GlobalFooter/GlobalFooter.theme';
 import TableOfContents from '../components/TableOfContents/TableOfContents.theme';
 import Text from '../components/Text/Text.theme';
 import NavigationBar from '../components/NavigationBar/NavigationBar.theme';
@@ -14,6 +21,7 @@ import Collection from '../components/Collection/Collection.theme';
 import CollectionCarousel from '../components/CollectionCarousel/CollectionCarousel.theme';
 import merge from 'lodash/merge';
 import camelCase from 'lodash/camelCase';
+import createGridMixin from './mixins/createGridMixin';
 
 const baseTheme: ThemeOptions = {
   spacing: 8,
@@ -27,12 +35,16 @@ const baseTheme: ThemeOptions = {
       sm: 600,
       md: 900,
       lg: 1200,
-      xl: 1536
+      xl: 1536,
+      xxl: 3840
     }
+  },
+  mixins: {
+    gridContainer: createGridMixin // this gives your mixin the name `gridContainer`
   },
   typography: {
     fontSize: 16,
-    // fontFamily: "'Open Sans', 'sans-serif'",
+    fontFamily: "'Open Sans', 'sans-serif'",
     h1: {
       fontSize: '2.65rem',
       fontWeight: 100,
@@ -59,15 +71,15 @@ const baseTheme: ThemeOptions = {
       letterSpacing: '.025em'
     },
     h5: {
-      fontSize: '1.15rem',
+      fontSize: '1.125rem',
       fontWeight: 100,
-      lineHeight: 1.5,
+      lineHeight: 1.25,
       letterSpacing: '.025em'
     },
     h6: {
-      fontSize: '1.15rem',
+      fontSize: '1.125rem',
       fontWeight: 100,
-      lineHeight: 1.5555,
+      lineHeight: 1.125,
       letterSpacing: '.025em'
     },
     body1: {
@@ -89,8 +101,22 @@ const baseTheme: ThemeOptions = {
       // fontFamily: "'Open Sans', 'sans-serif'",
       fontWeight: 400
     },
+    bodyXSmall: {
+      fontWeight: 400,
+      fontSize: '.75rem',
+      lineHeight: 1.25
+    },
+    bodySmall: {
+      fontWeight: 400,
+      fontSize: '.875rem',
+      lineHeight: 1.25
+    },
+    bodyLarge: {
+      fontWeight: 400,
+      fontSize: '1.5rem',
+      lineHeight: 1.625
+    },
     heading: {
-      // fontFamily: "'Open Sans', 'sans-serif'",
       fontWeight: 700
     }
   },
@@ -169,9 +195,16 @@ const createSchemeTheme = (schemeKey?: string) => {
       baseSchemeTheme,
       ...[
         Header(baseSchemeTheme),
+        HeaderNavLink(baseSchemeTheme),
+        HeaderNavGroup(baseSchemeTheme),
+        HeaderNavLinkNested(baseSchemeTheme),
         Text(baseSchemeTheme),
+        Block(baseSchemeTheme),
+        Person(baseSchemeTheme),
         Card(baseSchemeTheme),
+        CardMedia(baseSchemeTheme),
         Quote(baseSchemeTheme),
+        GlobalFooter(baseSchemeTheme),
         Media(baseSchemeTheme),
         Hero(baseSchemeTheme),
         NavigationItem(baseSchemeTheme),
@@ -186,188 +219,57 @@ const createSchemeTheme = (schemeKey?: string) => {
         createSchemeTheme,
         components: {
           MuiContainer: {
+            defaultProps: {
+              maxWidth: 'xl'
+            },
             styleOverrides: {
               root: {
-                [baseSchemeTheme.breakpoints.up('lg')]: {
+                [baseSchemeTheme.breakpoints.down('sm')]: {
+                  'paddingLeft': baseSchemeTheme.spacing(5),
+                  'paddingRight': baseSchemeTheme.spacing(5),
+                  '&.MuiContainer-disableGutters': {
+                    paddingLeft: 0,
+                    paddingRight: 0
+                  }
+                },
+
+                [baseSchemeTheme.breakpoints.up('sm')]: {
                   paddingLeft: baseSchemeTheme.spacing(10),
                   paddingRight: baseSchemeTheme.spacing(10)
                 },
-                '& .MuiContainer-disableGutters': {
+
+                '&.MuiContainer-disableGutters': {
                   paddingLeft: 0,
                   paddingRight: 0
                 }
               }
             }
           },
-          Header: {
-            height: 80,
+          MuiToolbar: {
             styleOverrides: {
               root: {
-                '& img': {
-                  width: 180,
-                  height: 'auto'
+                [baseSchemeTheme.breakpoints.down('sm')]: {
+                  'paddingLeft': baseSchemeTheme.spacing(5),
+                  'paddingRight': baseSchemeTheme.spacing(5),
+                  '&.MuiContainer-disableGutters': {
+                    paddingLeft: 0,
+                    paddingRight: 0
+                  }
                 },
-                '&::before': {
-                  backgroundColor: 'black'
-                }
-              },
-              contentContainer: {
-                'backgroundColor': 'black',
-                'width': '100%',
-                'maxWidth': baseSchemeTheme.breakpoints.values.xl,
-                'margin': 'auto',
-                'paddingLeft': baseSchemeTheme.spacing(4),
-                'paddingRight': baseSchemeTheme.spacing(4),
+
                 [baseSchemeTheme.breakpoints.up('sm')]: {
-                  paddingLeft: baseSchemeTheme.spacing(6),
-                  paddingRight: baseSchemeTheme.spacing(6)
-                },
-                [baseSchemeTheme.breakpoints.up('lg')]: {
                   paddingLeft: baseSchemeTheme.spacing(10),
                   paddingRight: baseSchemeTheme.spacing(10)
                 },
-                'height': 80,
-                '& svg[class*="Header-logo"]': {
-                  maxHeight: 36
-                },
-                '& img[class*="Header-logo"]': {
-                  height: 33,
-                  width: 'auto'
-                },
-                '& a': {
-                  textDecoration: 'none',
-                  [baseSchemeTheme.breakpoints.down('md')]: {
-                    display: 'flex',
-                    justifyContent: 'center'
-                  }
-                },
-                '& .MuiSvgIcon-root': {
-                  color: 'white'
-                },
-                '[data-csk-entry-type="collection"]': {
-                  padding: '24px 0px'
+
+                '&.MuiContainer-disableGutters': {
+                  paddingLeft: 0,
+                  paddingRight: 0
                 }
-              }
-            }
-          },
-          NavigationBar: {
-            styleOverrides: {
-              root: {
-                '& .MuiButton-contained': {
-                  textTransform: 'capitalize',
-                  fontSize: 17
-                },
-                '& .MuiLink-root': {
-                  'display': 'flex',
-                  'alignItems': 'center',
-                  'padding': 10,
-                  'color': 'white',
-                  '&.MuiLink-selected': {
-                    fontWeight: 400
-                  },
-                  '&:hover': {
-                    color: baseSchemeTheme.palette.primary.light
-                  }
-                },
-                '[data-csk-entry-type="navigationItem"]': {
-                  [baseSchemeTheme.breakpoints.down('md')]: {
-                    color: 'white',
-                    textAlign: 'center'
-                  }
-                }
-              }
-            }
-          },
-          Footer: {
-            styleOverrides: {
-              root: {
-                '& a': {
-                  textDecoration: 'none'
-                },
-                'backgroundColor': 'black',
-                '& .MuiGrid-container': {
-                  'paddingTop': baseSchemeTheme.spacing(2),
-                  '& .MuiGrid-root': {
-                    display: 'flex',
-                    alignSelf: 'flex-start'
-                  }
-                },
-                '& [class*="Media-root"]': {
-                  padding: '40px 0px',
-                  display: 'flex',
-                  maxWidth: '150px'
-                },
-                '[data-csk-entry-type="navigationItem"]': {
-                  [baseSchemeTheme.breakpoints.down('md')]: {
-                    color: 'white',
-                    textAlign: 'center'
-                  }
-                }
-              }
-            }
-          },
-          Hero: {
-            styleOverrides: {
-              contentContainer: {
-                '& > .MuiGrid-container': {
-                  alignItems: 'center'
-                },
-                '& [class*="Hero-actionsRoot"]': {
-                  '& a': {
-                    textDecoration: 'none'
-                  },
-                  [baseSchemeTheme.breakpoints.down('md')]: {
-                    'maxWidth': 200,
-                    'margin': 'auto',
-                    'flexDirection': 'column',
-                    '& :nth-child(n)': {
-                      marginBottom: baseSchemeTheme.spacing(2)
-                    },
-                    '& :last-child': {
-                      marginBottom: baseSchemeTheme.spacing(0)
-                    }
-                  }
-                }
-              }
-            }
-          },
-          Media: {
-            styleOverrides: {
-              root: {
-                display: 'block',
-                width: '100%',
-                height: 'auto'
               }
             }
           },
 
-          Collection: {
-            styleOverrides: {
-              root: {
-                'margin': '0 auto',
-                '[class*="Section-gridContainer"]': {
-                  'display': 'grid',
-                  'gridAutoRows': '1fr',
-                  '[class*="Box-content"]': {
-                    display: 'block'
-                  }
-                },
-                '[class*="Section-gridItem"]': {
-                  display: 'flex',
-                  justifyContent: 'center',
-                  flexBasis: '100%',
-                  maxWidth: '100%',
-                  height: '100%',
-                  [baseSchemeTheme.breakpoints.up('md')]: {
-                    flexBasis: '50%'
-                  },
-                  [baseSchemeTheme.breakpoints.up('lg')]: {
-                    flexBasis: '33.333333%'
-                  }
-                }
-              }
-            }
-          },
           Quote: {
             styleOverrides: {
               root: {}
@@ -383,7 +285,7 @@ const createSchemeTheme = (schemeKey?: string) => {
     )
   );
 
-  return responsiveFontSizes(schemeTheme);
+  return schemeTheme; //responsiveFontSizes(schemeTheme);
 };
 
 const theme = createSchemeTheme();

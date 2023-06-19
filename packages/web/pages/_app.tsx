@@ -4,11 +4,11 @@ import Head from 'next/head';
 import Script from 'next/script';
 import { ThemeProvider } from '@mui/system';
 import CssBaseline from '@mui/material/CssBaseline';
-import theme from '@last-rev-marketing-site/components/src/theme';
 import { CacheProvider, EmotionCache } from '@emotion/react';
+import SEO from '@last-rev/component-library/dist/components/SEO';
 import { Open_Sans } from '@next/font/google';
 import '@last-rev/component-library/dist/styles.css';
-import SEO from '@last-rev/component-library/dist/components/SEO';
+import theme from '@last-rev-marketing-site/components/src/theme';
 
 // import { LazyMotion } from 'framer-motion';
 

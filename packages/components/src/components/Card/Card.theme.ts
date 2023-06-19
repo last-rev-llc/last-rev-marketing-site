@@ -5,248 +5,223 @@ export const defaultProps = {};
 
 // https://mui.com/customization/theme-components/#global-style-overrides
 export const styleOverrides: ComponentsOverrides<Theme>['Card'] = {
-  root: ({ theme }) => {
-    return {
-      '&': {
-        'width': '100%',
-        'position': 'relative',
-        'boxShadow': `0 0 0 1px ${theme.palette.secondary.main}, 0 0 0 1px ${theme.palette.secondary.main}`,
-        'border': `solid 1px transparent`,
-        'backgroundColor': theme.palette.text.secondary,
-        'transition': 'all 0.25s ease-in-out',
-        'willChange': 'transform',
-        'transform': 'translateZ(0)',
+  root: ({ theme }) => ({
+    'padding': theme.spacing(0),
+    'position': 'relative',
+    'boxShadow': `0 0 0 1px ${theme.palette.primary.light}, 0 0 0 1px transparent`,
+    'border': `solid 3px transparent`,
+    'transition': 'all 0.25s ease-in-out',
+    'willChange': 'transform',
+    'transform': 'translateZ(0)',
+    'backgroundColor': theme.palette.common.white,
+    '& *': {
+      color: theme.palette.common.black
+    },
 
-        '&:hover': {
-          'transform': 'scale(1.05)',
-          'backgroundColor': 'transparent',
-          'border': `solid 1px ${theme.palette.text.secondary}`,
+    '&:hover': {
+      transform: 'scale(1.05)',
+      border: `solid 3px ${theme.palette.primary.light}`,
+      backgroundColor: theme.palette.backgroundOption?.light
+    }
+  }),
 
-          '& .MuiCardMedia-root > *': {
-            transform: 'scale(1.25)'
-          }
-        },
+  cardLink: () => ({
+    'position': 'absolute',
+    'top': 0,
+    'left': 0,
+    'zIndex': 10,
+    'width': '100%',
+    'height': '100%',
+    '&:hover': {
+      '.MuiCardActionArea-focusHighlight': {
+        opacity: 0
+      }
+    }
+  }),
 
-        '& .MuiTypography-h3': {
-          ...theme.typography.h1,
-          paddingBottom: theme.spacing(2)
-        },
+  cardMedia: ({ theme, ownerState }) => ({
+    'display': 'block',
+    'position': 'relative',
+    'width': '100%',
+    'paddingBottom': theme.spacing(2),
 
-        '& .MuiCardMedia-root': {
-          'overflow': 'hidden',
-          'position': 'relative',
+    '& > span': {
+      width: '100% !important',
+      height: '100% !important'
+    },
 
-          '& > *': {
-            transition: 'all 0.25s ease-in-out',
-            willChange: 'transform',
-            transform: 'translateZ(0)',
-            width: '100%',
-            maxWidth: '100%',
-            objectFit: 'cover'
-          }
-        },
+    ...(ownerState?.variant === 'icon' && {
+      padding: theme.spacing(0),
+      maxWidth: 48,
 
-        '& .MuiCard-root': {
-          height: '100%'
-        },
-
-        '& .MuiCardContent-root': {
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'flex-start',
-          height: '100%'
-        },
-
-        '& .MuiCardActions-root': {
-          'marginTop': 'auto',
-          'display': 'flex',
-          'flexDirection': 'column',
-          'alignItems': 'flex-start',
-
-          '& *': {
-            ...theme.typography.body3,
-            marginLeft: 0
-          }
+      [theme.breakpoints.up('lg')]: {
+        'padding': theme.spacing(1),
+        'maxWidth': 64,
+        '& > img': {
+          objectFit: 'contain'
         }
       }
-    };
-  }
+    })
+  }),
+
+  cardActions: ({ theme }) => ({
+    'padding': 0,
+    'marginTop': theme.spacing(1),
+    'flexDirection': 'column',
+
+    [theme.breakpoints.up('md')]: {
+      flexDirection: 'column',
+      alignItems: 'flex-start'
+    },
+
+    '& a': {
+      textDecoration: 'none !important',
+      marginLeft: '0 !important'
+    }
+  }),
+
+  cardAction: () => ({
+    paddingLeft: 0,
+    marginLeft: 0
+  }),
+
+  cardContent: ({ theme, ownerState }) => ({
+    ...(ownerState?.variant === 'icon' && {
+      '&:last-child': {
+        padding: theme.spacing(0)
+      }
+    })
+  }),
+
+  eyebrow: ({ theme }) => ({
+    ...theme.typography.bodyXSmall,
+    marginBottom: theme.spacing(1),
+    textTransform: 'uppercase',
+    color: theme.palette.grey[500]
+  }),
+
+  title: ({ theme }) => ({
+    ...theme.typography.h6
+  }),
+
+  subtitle: () => ({}),
+
+  body: ({ theme, ownerState }) => ({
+    'overflow': 'hidden',
+    'overflowWrap': 'break-word',
+    'textOverflow': 'ellipsis',
+    'display': '-webkit-box',
+    'hyphens': 'auto',
+    '-webkit-line-clamp': '3',
+    '-webkit-box-orient': 'vertical',
+
+    '& *': {
+      ...theme.typography.bodySmall
+    },
+
+    ...(ownerState?.variant === 'icon' && {
+      marginTop: theme.spacing(1)
+    })
+  })
 };
 
 // https://mui.com/customization/theme-components/#adding-new-component-variants
 const createVariants = (theme: Theme): ComponentsVariants['Card'] => [
-  // Use prop matching to set variant styles
-
   {
     props: {
-      variant: 'icon-centered'
+      variant: 'default'
     },
     style: {
-      'textAlign': 'center',
       'display': 'flex',
       'flexDirection': 'column',
-      '& .MuiTypography-h4': {
-        fontSize: '1.1rem'
-      },
-      '& .MuiCardMedia-root': {
-        'display': 'flex',
-        'justifyContent': 'center',
-        '& img': {
-          aspectRatio: '1',
-          width: '100%',
-          height: 'auto',
-          objectFit: 'contain',
-          minWidth: 200,
-          maxWidth: 200
-        }
-      }
-    }
-  },
-  {
-    props: {
-      variant: 'dark'
-    },
-    style: {
-      'padding': 24,
-      'backgroundColor': 'black',
-      'color': 'white',
-      'textAlign': 'center',
-      'display': 'flex',
-      'flexDirection': 'column',
-      'transition': 'all 0.3s ease-in-out',
-      'box-shadow': '0 0 0 1px hsl(0deg 0% 100% / 15%)',
-      '& .MuiTypography-h3': {
-        fontSize: '1.5rem',
-        paddingBottom: 16
-      },
-      '& .MuiTypography-h4': {
-        fontSize: '1.1rem',
-        paddingBottom: 16
-      },
-      '& .MuiCardMedia-root': {
-        'display': 'flex',
-        'justifyContent': 'center',
-        '& img': {
-          aspectRatio: '1',
-          width: '100%',
-          height: 'auto',
-          objectFit: 'contain',
-          minWidth: 200,
-          maxWidth: 200
-        }
-      },
-      '&:hover': {
-        backgroundColor: '#111111'
-      }
-    }
-  },
-  {
-    props: {
-      variant: 'left-icon-centered-text'
-    },
-    style: {
-      'textAlign': 'center',
+      'height': '100%',
 
-      '& .MuiCardMedia-root': {
-        // 'maxHeight': theme.spacing(12),
-        'border': 'solid 10px blue !important',
-        'marginBottom': theme.spacing(2),
+      [theme.breakpoints.up('md')]: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: theme.spacing(1)
+      },
 
-        [theme.breakpoints.up('sm')]: {
-          minHeight: theme.spacing(14),
-          marginBottom: theme.spacing(4)
+      [theme.breakpoints.up('lg')]: {
+        flexDirection: 'column',
+        gap: 0,
+        alignItems: 'normal'
+      },
+
+      '[class$=Card-cardMedia]': {
+        'display': 'flex',
+        'flexDirection': 'column',
+        'alignItems': 'center',
+        'padding': 0,
+
+        '[class$=Media-root]': {
+          margin: 0,
+          objectFit: 'cover',
+          aspectRatio: '16 / 9'
         },
 
-        '& > *': {
-          aspectRatio: '1/1'
-        }
-      }
-    }
-  },
-  {
-    props: {
-      variant: 'blog-featured'
-    },
-    style: {
-      'boxShadow': '0px 0px 0px 0px',
-      'borderRadius': 0,
-
-      '& .MuiCardMedia-root': {
-        '& > *': {
-          aspectRatio: '16/9'
-        }
-      },
-      '& .MuiCardActions-root': {
-        marginTop: theme.spacing(1),
-        padding: theme.spacing(2, 0)
-      }
-    }
-  },
-  {
-    props: {
-      variant: 'left-align'
-    },
-    style: {
-      'borderRadius': 0,
-      'backgroundColor': 'black',
-      'color': 'white',
-      '& .MuiCardMedia-root': {
-        'display': 'flex',
-        'justifyContent': 'start',
-        [theme.breakpoints.down('md')]: {
-          justifyContent: 'center',
-          textAlign: 'center'
-        },
-        '& img': {
-          maxWidth: 64
-        }
-      },
-      '& .MuiTypography-root': {
-        [theme.breakpoints.down('md')]: {
-          textAlign: 'center'
-        }
-      }
-    }
-  },
-  {
-    props: {
-      variant: 'left-align-no-bg'
-    },
-    style: {
-      [theme.breakpoints.down('md')]: {
-        flexDirection: 'column'
-      },
-
-      'color': theme.palette.text.primary,
-      'display': 'flex',
-
-      '& .MuiCardContent-root': {
-        height: 'auto',
-        justifyContent: 'center',
-        alignItems: 'center'
-      },
-
-      '& .MuiCardMedia-root': {
-        'display': 'flex',
-        'justifyContent': 'center',
-        'aspectRatio': '1/1',
-        'maxWidth': '20%',
-
-        [theme.breakpoints.down('md')]: {
-          justifyContent: 'center',
-          textAlign: 'center'
+        [theme.breakpoints.up('md')]: {
+          flex: '2 1 0px',
+          width: 0
         },
 
-        '& > *': {
-          width: '100%',
-          height: '100%',
-          objectFit: 'contain'
+        [theme.breakpoints.up('lg')]: {
+          flex: 'unset',
+          width: 'unset'
         }
       },
-      '& .MuiTypography-root': {
-        [theme.breakpoints.down('md')]: {
-          textAlign: 'center'
+
+      '[class$=Card-title]': {
+        marginBottom: theme.spacing(1)
+      },
+
+      '[class$=Card-cardContent]': {
+        'padding': theme.spacing(2),
+
+        '&:last-child': {
+          // padding: theme.spacing(1),
+          zIndex: 100,
+
+          [theme.breakpoints.up('md')]: {
+            flex: '3 1 0px',
+            width: 0
+          },
+
+          [theme.breakpoints.up('lg')]: {
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            width: 'unset'
+          }
         }
+      },
+
+      '[class$=Card-body]': {
+        flex: 1
+      },
+
+      '[class$=Card-cardActions]': {
+        padding: 0,
+        marginTop: theme.spacing(8),
+        justifyContent: 'space-between',
+        flexDirection: 'column',
+        gap: theme.spacing(1, 4),
+
+        [theme.breakpoints.up('md')]: {
+          flexDirection: 'column'
+        }
+      },
+
+      '[class$=CategoryTag-root]': {
+        overflow: 'hidden'
+      },
+
+      '[class$=Card-cardAction]': {
+        ...theme.typography.bodyXSmall,
+        paddingRight: 0,
+        whiteSpace: 'nowrap',
+        justifyContent: 'flex-end',
+        marginLeft: 'auto'
       }
     }
   }

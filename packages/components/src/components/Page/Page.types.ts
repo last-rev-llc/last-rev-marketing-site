@@ -1,8 +1,8 @@
-import { Page as PageContent } from '@last-rev-marketing-site/graphql-sdk/dist';
-export interface PageProps extends PageContent {}
+import { Page_BaseFragmentFragment } from '@last-rev-marketing-site/graphql-sdk';
+
+export interface PageProps extends Page_BaseFragmentFragment {}
 
 export interface PageClasses {
-  /** Styles applied to the root element. */
   root: string;
 }
 

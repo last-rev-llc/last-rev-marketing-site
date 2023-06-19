@@ -3,10 +3,10 @@ fragment Page_BaseFragment on Page {
   seo
   slug
   header {
-    ...ContentModule_BaseFragment
+    ...Header_BaseFragment
   }
   footer {
-    ...ContentModule_BaseFragment
+    ...GlobalFooter_BaseFragment
   }
   hero {
     ...ContentModule_BaseFragment
@@ -14,4 +14,11 @@ fragment Page_BaseFragment on Page {
   contents {
     ...ContentModule_BaseFragment
   }
+  headerOverride {
+    ...Header_BaseFragment
+  }
+  footerOverride {
+    ...GlobalFooter_BaseFragment
+  }
+  disableBackToTop
 }

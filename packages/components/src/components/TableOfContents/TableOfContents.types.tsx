@@ -1,4 +1,4 @@
-import { TableOfContents_BaseFragmentFragment } from '@last-rev-marketing-site/graphql-sdk/dist';
+import { TableOfContents_BaseFragmentFragment } from '@last-rev-marketing-site/graphql-sdk';
 
 export interface TableOfContentsProps extends TableOfContents_BaseFragmentFragment {}
 

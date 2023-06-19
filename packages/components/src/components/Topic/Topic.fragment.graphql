@@ -1,13 +1,12 @@
 fragment Topic_BaseFragment on Topic {
   ...Content_BaseFragment
-  title
   seo
   slug
   header {
-    ...ContentModule_BaseFragment
+    ...Header_BaseFragment
   }
   footer {
-    ...ContentModule_BaseFragment
+    ...GlobalFooter_BaseFragment
   }
   hero {
     ...ContentModule_BaseFragment
@@ -15,4 +14,22 @@ fragment Topic_BaseFragment on Topic {
   contents {
     ...ContentModule_BaseFragment
   }
+  headerOverride {
+    ...Header_BaseFragment
+  }
+  footerOverride {
+    ...GlobalFooter_BaseFragment
+  }
+}
+
+fragment Topic_LinkFragment on Topic {
+  ...Content_BaseFragment
+  title
+  slug
+}
+
+fragment Topic_CardFragment on Topic {
+  ...Content_BaseFragment
+  title
+  slug
 }

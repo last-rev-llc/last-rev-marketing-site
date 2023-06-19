@@ -1,10 +1,6 @@
 # This will go 3 levels deep recursive
 fragment Section_BaseFragment on Section {
   ...Section_BaseFieldsFragment
-  hasBackground
-  introText {
-    ...Text_IntroTextFragment
-  }
   contents {
     ...ContentModule_SectionFragment
     ... on Section {
@@ -47,9 +43,10 @@ fragment Section_BaseFieldsFragment on Section {
   background {
     ...Media_BaseFragment
   }
-  #introText {
-  #  ...Text_IntroTextFragment
-  #}
+  introText {
+    ...Text_IntroTextFragment
+  }
+  hasBackground
 }
 
 # This will go 3 levels deep recursive
@@ -90,6 +87,7 @@ fragment ContentModule_RichText_SectionFragment on Content {
   ...NavigationItem_BaseFragment
   ...Collection_RichTextFragment
   ...Card_RichTextFragment
+  ...ModuleIntegration_BaseFragment
   #...Text_RichTextFragment
   #...Section_BaseFragment
 }

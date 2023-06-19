@@ -5,9 +5,12 @@ import { camelCase, toUpper } from 'lodash';
 
 import { collectOptions } from './utils/collectOptions';
 import { queryContentful } from '@last-rev/graphql-contentful-extensions/dist/utils/queryContentful';
+import collectionItemsResolver, { CollectionSettings } from './resolvers/collectionItemsResolver';
+import defaultResolver from './resolvers/defaultResolver';
 
 const pascalCase = (str: string) => camelCase(str).replace(/^(.)/, toUpper);
-const COLLECTION_ITEM_TYPES = ['Card', 'Link', 'Media', 'Section', 'NavigationItem'];
+
+const COLLECTION_ITEM_TYPES = ['Card', 'Link', 'Media', 'Section', 'NavigationItem', 'Blog', 'Topic'];
 
 export const typeDefs = gql`
   extend type Collection {
@@ -50,37 +53,18 @@ interface ItemsConnectionArgs {
   filter?: any;
 }
 
-interface CollectionSettings {
-  contentType: string;
-  limit?: number;
-  offset?: number;
-  filter?: any;
-  order?: string;
-  filters: Array<{
-    id: string;
-    key: string;
-  }>;
-}
-
 export const mappers: any = {
   Collection: {
     Collection: {
-      items: async (collection: any, _args: any, ctx: ApolloContext) => {
-        let items = getLocalizedField(collection.fields, 'items', ctx) ?? [];
-        try {
-          const { contentType, limit, offset, order, filter } =
-            (getLocalizedField(collection.fields, 'settings', ctx) as CollectionSettings) || {};
-          if (contentType) {
-            items = await queryContentful({ contentType, ctx, order, filter, limit, skip: offset });
-            return ctx.loaders.entryLoader.loadMany(
-              items?.map((x: any) => ({ id: x?.sys?.id, preview: !!ctx.preview }))
-            );
-          }
-        } catch (error: any) {
-          return 'error from Collection extension';
-        }
-        return items;
-      },
+      variant: defaultResolver('variant'),
+      items: collectionItemsResolver,
+      itemsVariant: defaultResolver('itemsVariant'),
+      itemsWidth: defaultResolver('itemsWidth'),
+      gutterWidth: defaultResolver('gutterWidth'),
+      colorScheme: defaultResolver('colorScheme'),
+      disableGutters: defaultResolver('disableGutters', {
+        noCamelCase: true
+      }),
       itemsConnection: async (collection: any, { limit, offset, filter }: ItemsConnectionArgs, ctx: ApolloContext) => {
         let items = getLocalizedField(collection.fields, 'items', ctx) ?? [];
         try {
@@ -120,6 +104,10 @@ export const mappers: any = {
 
         return items;
       }
+    },
+    NavigationItem: {
+      text: 'internalTitle',
+      subNavigation: 'items'
     }
   }
 };
@@ -128,6 +116,7 @@ export const mappers: any = {
 const ITEM_MAPPING: { [key: string]: string } = {
   Page: 'Link',
   PageBlog: 'Card',
+  Topic: 'Link',
   Media: 'Card'
 };
 

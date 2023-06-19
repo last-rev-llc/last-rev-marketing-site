@@ -13,9 +13,9 @@ import Link from '../Link';
 import ContentModule from '../ContentModule';
 import ErrorBoundary from '../ErrorBoundary';
 import theme from '../../theme';
-import { FooterProps } from './Footer.types';
+import { GlobalFooterProps } from './GlobalFooter.types';
 
-export const Footer = ({ logo, logoUrl, navigationItems, brandAndYear, sidekickLookup }: FooterProps) => {
+export const GlobalFooter = ({ logo, logoUrl, navigationItems, brandAndYear, sidekickLookup }: GlobalFooterProps) => {
   return (
     <ErrorBoundary>
       <Root sx={{ backgroundColor: 'black' }} {...sidekick(sidekickLookup)}>
@@ -72,9 +72,9 @@ export const Footer = ({ logo, logoUrl, navigationItems, brandAndYear, sidekickL
 };
 
 const Root = styled(Box, {
-  name: 'Footer',
+  name: 'GlobalFooter',
   slot: 'Root',
   overridesResolver: (_, styles) => [styles.root]
 })``;
 
-export default Footer;
+export default GlobalFooter;

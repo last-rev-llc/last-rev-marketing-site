@@ -12,12 +12,32 @@ import { CollectionCarouselProps } from './CollectionCarousel.types';
 
 export const CollectionCarousel = ({
   items,
-  variant,
   itemsWidth,
+  variant,
   itemsVariant,
-  sidekickLookup
+  sidekickLookup,
+  introText,
+  ...props
 }: CollectionCarouselProps) => {
   const [carouselLoaded, setCarouselLoaded] = useState(false);
+  let slidesPerView: number = 4;
+
+  switch (variant) {
+    case 'carouselOnePerRow':
+      slidesPerView = 1;
+      break;
+    case 'carouselTwoPerRow':
+      slidesPerView = 2;
+      break;
+
+    case 'carouselThreePerRow':
+      slidesPerView = 3;
+      break;
+
+    case 'carouselFourPerRow':
+      slidesPerView = 4;
+      break;
+  }
 
   useEffect(() => {
     setCarouselLoaded(true);
@@ -31,14 +51,21 @@ export const CollectionCarousel = ({
       <Root
         {...sidekick(sidekickLookup)}
         variant={variant}
+        itemsVariant={itemsVariant}
+        {...props}
         style={!carouselLoaded ? { opacity: 0 } : undefined}
         data-testid="CollectionCarousel">
-        <ContentContainer maxWidth={itemsWidth} disableGutters>
+        {introText && (
+          <Container>
+            <IntroText {...introText} {...sidekick(sidekickLookup, 'introText')} data-testid="Collection-introText" />
+          </Container>
+        )}
+        <ContentContainer>
           <CarouselContainer
             modules={[Autoplay, A11y]}
             {...{
               loop: true,
-              slidesPerView: 4,
+              slidesPerView: slidesPerView,
               spaceBetween: 80,
               loopedSlides: items?.length,
               pagination: false,
@@ -49,26 +76,33 @@ export const CollectionCarousel = ({
                 disableOnInteraction: false
               },
               breakpoints: {
-                684: {
+                10: {
                   slidesPerView: 1,
                   spaceBetween: 40
                 },
-                780: {
-                  slidesPerView: 2,
+                600: {
+                  slidesPerView: slidesPerView <= 2 ? slidesPerView : 2,
+                  spaceBetween: 40
+                },
+                900: {
+                  slidesPerView: slidesPerView <= 2 ? slidesPerView : 2,
                   spaceBetween: 80
                 },
-                1024: {
-                  slidesPerView: 3
+                1200: {
+                  slidesPerView
                 },
-                1440: {
-                  slidesPerView: 4
+                1536: {
+                  slidesPerView
+                },
+                3840: {
+                  slidesPerView
                 }
               }
             }}>
             {itemsWithVariant.map((item: any, idx: number) => (
-              <SwiperSlide key={idx}>
+              <SwiperSlide key={item.id ?? idx}>
                 <CarouselItem>
-                  <ContentModule {...item} />
+                  <Item {...item} variant={itemsVariant ?? item?.variant} />
                 </CarouselItem>
               </SwiperSlide>
             ))}
@@ -123,6 +157,12 @@ const CarouselContainer = styled(Swiper, {
   }
 }));
 
+const IntroText = styled(ContentModule, {
+  name: 'CollectionCarousel',
+  slot: 'IntroText',
+  overridesResolver: (_, styles) => [styles.introText]
+})<{ variant?: string }>``;
+
 const CarouselItem = styled(Box, {
   name: 'CollectionCarousel',
   slot: 'CarouselItem',
@@ -134,5 +174,11 @@ const CarouselItem = styled(Box, {
   height: '100%',
   width: '100%'
 }));
+
+const Item = styled(ContentModule, {
+  name: 'CollectionCarousel',
+  slot: 'Item',
+  overridesResolver: (_, styles) => [styles.item]
+})<{ variant?: string }>``;
 
 export default CollectionCarousel;

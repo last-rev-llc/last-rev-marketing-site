@@ -44,6 +44,7 @@ export const NextLinkComposed = React.forwardRef<HTMLAnchorElement, NextLinkComp
         scroll={scroll}
         shallow={shallow}
         passHref={passHref}
+        legacyBehavior
         locale={locale}>
         <RootLink ref={ref} {...other} onClick={onClick}>
           {text || children}

@@ -1,5 +1,5 @@
 import { lorem } from 'faker';
-import { PageProps } from './Page';
+import { PageProps } from './Page.types';
 import heroMock from '../Hero/Hero.mock';
 import collectionMock from '../Collection/Collection.mock';
 import sectionMock from '../Section/Section.mock';

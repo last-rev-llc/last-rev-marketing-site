@@ -1,7 +1,7 @@
 import React from 'react';
 import Head from 'next/head';
 import styled from '@mui/system/styled';
-import { kebabCase } from 'lodash';
+import kebabCase from 'lodash/kebabCase';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import List from '@mui/material/List';
@@ -14,35 +14,12 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import EmailIcon from '@mui/icons-material/Email';
 import TwitterIcon from '@mui/icons-material/Twitter';
-// import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import ErrorBoundary from '@last-rev/component-library/dist/components/ErrorBoundary';
-import ContentModule from '@last-rev/component-library/dist/components/ContentModule';
+import ErrorBoundary from '../ErrorBoundary';
+import ContentModule from '../ContentModule';
 import Text from '../Text';
-import { MediaProps } from '@last-rev/component-library/dist/components/Media';
-import { LinkProps } from '@last-rev/component-library/dist/components/Link';
-import sidekick from '@last-rev/contentful-sidekick-util';
-
 import Link from '../Link';
-
-export interface PageBlogProps {
-  __typename?: string;
-  sidekickLookup?: any;
-  title?: string;
-  creationDate?: string;
-  slug?: string;
-  featuredMedia?: Array<MediaProps>;
-  author?: any;
-  body?: any;
-  quote?: string;
-  tags?: Array<string>;
-  relatedLinks?: LinkProps[];
-  contents?: any;
-  header: any;
-  footer: any;
-  topics?: any;
-  landingPageSummary?: string;
-  seo: any;
-}
+import { PageBlogProps } from './PageBlog.types';
+import sidekick from '@last-rev/contentful-sidekick-util';
 
 export const PageBlog = ({
   header,
@@ -90,6 +67,7 @@ export const PageBlog = ({
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }} />
       </Head>
       {header ? <ContentModule {...(header as any)} /> : null}
+
       <Root {...sidekick(sidekickLookup)} itemScope itemType="https://schema.org/Blog">
         <ContentContainer maxWidth={'xl'}>
           <Grid container spacing={5} sx={{ py: { lg: 4 } }} justifyContent="center">
@@ -401,6 +379,7 @@ export const PageBlog = ({
           </Grid>
         </ContentContainer>
       </Root>
+
       {footer ? <ContentModule {...(footer as any)} /> : null}
     </ErrorBoundary>
   );

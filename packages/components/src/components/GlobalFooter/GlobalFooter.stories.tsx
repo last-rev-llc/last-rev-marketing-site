@@ -1,10 +1,10 @@
 import React from 'react';
-import Footer from './Footer';
-import footerMock from './Footer.mock';
+import GlobalFooter from './GlobalFooter';
+import footerMock from './GlobalFooter.mock';
 
 export default {
   title: 'Global / Footer',
-  component: Footer,
+  component: GlobalFooter,
   argTypes: {
     logo: { name: 'Logo' },
     logoUrl: { name: 'Logo URL' },
@@ -13,6 +13,6 @@ export default {
   }
 };
 
-const Template = (args: JSX.IntrinsicAttributes) => <Footer sidekickLookup={{}} {...args} />;
+const Template = (args: JSX.IntrinsicAttributes) => <GlobalFooter sidekickLookup={{}} {...args} />;
 export const Default = Template.bind({});
 Default.args = { ...footerMock };

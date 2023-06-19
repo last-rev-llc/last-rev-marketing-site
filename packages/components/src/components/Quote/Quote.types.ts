@@ -1,4 +1,4 @@
-import { Quote_BaseFragmentFragment } from '@last-rev-marketing-site/graphql-sdk/dist';
+import { Quote_BaseFragmentFragment } from '@last-rev-marketing-site/graphql-sdk';
 
 export interface QuoteProps extends Quote_BaseFragmentFragment {
   variant?: 'one-column' | 'two-column';

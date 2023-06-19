@@ -1,10 +1,13 @@
 import gql from 'graphql-tag';
 import { getDefaultFieldValue, getLocalizedField, createRichText } from '@last-rev/graphql-contentful-core';
-import { ContentfulPathsGenerator, ApolloContext } from '@last-rev/types';
+import { ContentfulPathsGenerator, ApolloContext, ContentfulLoaders } from '@last-rev/types';
 import { Page } from '@last-rev/graphql-contentful-extensions';
 import getFirstOfArray from '@last-rev/component-library/dist/utils/getFirstOfArray';
-import kebabCase from 'lodash/kebabCase';
+import { format } from 'date-fns';
 import createType from './utils/createType';
+import getPathUrl from './utils/getPathUrl';
+import createPath from './utils/createPath';
+import hrefUrlResolver from './resolvers/hrefUrlResolver';
 
 const mediaFieldResolver = async ({ fields, ctx }: any) => {
   let mediaField: any = null;
@@ -44,19 +47,6 @@ const mediaFieldResolver = async ({ fields, ctx }: any) => {
 const getSeoValue = (value: string | undefined, defaultValue: string) =>
   value && value?.trim() !== '' ? value : defaultValue;
 
-const getSlug = (topic: any, ctx: ApolloContext) => {
-  const title = getLocalizedField(topic.fields, 'title', ctx);
-  const slug = getLocalizedField(topic.fields, 'slug', ctx);
-  return slug ?? kebabCase(title);
-};
-
-export const createPath = (...slug: string[]) => {
-  let path = slug.join('/').replace(/\/\//g, '/');
-  if (path[0] !== '/') path = '/' + path;
-  if (path != '/' && path[path.length - 1] === '/') path = path.slice(0, -1);
-  return path;
-};
-
 export const typeDefs = gql`
   extend type PageBlog {
     relatedLinks: [Link]
@@ -64,6 +54,7 @@ export const typeDefs = gql`
     topics: [Topic]
     header: Header
     footer: Content
+    authoredBy: Content
   }
 `;
 
@@ -146,6 +137,10 @@ export const mappers: any = {
     PageBlog: {
       header: Page.mappers.Page.Page.header,
       footer: Page.mappers.Page.Page.footer,
+      creationDate: async (ref: any, _args: any, ctx: ApolloContext) => {
+        const pubDate = getLocalizedField(ref?.fields, 'pubDate', ctx);
+        return pubDate && format(new Date(pubDate), 'MMMM dd, yyyy');
+      },
       seo: async (blog: any, _args: any, ctx: ApolloContext) => {
         const seo: any = getLocalizedField(blog.fields, 'seo', ctx);
         const title: any = getLocalizedField(blog.fields, 'title', ctx);
@@ -210,6 +205,9 @@ export const mappers: any = {
       }
     },
     Card: {
+      eyebrow: () => {
+        return 'Blog';
+      },
       media: async (blog: any, _args: any, ctx: ApolloContext) => {
         const featuredMedia: any = getLocalizedField(blog.fields, 'featuredMedia', ctx);
         if (!featuredMedia) return null;
@@ -229,67 +227,88 @@ export const mappers: any = {
         }
         return body;
       },
+
       actions: async (blog: any, _args: any, ctx: ApolloContext) => {
         // Get all topics from this blog and convert them into links
         const topicsLinks: any = getLocalizedField(blog.fields, 'topics', ctx);
 
         if (!!topicsLinks?.length) {
-          const topics = await ctx.loaders.entryLoader.loadMany(
-            topicsLinks?.map((topic: any) => ({ id: topic?.sys?.id, preview: !!ctx.preview }))
-          );
-
-          if (!!topics?.length) {
-            const actions = topics?.map((topic: any) =>
-              !!topic
-                ? createType('Link', {
-                    id: topic?.sys?.id,
-                    text: getLocalizedField(topic.fields, 'title', ctx),
-                    href: `/blog/${getSlug(topic, ctx)}`
-                  })
-                : null
-            ) as any; // any used to allow adding __fieldName__
-            actions.__fieldName__ = 'topics';
-            return actions;
-          }
+          return topicsLinks;
         }
-
-        const path = createPath('blog', getLocalizedField(blog.fields, 'slug', ctx));
 
         return [
           createType('Link', {
             id: blog?.sys?.id,
-            text: 'Read more',
-            variant: 'text',
-            manualUrl: path
+            text: 'Read More',
+            linkedContent: blog
           })
         ];
       },
 
       link: async (blog: any, _args: any, ctx: ApolloContext) => {
-        const path = createPath('blog', getLocalizedField(blog.fields, 'slug', ctx));
+        const path = await getPathUrl(blog, ctx);
         return createType('Link', {
           id: blog?.sys?.id,
           manualUrl: path
         });
       }
+    },
+
+    Link: {
+      href: hrefUrlResolver
     }
   }
 };
 
-const pageBlog: ContentfulPathsGenerator = async (blogItem, _loaders, defaultLocale, _locales, _preview) => {
+// only checking for the first item
+const generateParentPaths = async (
+  blog: any,
+  loaders: ContentfulLoaders,
+  defaultLocale: string,
+  preview?: boolean,
+  paths: string[] = []
+): Promise<string[]> => {
+  const parentPageRef = getDefaultFieldValue(blog, 'parentPage', defaultLocale);
+
+  if (parentPageRef) {
+    const parentPage = await loaders.entryLoader.load({ id: parentPageRef.sys.id, preview: !!preview });
+    if (parentPage) {
+      const parentSlug = getDefaultFieldValue(parentPage as any, 'slug', defaultLocale);
+      paths.push(parentSlug);
+      return generateParentPaths(parentPage, loaders, defaultLocale, preview, paths);
+    }
+  }
+
+  return paths;
+};
+
+const generatePaths: ContentfulPathsGenerator = async (
+  blogItem,
+  loaders,
+  defaultLocale,
+  _locales,
+  preview = false,
+  _site
+) => {
   const slug = getDefaultFieldValue(blogItem, 'slug', defaultLocale);
-  const blogLandingSlug = 'blog';
-  const fullPath = createPath(blogLandingSlug, slug);
+
+  const paths = await generateParentPaths(blogItem, loaders, defaultLocale, preview);
+
+  paths.reverse().push(slug);
+
+  const fullPath = createPath(...paths);
+  const excludedLocales = getDefaultFieldValue(blogItem, 'excludeFromLocale', defaultLocale) || [];
+
   return {
     [fullPath]: {
       fullPath,
       isPrimary: true,
-      contentId: blogItem.sys.id,
-      excludedLocales: []
+      contentId: blogItem?.sys?.id,
+      excludedLocales
     }
   };
 };
 
 export const pathsConfigs = {
-  pageBlog
+  pageBlog: generatePaths
 };

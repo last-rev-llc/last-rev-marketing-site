@@ -1,31 +1,40 @@
 fragment PageBlog_BaseFragment on PageBlog {
   ...Content_BaseFragment
-  header {
-    ...ContentModule_BaseFragment
-  }
-  footer {
-    ...ContentModule_BaseFragment
-  }
-  seo
   title
   slug
-  author
-  #quote
-  tags
-  landingPageSummary
-  creationDate
+  header {
+    ...Header_BaseFragment
+  }
+  footer {
+    ...GlobalFooter_BaseFragment
+  }
   featuredMedia {
     ...Media_BaseFragment
   }
+  landingPageSummary
+  creationDate
   body {
     ...RichText_BaseFragment
   }
-  relatedLinks {
-    ...Link_BaseFragment
+  authoredBy {
+    ...Person_Card_Fragment
   }
-  topics {
-    id
-    slug
-    title
+  seo
+}
+
+fragment PageBlog_LinkFragment on PageBlog {
+  ...Content_BaseFragment
+  title
+  slug
+}
+
+fragment PageBlog_CardFragment on PageBlog {
+  ...Content_BaseFragment
+  title
+  slug
+  featuredMedia {
+    ...Media_BaseFragment
   }
+  landingPageSummary
+  creationDate
 }

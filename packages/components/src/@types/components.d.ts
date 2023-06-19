@@ -20,6 +20,14 @@ declare module '@mui/material/styles' {
        */
       variants?: ComponentsVariants['Accordion'];
     };
+    Block?: {
+      defaultProps?: ComponentsProps['Block'];
+      styleOverrides?: ComponentsOverrides<Theme>['Block'];
+      /**
+       * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
+       */
+      variants?: ComponentsVariants['Block'];
+    };
     Card?: {
       defaultProps?: ComponentsProps['Card'];
       styleOverrides?: ComponentsOverrides<Theme>['Card'];
@@ -27,6 +35,14 @@ declare module '@mui/material/styles' {
        * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
        */
       variants?: ComponentsVariants['Card'];
+    };
+    CardMedia?: {
+      defaultProps?: ComponentsProps['CardMedia'];
+      styleOverrides?: ComponentsOverrides<Theme>['CardMedia'];
+      /**
+       * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
+       */
+      variants?: ComponentsVariants['CardMedia'];
     };
 
     ContentModule?: {
@@ -110,6 +126,30 @@ declare module '@mui/material/styles' {
        */
       variants?: ComponentsVariants['Header'];
     };
+    HeaderNavLink?: {
+      defaultProps?: ComponentsProps['HeaderNavLink'];
+      styleOverrides?: ComponentsOverrides<Theme>['HeaderNavLink'];
+      /**
+       * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
+       */
+      variants?: ComponentsVariants['HeaderNavLink'];
+    };
+    HeaderNavGroup?: {
+      defaultProps?: ComponentsProps['HeaderNavGroup'];
+      styleOverrides?: ComponentsOverrides<Theme>['HeaderNavGroup'];
+      /**
+       * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
+       */
+      variants?: ComponentsVariants['HeaderNavGroup'];
+    };
+    HeaderNavLinkNested?: {
+      defaultProps?: ComponentsProps['HeaderNavLinkNested'];
+      styleOverrides?: ComponentsOverrides<Theme>['HeaderNavLinkNested'];
+      /**
+       * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
+       */
+      variants?: ComponentsVariants['HeaderNavLinkNested'];
+    };
     Hero?: {
       defaultProps?: ComponentsProps['Hero'];
       styleOverrides?: ComponentsOverrides<Theme>['Hero'];
@@ -168,13 +208,21 @@ declare module '@mui/material/styles' {
        */
       variants?: ComponentsVariants['NavigationBar'];
     };
-    Footer?: {
-      defaultProps?: ComponentsProps['Footer'];
-      styleOverrides?: ComponentsOverrides<Theme>['Footer'];
+    GlobalFooter?: {
+      defaultProps?: ComponentsProps['GlobalFooter'];
+      styleOverrides?: ComponentsOverrides<Theme>['GlobalFooter'];
       /**
        * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
        */
-      variants?: ComponentsVariants['Footer'];
+      variants?: ComponentsVariants['GlobalFooter'];
+    };
+    Person?: {
+      defaultProps?: ComponentsProps['Person'];
+      styleOverrides?: ComponentsOverrides<Theme>['Person'];
+      /**
+       * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
+       */
+      variants?: ComponentsVariants['Person'];
     };
     // MailchimpForm?: {
     //   defaultProps?: ComponentsProps['MailchimpForm'];

@@ -1,17 +1,12 @@
 import React from 'react';
 import styled from '@mui/system/styled';
-import { MediaProps } from '@last-rev/component-library/dist/components/Media';
+import { MediaProps } from './Media.types';
 import { useAmp } from 'next/amp';
 import ErrorBoundary from '../ErrorBoundary';
 import Image from '../Image';
-// import ArtDirectedImage from '../ArtDirectedImage';
 import sidekick from '@last-rev/contentful-sidekick-util';
 
 import useThemeProps from '../../utils/useThemeProps';
-// import dynamic from 'next/dynamic';
-
-// const Image = dynamic(() => import('../Image'));
-// const ArtDirectedImage = dynamic(() => import('../ArtDirectedImage'));
 
 const Media = (inProps: MediaProps) => {
   const isAmp = useAmp();
