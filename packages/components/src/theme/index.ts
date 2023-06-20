@@ -44,7 +44,7 @@ const baseTheme: ThemeOptions = {
   },
   typography: {
     fontSize: 16,
-    fontFamily: "'Open Sans', 'sans-serif'",
+    // fontFamily: "'Open Sans', 'sans-serif'",
     h1: {
       fontSize: '2.65rem',
       fontWeight: 100,
