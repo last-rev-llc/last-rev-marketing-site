@@ -1,6 +1,6 @@
 #!/bin/bash
 set -a
-source .env || echo "No .env file found"
+source .envkey || echo "No .envkey file found"
 set +a
 function cleanup() {
     rv=$?
