@@ -1,6 +1,6 @@
 #!/bin/bash
 set -a
-source .env || echo "No .env file found"
+source .envkey || echo "No .envkey file found"
 set +a
 function cleanup() {
     rv=$?
@@ -11,7 +11,7 @@ function cleanup() {
 trap "cleanup" EXIT
 
 echo "Starting develop server..."
-yarn propagate:env
+yarn propagate:envkey
 if [[ "${GRAPHQL_RUNNER_STRATEGY}" == "fs" ]] || [[ -z "${GRAPHQL_RUNNER_STRATEGY}" ]]; then
     echo "Syncing CMS data..."
     turbo run sync:cms

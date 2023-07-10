@@ -3,7 +3,7 @@ const { readdir, copyFile } = require('fs-extra');
 const { resolve, join } = require('path');
 
 const run = async () => {
-  const envFile = resolve(__dirname, '../.env');
+  const envKeyFile = resolve(__dirname, '../.envkey');
   const packagesDir = resolve(__dirname, '../packages');
   const packages = await readdir(packagesDir);
 
@@ -11,22 +11,22 @@ const run = async () => {
     await Promise.all(
       packages.map(async (packageName) => {
         if (packageName !== '.DS_Store') {
-          const newEnv = join(packagesDir, packageName, '.env');
-          await copyFile(envFile, newEnv);
+          const newEnvKey = join(packagesDir, packageName, '.envkey');
+          await copyFile(envKeyFile, newEnvKey);
         }
       })
     );
   } catch (err) {
-    console.log('PropagateEnv Error', err);
+    console.log('PropagateEnvKey Error', err);
   }
 };
 
 run()
   .then(() => {
-    console.log('successfully propagated .env file to packages');
+    console.log('successfully propagated .envkey file to packages');
     process.exit(0);
   })
   .catch((e) => {
-    console.error(`Problem propagating .env file: ${e.message}`);
+    console.error(`Problem propagating .envkey file: ${e.message}`);
     process.exit(1);
   });

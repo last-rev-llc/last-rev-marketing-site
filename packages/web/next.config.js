@@ -1,5 +1,5 @@
 const { withSentryConfig } = require('@sentry/nextjs');
-require('dotenv').config();
+require('envkey');
 const path = require('path');
 const withPlugins = require('next-compose-plugins');
 const withTM = require('next-transpile-modules')([

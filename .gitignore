@@ -5,7 +5,6 @@ node_modules
 **/build/**
 **/.next/**
 **/yarn-error.log
-**/.env
 **/out
 .netlify
 *.code-workspace
@@ -14,7 +13,7 @@ node_modules
 **/coverage
 
 lerna-debug.log
-.env
+**/.env
 .turbo
 
 **/*sitemap.xml
@@ -23,3 +22,7 @@ lerna-debug.log
 **/cypress/screenshots
 
 create-app.json
+
+# .envkey will be ignored everywhere except for the root directory
+**/.envkey
+!/.envkey
