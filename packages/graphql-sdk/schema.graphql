@@ -20,6 +20,19 @@ type Asset {
   width: String
 }
 
+type Block implements Content {
+  animation: JSON
+  body: RichText
+  eyebrow: String
+  id: String
+  internalTitle: String
+  sidekickLookup: JSON
+  subtitle: String
+  theme: [Theme]
+  title: String
+  variant: String
+}
+
 type Blog implements Content {
   animation: JSON
   id: String
@@ -33,6 +46,7 @@ type Card implements Content {
   actions: [Link]
   animation: JSON
   body: RichText
+  eyebrow: String
   id: String
   internalTitle: String
   link: Link
@@ -58,6 +72,7 @@ type CategoryBlog implements Content {
 type Collection implements Content {
   animation: JSON
   id: String
+  images: [Media]
   internalTitle: String
   introText: Text
   items: [CollectionItem]
@@ -276,10 +291,13 @@ type Page implements Content {
   header: Header
   hero: Hero
   id: String
+  internalTitle: String
+  listImage: Media
   lr__path__: String
   seo: JSON
   sidekickLookup: JSON
   slug: String
+  summary: String
   theme: [Theme]
   title: String
 }
@@ -317,17 +335,22 @@ type PagePathParams {
 
 type Person implements Content {
   animation: JSON
+  body: RichText
   calendlyUrl: String
   emailAddress: String
   id: String
   image: Media
   jobTitle: String
   linkedIn: String
+  listImage: Media
   lr__path__: String
+  mainImage: Media
   name: String
   phone: String
+  rolloverImage: Media
   sidekickLookup: JSON
   slug: String
+  summary: String
   theme: [Theme]
 }
 
@@ -461,11 +484,14 @@ type Text implements Content {
   animation: JSON
   body: RichText
   color: String
+  eyebrow: String
   id: String
   internalTitle: String
   sidekickLookup: JSON
   styles: JSON
+  subtitle: String
   theme: [Theme]
+  title: String
   variant: String
 }
 
