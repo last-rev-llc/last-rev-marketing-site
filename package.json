@@ -27,7 +27,7 @@
     "nuclear": "lerna exec 'rm -rf node_modules/ dist/'; rm -rf node_modules/; yarn install",
     "postinstall": "patch-package",
     "prettier": "prettier --write \"**/*.{js,ts,tsx,md,json}\"",
-    "propagate:env": "node scripts/propagateEnvkey.js",
+    "propagate:envkey": "node scripts/propagateEnvkey.js",
     "serve:site": "yarn workspace @last-rev-marketing-site/web serve",
     "start": "turbo run start --output-logs=new-only",
     "storybook": "turbo run storybook",
