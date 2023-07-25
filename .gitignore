@@ -26,3 +26,4 @@ create-app.json
 # .envkey will be ignored everywhere except for the root directory
 **/.envkey
 !/.envkey
+daisy/preview
