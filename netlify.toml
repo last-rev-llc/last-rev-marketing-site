@@ -8,9 +8,9 @@
 
 [functions]
   directory = "packages/functions/src"
+  included_files = ["!node_modules/@swc/core-linux-x64-musl/*","!node_modules/@swc/core-linux-x64-gnu/*", "node_modules/envkey/ext/envkey-source_*_linux_amd64/envkey-source"]
   external_node_modules = ["express", "enveky"]
   node_bundler = "esbuild"
-  included_files = ["!node_modules/@swc/core-linux-x64-musl/*","!node_modules/@swc/core-linux-x64-gnu/*", "node_modules/envkey/ext/envkey-source_*_linux_amd64/envkey-source"]
 
 [[plugins]]
   package = "./packages/cache-netlify-plugin"

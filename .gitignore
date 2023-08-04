@@ -23,7 +23,9 @@ lerna-debug.log
 
 create-app.json
 
+daisy/preview
+
 # .envkey will be ignored everywhere except for the root directory
 **/.envkey
 !/.envkey
-daisy/preview
+/scripts/removeEnvFirstRun
