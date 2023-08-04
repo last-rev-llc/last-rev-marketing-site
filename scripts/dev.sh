@@ -1,7 +1,5 @@
 #!/bin/bash
-set -a
-source .envkey || echo "No .envkey file found"
-set +a
+
 function cleanup() {
     rv=$?
     yarn gql:pm2:kill
@@ -10,8 +8,10 @@ function cleanup() {
 
 trap "cleanup" EXIT
 
-echo "Starting develop server..."
+echo "Preparing environment..."
 yarn propagate:envkey
+
+echo "Starting develop server..."
 if [[ "${GRAPHQL_RUNNER_STRATEGY}" == "fs" ]] || [[ -z "${GRAPHQL_RUNNER_STRATEGY}" ]]; then
     echo "Syncing CMS data..."
     turbo run sync:cms

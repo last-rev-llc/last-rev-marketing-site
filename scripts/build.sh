@@ -1,23 +1,21 @@
 #!/bin/bash
-set -a
-source .envkey || echo "No .envkey file found"
-set +a
+
 function cleanup() {
     rv=$?
     bash "$PWD/scripts/post_build.sh"
     if [[ "$rv" != "0" ]]; then
         echo "Build failed."
-        # if node env is buprodild do this
+        # if node env is prod, do this
         if [[ "$NODE_ENV" == "prod" ]]; then
             yarn pm2 logs --nostream --lines=1000
         fi
-        
     fi
     exit $rv
 }
 
 trap "cleanup" EXIT
 
+echo "Preparing environment..."
 yarn propagate:envkey
 
 bash "$PWD/scripts/pre_build.sh"
