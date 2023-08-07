@@ -1,16 +1,16 @@
 [build]
   publish = "packages/web/.next"
-  command = "yarn installEnvkey && es -- yarn build"
+  command = "yarn installEnvkey && yarn build"
 
 [dev]
   publish = "packages/web/.next"
-  command = "yarn installEnvkey && es -- yarn dev"
+  command = "yarn installEnvkey && yarn dev"
 
 [functions]
   directory = "packages/functions/src"
-  external_node_modules = ["express"]
-  node_bundler = "esbuild"
   included_files = ["!node_modules/@swc/core-linux-x64-musl/*","!node_modules/@swc/core-linux-x64-gnu/*", "node_modules/envkey/ext/envkey-source_*_linux_amd64/envkey-source"]
+  external_node_modules = ["express", "enveky"]
+  node_bundler = "esbuild"
 
 [[plugins]]
   package = "./packages/cache-netlify-plugin"
