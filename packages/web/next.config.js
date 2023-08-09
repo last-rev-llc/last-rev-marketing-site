@@ -28,6 +28,7 @@ const ContentSecurityPolicy = `
   img-src * data:;
   media-src * data:;
   object-src 'none';
+  frame-ancestors https://app.contentful.com;
 `;
 
 const securityHeaders = [
