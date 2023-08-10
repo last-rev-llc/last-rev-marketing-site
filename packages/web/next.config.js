@@ -24,7 +24,7 @@ const ContentSecurityPolicy = `
   style-src 'self' 'unsafe-inline' *.hs-scripts.com *.hsforms.net *.sentry.io fonts.googleapis.com;
   script-src 'self' 'unsafe-inline' *.hs-analytics.net *.hs-banner.com *.hsadspixel.net *.hscollectedforms.net *.sentry.io app.netlify.com *.netlify.app analytics.google.com *.google-analytics.com *.googletagmanager.com *.googleoptimize.com *.jquery.com *.hs-scripts.com *.hsforms.net;
   font-src 'self' *.sentry.io  *.hs-scripts.com *.hsforms.net fonts.gstatic.com data:;
-  frame-src https://calendly.com *.youtube.com;
+  frame-src https://calendly.com https://forms.hsforms.com *.youtube.com;
   img-src * data:;
   media-src * data:;
   object-src 'none';
