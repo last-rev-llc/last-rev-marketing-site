@@ -23,6 +23,7 @@ const Hero = dynamic(() => import('./components/Hero'));
 const Text = dynamic(() => import('./components/Text'));
 
 const Footer = dynamic(() => import('./components/Footer'));
+const Form = dynamic(() => import('./components/Form'));
 
 const BackToTop = dynamic(() => import('@last-rev/component-library/dist/components/BackToTop'));
 
@@ -42,27 +43,28 @@ const Topic = dynamic(() => import('./components/PageTopic'));
 const contentMapping: {
   [key: string]: any;
 } = {
-  Page,
-  Header,
-  Section,
-  Collection,
-  'Collection:carousel': CollectionCarousel,
   'Collection:accordion': CollectionAccordion,
+  'Collection:carousel': CollectionCarousel,
   'Collection:filtered': CollectionFiltered,
   'Collection:navigation-bar': NavigationBar,
+  'ModuleIntegration:calendly-inline-widget': CalendlyInlineWidget,
   BackToTop,
   Card,
-  Text,
-  Media,
-  Link,
-  'ModuleIntegration:calendly-inline-widget': CalendlyInlineWidget,
-  NavigationItem,
-  Hero,
-  Quote,
+  Collection,
   Footer,
+  Header,
+  Hero,
+  Link,
+  Media,
+  NavigationItem,
+  Page,
   PageBlog,
+  Quote,
+  Section,
+  TableOfContents,
+  Text,
   Topic,
-  TableOfContents
+  Form
 };
 
 export default contentMapping;

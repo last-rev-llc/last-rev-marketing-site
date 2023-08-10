@@ -162,6 +162,19 @@ type Footer implements Content {
   variant: String
 }
 
+type Form implements Content {
+  animation: JSON
+  headerText: RichText
+  hubspotFormId: String
+  hubspotPortalId: String
+  id: String
+  internalTitle: String
+  sidekickLookup: JSON
+  successText: RichText
+  theme: [Theme]
+  variant: String
+}
+
 type Header implements Content {
   animation: JSON
   colorScheme: String

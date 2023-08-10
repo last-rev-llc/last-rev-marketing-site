@@ -59,6 +59,9 @@ function MyApp({ Component, emotionCache = clientSideEmotionCache, pageProps }: 
               `
             }}
           />
+
+          <Script type="text/javascript" id="hs-script-loader" src="//js-na1.hs-scripts.com/24052454.js" />
+
           <noscript>
             <iframe
               title="GTM-NOSCRIPT"

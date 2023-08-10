@@ -42,7 +42,7 @@ const baseTheme: ThemeOptions = {
       fontSize: '2.25rem',
       fontWeight: 600,
       lineHeight: 1.25,
-      paddingBoddom: 16
+      paddingBottom: 16
     },
     h3: {
       fontSize: '1.55rem',
