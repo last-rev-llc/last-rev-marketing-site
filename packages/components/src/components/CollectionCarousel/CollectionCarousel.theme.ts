@@ -25,12 +25,16 @@ const createVariants = (_theme: Theme): ComponentsVariants['CollectionCarousel1'
       variant: 'carousel'
     },
     style: {
+      'overflow': 'hidden',
       '& [class*="CollectionCarousel-carouselItem"]': {
         '& .MuiPaper-root': {
           boxShadow: 'none',
           borderRadius: 0,
           [_theme.breakpoints.down('md')]: {
             padding: '0px 32px 40px 32px'
+          },
+          [_theme.breakpoints.down('sm')]: {
+            padding: '0px'
           }
         }
       }
