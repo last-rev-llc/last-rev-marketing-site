@@ -20,9 +20,9 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 });
 
 const ContentSecurityPolicy = `
-  default-src 'self' *.sentry.io *.hs-scripts.com *.hsforms.net app.netlify.com *.netlify.app *.facebook.com *.google-analytics.com *.googleoptimize.com;
+  default-src 'self' *.sentry.io *.s3.amazonaws.com *.hsforms.com *.hs-scripts.com *.hsforms.net app.netlify.com *.netlify.app *.facebook.com *.google-analytics.com *.googleoptimize.com;
   style-src 'self' 'unsafe-inline' *.hs-scripts.com *.hsforms.net *.sentry.io fonts.googleapis.com;
-  script-src 'self' 'unsafe-inline' *.sentry.io app.netlify.com *.netlify.app analytics.google.com *.google-analytics.com *.googletagmanager.com *.googleoptimize.com *.jquery.com *.hs-scripts.com *.hsforms.net;
+  script-src 'self' 'unsafe-inline' *.hs-analytics.net *.hs-banner.com *.hsadspixel.net *.hscollectedforms.net *.sentry.io app.netlify.com *.netlify.app analytics.google.com *.google-analytics.com *.googletagmanager.com *.googleoptimize.com *.jquery.com *.hs-scripts.com *.hsforms.net;
   font-src 'self' *.sentry.io  *.hs-scripts.com *.hsforms.net fonts.gstatic.com data:;
   frame-src https://calendly.com *.youtube.com;
   img-src * data:;
