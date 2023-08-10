@@ -162,7 +162,10 @@ const nextConfig = {
   }
 };
 
-module.exports = withPlugins(
-  [[withTM], withBundleAnalyzer, [withSentryConfig, sentryWebpackPluginOptions]],
-  nextConfig
-);
+const plugins = [[withTM], withBundleAnalyzer];
+
+if (process.env.NODE_ENV === 'production') {
+  plugins.push([withSentryConfig, sentryWebpackPluginOptions]);
+}
+
+module.exports = withPlugins(plugins, nextConfig);
