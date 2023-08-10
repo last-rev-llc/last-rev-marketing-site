@@ -110,7 +110,7 @@ const baseTheme: ThemeOptions = {
       main: '#ffff55',
       light: '#ffff55',
       dark: '#c6b300',
-      contrastText: 'white'
+      contrastText: 'black'
     },
 
     text: {
