@@ -1,46 +1,154 @@
-Summary:
-The provided React file is a functional component called "NavigationItem" that represents a navigation item in a larger application. It renders a link and a dropdown menu of sub-navigation items. The component handles user interaction to toggle the dropdown menu and close it when a sub-navigation item is clicked.
+import React from 'react';
+import MenuItem from '@mui/material/MenuItem';
+import Paper from '@mui/material/Paper';
+import Box from '@mui/material/Box';
+import styled from '@mui/system/styled';
+import { useMediaQuery } from '@mui/material';
+import { useTheme } from '@mui/system';
 
-Import statements:
-- React: The core React library.
-- MenuItem: A component from the Material-UI library that represents a menu item.
-- Paper: A component from the Material-UI library that represents a paper container.
-- Box: A component from the Material-UI library that represents a box container.
-- styled: A function from the Material-UI library that allows styling components with CSS-in-JS.
-- useMediaQuery: A hook from the Material-UI library that allows checking the current media query.
-- useTheme: A hook from the Material-UI library that allows accessing the current theme.
-- ErrorBoundary: A custom component that wraps its children and catches any errors that occur within them.
-- LinkProps: A type definition for the props of a custom Link component.
-- ContentModule: A custom component that represents a content module.
-- sidekick: A utility function from the "@last-rev/contentful-sidekick-util" library.
-- NavigationItemProps: A type definition for the props of the NavigationItem component.
+import ErrorBoundary from '../ErrorBoundary';
+import { LinkProps } from '../Link';
+import ContentModule from '../ContentModule';
+import sidekick from '@last-rev/contentful-sidekick-util';
+import { NavigationItemProps } from './NavigationItem.types';
 
-Component:
-The NavigationItem component is a functional component that takes props as input and renders a navigation item. It uses the useState hook to manage the state of the dropdown menu. It also uses the useTheme and useMediaQuery hooks to determine if the current screen size is mobile. The component renders a link and a dropdown menu of sub-navigation items. The link and sub-navigation items are rendered using the ContentModule component. The component also uses the ErrorBoundary component to catch any errors that occur within its children.
+export const NavigationItem = ({ subNavigation, sidekickLookup, onRequestClose, ...props }: NavigationItemProps) => {
+  const [open, setOpen] = React.useState<boolean>(false);
+  const theme = useTheme();
+  const menuBreakpoint = theme?.components?.Header?.mobileMenuBreakpoint ?? 'sm';
+  const isMobile = useMediaQuery(theme.breakpoints.down(menuBreakpoint), { defaultMatches: true });
+  const handleClick = (evt: any) => {
+    if (isMobile && subNavigation?.length) {
+      evt.preventDefault();
+      evt.stopPropagation();
+      setOpen(!open);
+    } else {
+      if (onRequestClose) onRequestClose();
+    }
+  };
+  const handleSubnavClick = () => {
+    setOpen(false);
+    if (onRequestClose) onRequestClose();
+  };
 
-Hooks:
-- useState: Used to manage the state of the dropdown menu.
-- useTheme: Used to access the current theme.
-- useMediaQuery: Used to check the current media query.
+  // console.log({ handleSubnavClick, onRequestClose });
 
-Event Handlers:
-- handleClick: Handles the click event on the navigation item. If the screen size is mobile and there are sub-navigation items, it toggles the dropdown menu. Otherwise, it calls the onRequestClose function if provided.
-- handleSubnavClick: Handles the click event on a sub-navigation item. It closes the dropdown menu and calls the onRequestClose function if provided.
+  return (
+    <ErrorBoundary>
+      <Root sx={{ position: 'relative' }} open={open} data-testid="NavigationItem" menuBreakpoint={menuBreakpoint}>
+        <NavigationItemLink
+          {...(props as LinkProps)}
+          {...sidekick(sidekickLookup)}
+          onClick={handleClick}
+          __typename="Link"
+        />
+        {subNavigation?.length ? (
+          <MenuRoot menuBreakpoint={menuBreakpoint} component={'ul'}>
+            {subNavigation?.map((item) => (
+              <MenuItem key={item.id}>
+                <ContentModule
+                  {...item}
+                  variant={'link'}
+                  onClick={handleSubnavClick}
+                  {...(item?.__typename == 'NavigationItem'
+                    ? {
+                        onRequestClose: handleSubnavClick
+                      }
+                    : {})}
+                />
+              </MenuItem>
+            ))}
+          </MenuRoot>
+        ) : null}
+      </Root>
+    </ErrorBoundary>
+  );
+};
 
-Rendered components:
-- Root: A styled Box component that represents the root container of the navigation item. It applies styles based on the open state and the current screen size.
-- NavigationItemLink: A styled ContentModule component that represents the link of the navigation item.
-- MenuRoot: A styled Paper component that represents the dropdown menu container. It applies styles based on the current screen size.
+const visibleStyles = (open: boolean) => `
+  max-height: ${open ? 300 : 0}px;
+  box-shadow: ${open ? 'inset 0 0 16px -8px rgb(0 0 0 / 30%)' : 'inset 0 0 0 0 rgb(0 0 0 / 0%)'};
+`;
+const shouldForwardProp = (prop: string) =>
+  prop !== 'variant' && prop !== 'onRequestClose' && prop !== 'menuBreakpoint';
 
-Interaction Summary:
-The NavigationItem component interacts with other components by rendering a link and a dropdown menu of sub-navigation items. It handles user interaction to toggle the dropdown menu and close it when a sub-navigation item is clicked. It also uses the ErrorBoundary component to catch any errors that occur within its children.
+const Root = styled(Box, {
+  name: 'NavigationItem',
+  slot: 'Root',
+  shouldForwardProp,
+  overridesResolver: (_, styles) => [styles.root]
+})<{ variant?: string; open: boolean; menuBreakpoint: 'xs' | 'sm' | 'md' | 'lg' | 'xl' }>`
+  ${({ open, theme, menuBreakpoint }) => `
+    @media (max-width: ${theme.breakpoints.values[menuBreakpoint]}px) {
+      [class$=NavigationItem-menuRoot] {
+        ${visibleStyles(open)}
+      }
+    }
+    @media (min-width: ${theme.breakpoints.values[menuBreakpoint]}px) {
+      [class$=NavigationItem-menuRoot] {
+        max-height: 0px;
+      }
+      &:hover {
+        background: rgba(0,0,0,0.05);
+        [class$=NavigationItem-menuRoot] {
+          max-height: 300px;
+        }
+      }
+   }
+  `}
+`;
 
-Developer Questions:
-- How can I customize the styles of the NavigationItem component?
-- How can I pass additional props to the Link component rendered by the NavigationItem component?
-- How can I customize the styles of the sub-navigation items?
-- How can I handle additional user interactions within the NavigationItem component?
+const NavigationItemLink = styled(ContentModule, {
+  name: 'NavigationItem',
+  slot: 'Link',
+  shouldForwardProp,
+  overridesResolver: (_, styles) => [styles.link]
+})<LinkProps>``;
 
-Known Issues / Todo:
-- No known issues or bugs with the component.
-- No specific todo items related to this component.
+const MenuRoot = styled(Paper, {
+  name: 'NavigationItem',
+  slot: 'MenuRoot',
+  shouldForwardProp,
+  overridesResolver: (_, styles) => [styles.menuRoot]
+})<{ variant?: string; menuBreakpoint: 'xs' | 'sm' | 'md' | 'lg' | 'xl'; component?: string }>`
+  ${({ theme, menuBreakpoint }) => `
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: 0.3s ease-in-out;
+    background: rgb(242 242 242);
+
+    // Desktop
+    @media (min-width: ${theme.breakpoints.values[menuBreakpoint]}px) {
+      box-shadow: 0px 2px 4px -1px rgb(0 0 0 / 20%), 0px 4px 5px 0px rgb(0 0 0 / 14%), 0px 10px -10px 0px rgb(0 0 0 / 12%);
+      position: absolute;
+      right: 0;
+      .MuiMenuItem-root {
+        padding: 0;
+        display:block;
+        width: 100%;
+        * {
+          width: 100%;
+        }
+      }
+    }
+
+    // Mobile
+    @media (max-width: ${theme.breakpoints.values[menuBreakpoint]}px) {
+      width: 100%;
+      && { // Needed to override Paper styles
+       box-shadow: inset 0 0 16px -8px rgb(0 0 0 / 30%)
+      }
+      .MuiMenuItem-root{
+        width: 100%;
+        display: block;
+        // padding: 0;
+        > div {
+          width: 100%;
+        }
+      }
+    }
+  `}
+`;
+
+export default NavigationItem;

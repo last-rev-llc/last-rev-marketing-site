@@ -1,30 +1,51 @@
-Summary:
-This file exports a function that returns a ThemeOptions object for customizing the MUI theme. It defines default props, style overrides, and variants for the Page component.
+import { Theme, ThemeOptions, ComponentsProps, ComponentsOverrides, ComponentsVariants } from '@mui/material/styles';
 
-Import statements:
-- Theme, ThemeOptions: These are types from the MUI library for defining the theme and theme options.
-- ComponentsProps, ComponentsOverrides, ComponentsVariants: These are types from the MUI library for defining component props, style overrides, and variants.
+// https://mui.com/customization/theme-components/#default-props
+export const defaultProps: ComponentsProps['Page'] = {};
 
-Component:
-The component being customized in this file is the Page component.
+// https://mui.com/customization/theme-components/#global-style-overrides
+export const styleOverrides: ComponentsOverrides<Theme>['Page'] = {
+  // Set some static styles
+  // root: {
+  //   backgroundColor: 'red'
+  // }
+  //
+  // Use the ownerState to set dynamic styles
+  // root: ({ ownerState, theme }) => {
+  //   return {
+  //     backgroundColor: ownerState.variant === 'example' ? 'red' : theme.palette.background.paper
+  //   };
+  // }
+};
 
-Hooks:
-None.
+// https://mui.com/customization/theme-components/#adding-new-component-variants
+const createVariants = (_theme: Theme): ComponentsVariants['Page'] => [
+  // Use prop matching to set variant styles
+  // {
+  //   props: {
+  //     variant: 'example'
+  //   },
+  //   style: {
+  //     backgroundColor: theme.palette.primary.main
+  //   }
+  // }
+  // Other props are also valid
+  // {
+  //   props: {
+  //     backgroundColor: 'primary.main',
+  //   },
+  //   style: {
+  //     color: theme.palette.primary.contrastText
+  //   }
+  // }
+];
 
-Event Handlers:
-None.
-
-Rendered components:
-None.
-
-Interaction Summary:
-This file is a server-side component as it exports a function that returns the theme options. It is used as part of the larger MUI theme customization process. Other components in the application can access the customized theme through the MUI theme provider.
-
-Developer Questions:
-- How can I add additional style overrides or variants for the Page component?
-- How can I customize the default props for the Page component?
-- How can I access the customized theme in other components?
-
-Known Issues / Todo:
-- There are no known issues or bugs with this component.
-- There are no specific todo items related to this component.
+export default (theme: Theme): ThemeOptions => ({
+  components: {
+    Page: {
+      defaultProps,
+      styleOverrides,
+      variants: createVariants(theme)
+    }
+  }
+});

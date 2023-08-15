@@ -1,38 +1,69 @@
-Summary:
-The provided React file is a client-side component that is responsible for rendering a preview of content from a Contentful CMS. It uses the Last Rev GraphQL SDK to fetch the preview data and the Next.js router to get the query parameters. The component also uses the SWR library for data fetching and caching. It renders a ContentPreview component from the Last Rev Component Library, which displays the previewed content.
+import React from 'react';
+import { getSdk } from '@last-rev-marketing-site/graphql-sdk';
+import { GraphQLClient } from 'graphql-request';
+import { useRouter } from 'next/dist/client/router';
+import ContentPreview from '@last-rev/component-library/dist/components/ContentPreview/ContentPreview';
+import contentMapping from '@last-rev-marketing-site/components/src/contentMapping';
+import useSWR from 'swr';
+import { ContentModuleProvider } from '@last-rev/component-library/dist/components/ContentModule/ContentModuleContext';
 
-Import statements:
-- React: The React library for creating React components.
-- getSdk: A function from the Last Rev GraphQL SDK that generates a GraphQL client.
-- GraphQLClient: A class from the graphql-request library for making GraphQL requests.
-- useRouter: A hook from the Next.js library for accessing the router object.
-- ContentPreview: A component from the Last Rev Component Library for rendering the content preview.
-- contentMapping: A mapping object that maps content types to React components.
-- useSWR: A hook from the SWR library for data fetching and caching.
-- ContentModuleProvider: A component from the Last Rev Component Library for providing the content mapping to child components.
+const fetchPreview = async (id: string, locale: string, environment: string) => {
+  const previewGqlClient = new GraphQLClient(`/api/graphql?env=${environment}`);
+  const sdk = getSdk(previewGqlClient);
+  return sdk.Preview({ id, locale });
+};
+const spaceId = process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID;
 
-Component:
-The Preview component is the main component in the file. It is a functional component that takes no props. It renders the ContentModuleProvider component and the ContentPreview component.
+interface Action {
+  type: 'OVERRIDE_VALUES' | 'REFRESH_CONTENT';
+  payload: any;
+}
+export default function Preview({}: any) {
+  const { query } = useRouter();
+  const {
+    environment,
+    id,
+    locale = 'en-US'
+  } = query as {
+    environment?: string;
+    id: string;
+    locale?: string;
+  };
 
-Hooks:
-- useSWR: This hook is used to fetch the preview data from the GraphQL API. It takes an array of dependencies and a fetcher function. The fetcher function is the fetchPreview function defined in the file. The hook returns an object with the data, error, and mutate function.
+  const { data, error, mutate } = useSWR(id ? [id, locale, environment, 'preview', spaceId] : null, fetchPreview);
+  const content = data?.data?.content;
+  const isLoadingInitialData = !data && !error;
 
-Event Handlers:
-- React.useLayoutEffect: This hook is used to add an event listener to the window object. It listens for 'message' events and handles two types of actions: 'OVERRIDE_VALUES' and 'REFRESH_CONTENT'. If the action type is 'OVERRIDE_VALUES', it sets the override state with the payload. If the action type is 'REFRESH_CONTENT', it sets the override state to null and calls the mutate function to refetch the preview data.
+  const [override, setOverride] = React.useState<any>();
+  React.useLayoutEffect(() => {
+    window.addEventListener(
+      'message',
+      (event) => {
+        const action: Action = event.data;
 
-Rendered components:
-- ContentModuleProvider: This component is responsible for providing the content mapping to child components. It takes the contentMapping object as a prop.
-- ContentPreview: This component is responsible for rendering the content preview. It takes several props, including id, loading, content, error, environment, locale, and spaceId.
+        if (action.type === 'OVERRIDE_VALUES') {
+          setOverride(action.payload);
+        }
+        if (action.type === 'REFRESH_CONTENT') {
+          setOverride(null);
+          mutate();
+        }
+      },
+      false
+    );
+  }, [mutate]);
 
-Interaction Summary:
-The Preview component interacts with other components in the application by rendering the ContentModuleProvider and ContentPreview components. It uses the Last Rev GraphQL SDK to fetch the preview data and the Next.js router to get the query parameters. It also uses the SWR library for data fetching and caching.
-
-Developer Questions:
-- How does the fetchPreview function work and what does it return?
-- How does the useSWR hook handle data fetching and caching?
-- How does the ContentPreview component render the previewed content?
-- How does the ContentModuleProvider component provide the content mapping to child components?
-
-Known Issues / Todo:
-- No known issues or bugs with the component.
-- No todo items related to this component.
+  return (
+    <ContentModuleProvider contentMapping={contentMapping}>
+      <ContentPreview
+        id={id}
+        loading={isLoadingInitialData}
+        content={{ ...content, ...override }}
+        error={error}
+        environment={environment as string}
+        locale={locale as string}
+        spaceId={spaceId as string}
+      />
+    </ContentModuleProvider>
+  );
+}

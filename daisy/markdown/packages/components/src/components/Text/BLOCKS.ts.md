@@ -1,23 +1,26 @@
-Summary:
-This code defines a constant object called "BLOCKS" which serves as a map of all Contentful block types. It exports this object as the default export of the module.
+/**
+ * Map of all Contentful block types. Blocks contain inline or block nodes.
+ */
+const BLOCKS = {
+  DOCUMENT: 'document',
+  PARAGRAPH: 'paragraph',
+  HEADING_1: 'heading-1',
+  HEADING_2: 'heading-2',
+  HEADING_3: 'heading-3',
+  HEADING_4: 'heading-4',
+  HEADING_5: 'heading-5',
+  HEADING_6: 'heading-6',
+  OL_LIST: 'ordered-list',
+  UL_LIST: 'unordered-list',
+  LIST_ITEM: 'list-item',
+  HR: 'hr',
+  QUOTE: 'blockquote',
+  EMBEDDED_ENTRY: 'embedded-entry-block',
+  EMBEDDED_ASSET: 'embedded-asset-block',
+  TABLE: 'table',
+  TABLE_ROW: 'table-row',
+  TABLE_CELL: 'table-cell',
+  TABLE_HEADER_CELL: 'table-header-cell'
+};
 
-Import statements:
-There are no import statements in this code.
-
-Script Summary:
-This script defines a constant object called "BLOCKS" which maps various block types used in Contentful. These block types represent different types of content elements that can be used in a document or page. The object is exported as the default export of the module, making it accessible to other parts of the application.
-
-Internal Functions:
-There are no internal functions in this script.
-
-External Functions:
-There are no external functions in this script.
-
-Interaction Summary:
-This script serves as a utility module that provides a map of Contentful block types. Other parts of the application can import this module and use the "BLOCKS" object to identify and work with different block types.
-
-Developer Questions:
-- How can I use the "BLOCKS" object in my code to identify and handle different block types?
-- Are there any additional block types that need to be added to the "BLOCKS" object?
-- Can I modify the values of the block types in the "BLOCKS" object?
-- How can I ensure that the "BLOCKS" object is up-to-date with the latest block types defined in Contentful?
+export default BLOCKS;

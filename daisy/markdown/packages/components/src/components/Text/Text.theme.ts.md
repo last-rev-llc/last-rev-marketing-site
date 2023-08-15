@@ -1,24 +1,71 @@
-Summary:
-This code is a module that exports a function that returns a ThemeOptions object for customizing the MUI (Material-UI) theme. It provides default props, style overrides, and variants for the Text component.
+import { Theme, ThemeOptions, ComponentsProps, ComponentsOverrides, ComponentsVariants } from '@mui/material/styles';
 
-Import statements:
-- `Theme`, `ThemeOptions`, `ComponentsProps`, `ComponentsOverrides`, and `ComponentsVariants` are imported from the `@mui/material/styles` package. These are types used for defining the MUI theme and customizing components.
+// https://mui.com/customization/theme-components/#default-props
+export const defaultProps: ComponentsProps['Text'] = {};
 
-Script Summary:
-The script exports a function that takes a `theme` object as a parameter and returns a `ThemeOptions` object. The `ThemeOptions` object contains customization options for the MUI theme. Specifically, it customizes the `Text` component by providing default props, style overrides, and variants.
+// https://mui.com/customization/theme-components/#global-style-overrides
+export const styleOverrides: ComponentsOverrides<Theme>['Text'] = {
+  // Set some static styles
+  root: {
+    'ol, ul, li': {
+      /* Revert padding reset is what gives the indentation to list */
 
-Internal Functions:
-- `createVariants`: This function takes a `theme` object as a parameter and returns an array of component variants for the `Text` component. Each variant is an object with `props` and `style` properties. The `props` property specifies the props that should trigger the variant, and the `style` property specifies the styles to apply when the variant is active.
+      padding: 'revert'
+    },
+    'h2': {
+      // paddingTop: 16,
+      paddingBottom: 16
+    },
+    'h3': { paddingBottom: 16 },
+    'h4': { paddingBottom: 16 },
+    'p': { paddingBottom: 16 }
+  }
+  //
+  // Use the ownerState to set dynamic styles
+  // root: ({ ownerState, theme }) => {
+  //   return {
+  //     backgroundColor: ownerState.variant === 'example' ? 'red' : theme.palette.background.paper
+  //   };
+  // }
+};
 
-External Functions:
-None
+// https://mui.com/customization/theme-components/#adding-new-component-variants
+const createVariants = (_theme: Theme): ComponentsVariants['Text'] => [
+  // Use prop matching to set variant styles
+  // {
+  //   props: {
+  //     variant: 'example'
+  //   },
+  //   style: {
+  //     backgroundColor: theme.palette.primary.main
+  //   }
+  // }
+  // Other props are also valid
+  // {
+  //   props: {
+  //     backgroundColor: 'primary.main',
+  //   },
+  //   style: {
+  //     color: theme.palette.primary.contrastText
+  //   }
+  // }
+  {
+    props: { variant: 'blog' },
+    style: {
+      'ol, ul, li': { padding: 'revert' },
+      'h1': { paddingTop: 16, paddingBottom: 16 },
+      'h2': { paddingTop: 16, paddingBottom: 16 },
+      'p': { paddingBottom: 16 }
+    }
+  }
+];
 
-Interaction Summary:
-This module can be used by importing the default exported function and passing a `theme` object to it. The returned `ThemeOptions` object can then be used to customize the MUI theme, specifically the `Text` component.
-
-Developer Questions:
-- How can I customize the `Text` component using this module?
-- What are the available default props for the `Text` component?
-- How can I override the styles of the `Text` component?
-- How can I define custom variants for the `Text` component?
-- How can I use the `ThemeOptions` object returned by this module to customize the MUI theme?
+export default (theme: Theme): ThemeOptions => ({
+  components: {
+    Text: {
+      defaultProps,
+      styleOverrides,
+      variants: createVariants(theme)
+    }
+  }
+});

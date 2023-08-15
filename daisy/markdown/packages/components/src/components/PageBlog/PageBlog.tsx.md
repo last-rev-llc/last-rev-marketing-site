@@ -1,56 +1,456 @@
-Summary:
-The provided React file is a functional component called "PageBlog" that represents a blog page in a larger application. It receives various props related to the blog content and renders the necessary components to display the blog post, including the title, creation date, author, featured media, body text, related links, and tags. It also generates schema data for search engine optimization purposes.
+import React from 'react';
+import Head from 'next/head';
+import styled from '@mui/system/styled';
+import { kebabCase } from 'lodash';
+import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import Container from '@mui/material/Container';
+import TextField from '@mui/material/TextField';
+import InputLabel from '@mui/material/InputLabel';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import EmailIcon from '@mui/icons-material/Email';
+import TwitterIcon from '@mui/icons-material/Twitter';
+// import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import ErrorBoundary from '@last-rev/component-library/dist/components/ErrorBoundary';
+import ContentModule from '@last-rev/component-library/dist/components/ContentModule';
+import Text from '../Text';
+import { MediaProps } from '@last-rev/component-library/dist/components/Media';
+import { LinkProps } from '@last-rev/component-library/dist/components/Link';
+import sidekick from '@last-rev/contentful-sidekick-util';
 
-Import statements:
-- React: The core React library.
-- Head: A component from the Next.js library for managing the head section of the HTML document.
-- styled: A utility from the MUI (Material-UI) library for creating styled components.
-- lodash: A utility library that provides various helper functions, including "kebabCase".
-- Box, Grid, List, ListItem, ListItemText, Container, TextField, InputLabel, Button, Typography: Components from the MUI library.
-- EmailIcon, TwitterIcon: Icons from the MUI library.
-- ErrorBoundary, ContentModule: Components from the "@last-rev/component-library" package.
-- Text: A custom component from the local "Text" file.
-- MediaProps, LinkProps: Interfaces from the "@last-rev/component-library" package.
-- sidekick: A utility function from the "@last-rev/contentful-sidekick-util" package.
-- Link: A custom component from the local "Link" file.
+import Link from '../Link';
 
-Component:
-The "PageBlog" component is a functional component that receives various props related to the blog content. It renders the necessary components to display the blog post, including the title, creation date, author, featured media, body text, related links, and tags. It also generates schema data for search engine optimization purposes.
+export interface PageBlogProps {
+  __typename?: string;
+  sidekickLookup?: any;
+  title?: string;
+  creationDate?: string;
+  slug?: string;
+  featuredMedia?: Array<MediaProps>;
+  author?: any;
+  body?: any;
+  quote?: string;
+  tags?: Array<string>;
+  relatedLinks?: LinkProps[];
+  contents?: any;
+  header: any;
+  footer: any;
+  topics?: any;
+  landingPageSummary?: string;
+  seo: any;
+}
 
-Hooks:
-- None
+export const PageBlog = ({
+  header,
+  footer,
+  slug,
+  title,
+  creationDate,
+  featuredMedia,
+  author,
+  body,
+  quote,
+  tags,
+  topics,
+  relatedLinks,
+  sidekickLookup,
+  contents,
+  seo
+}: PageBlogProps) => {
+  // Transforms date to expected format for schema
+  // -> Ex. from 02/12/2023 to 2023-12-02
+  const regex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+  const dateCreated = creationDate && regex.test(creationDate) ? creationDate.replace(regex, '$3-$2-$1') : creationDate;
 
-Event Handlers:
-- None
+  const schemaData = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    'headline': title,
+    'image': featuredMedia
+      ? featuredMedia[0]?.file?.url
+      : 'https://images.ctfassets.net/imglmb3xms7o/1VUPTATYD3ZMlFk4KQDJxl/12006d2bc2c51df42430a4765aff7042/Lastrev_logotype_trimmed.svg',
+    'keywords': `${seo?.keywords.value ?? tags ?? 'Technology'}`,
+    'url': `https://www.lastrev.com/blog/${slug}`,
+    'author': {
+      '@type': 'Person',
+      'name': author ?? 'LastRev'
+    },
+    'dateCreated': dateCreated
+  };
 
-Rendered components:
-- ErrorBoundary: Wraps the entire component to catch and handle any errors that occur within it.
-- Head: Sets the metadata for the HTML document, including the content type, favicon, and schema data.
-- ContentModule: Renders the header and footer components if they are provided as props.
-- Root: A styled component that serves as the root container for the blog page.
-- ContentContainer: A styled component that serves as the container for the main content of the blog page.
-- Grid: A component from the MUI library that provides a grid layout for arranging the content.
-- Typography: A component from the MUI library for displaying text with various styles.
-- MediaWrap: A styled component that wraps the featured media component.
-- Text: A custom component that renders the body text of the blog post.
-- ContentsWrapper: A styled component that wraps the contents section of the blog post.
-- List, ListItem, ListItemText: Components from the MUI library for displaying lists.
-- Box: A component from the MUI library for creating boxes and containers.
-- InputLabel: A component from the MUI library for displaying labels for form inputs.
-- TextField: A component from the MUI library for creating text input fields.
-- Button: A component from the MUI library for creating buttons.
+  return (
+    <ErrorBoundary>
+      <Head>
+        <meta name="content_type" content="blog" />
+        <link rel="shortcut icon" href="/images/favicon.ico" />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }} />
+      </Head>
+      {header ? <ContentModule {...(header as any)} /> : null}
+      <Root {...sidekick(sidekickLookup)} itemScope itemType="https://schema.org/Blog">
+        <ContentContainer maxWidth={'xl'}>
+          <Grid container spacing={5} sx={{ py: { lg: 4 } }} justifyContent="center">
+            <Grid component="article" item xs={12} sm={9}>
+              {title ? (
+                <Typography
+                  variant="h1"
+                  component="h1"
+                  sx={{ color: 'primary.main' }}
+                  {...sidekick(sidekickLookup?.title)}>
+                  {title}
+                </Typography>
+              ) : null}
+              {creationDate ? (
+                <Typography
+                  variant="body1"
+                  component="p"
+                  sx={{ color: 'black', paddingTop: 1 }}
+                  {...sidekick(sidekickLookup?.creationDate)}>
+                  {creationDate}
+                </Typography>
+              ) : null}
+              {author ? (
+                <Typography variant="body1" component="p" {...sidekick(sidekickLookup?.author)}>
+                  {author}
+                </Typography>
+              ) : null}
+              {featuredMedia ? (
+                <MediaWrap>
+                  <ContentModule {...featuredMedia[0]} {...sidekick(sidekickLookup?.featuredMedia)} />
+                </MediaWrap>
+              ) : null}
+              {body ? <Text variant="blog" sidekickLookup={sidekickLookup?.body} body={body} /> : null}
+              {contents ? (
+                <ContentsWrapper sx={{ py: 3 }}>
+                  {contents?.map((content: any) => (
+                    <ContentModule key={content?.id} {...content} />
+                  ))}
+                </ContentsWrapper>
+              ) : null}
+            </Grid>
 
-Interaction Summary:
-The "PageBlog" component interacts with other components in the application by receiving props related to the blog content and rendering the necessary components to display the blog post. It also generates schema data for search engine optimization purposes. The component does not have any direct user interaction or state management.
+            <Grid
+              component="aside"
+              item
+              xs={12}
+              sm={3}
+              sx={{}}
+              // NOTE: Hidden for now per request
+              display="none">
+              {quote ? (
+                <Box
+                  component="blockquote"
+                  sx={{
+                    margin: 0,
+                    padding: { xs: 2, xl: 4 },
+                    backgroundColor: 'quartiary.main'
+                  }}>
+                  <Typography
+                    variant="h1"
+                    component="p"
+                    sx={{
+                      paddingTop: 3,
+                      paddingBottom: 0,
+                      color: 'secondary.main',
+                      fontSize: { xs: '2rem', lg: '3rem' },
+                      fontStyle: 'normal',
+                      lineHeight: 0
+                    }}>
+                    “
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    component="p"
+                    sx={{
+                      padding: { xs: '0 8px', xl: '0 24px' },
+                      fontSize: { xs: '1rem', sm: '0.9rem', lg: '1.1rem' }
+                    }}
+                    {...sidekick(sidekickLookup?.quote)}>
+                    {quote}
+                  </Typography>
+                </Box>
+              ) : null}
+              <Box
+                sx={{
+                  padding: { xs: 2, md: 2, xl: 4 },
+                  position: 'sticky',
+                  top: 132, // Header height + 32px
+                  backgroundColor: 'tertiary.main'
+                }}>
+                <List
+                  sx={{
+                    '& .MuiListItem-root': {
+                      'flexDirection': 'column',
+                      'alignItems': 'flex-start',
+                      'padding': '0 8px',
+                      'color': 'white',
+                      '&:not(:last-child)': {
+                        paddingBottom: { xs: 3, xl: 5 },
+                        borderBottom: '2px solid',
+                        borderColor: 'primary.main'
+                      },
+                      '&:not(:first-of-type)': {
+                        paddingTop: { xs: 4, sm: 3, xl: 4 }
+                      },
+                      // <ArrowForwardIosIcon/> hover
+                      '& li:hover > svg': {
+                        backgroundColor: 'primary.main'
+                      }
+                    },
+                    '& .MuiListItemText-root': {
+                      width: '100%',
+                      paddingBottom: 0
+                    },
+                    'a': {
+                      'color': 'white',
+                      'textDecoration': 'none',
+                      '&:hover': {
+                        color: 'primary.main',
+                        textDecoration: 'underline'
+                      }
+                    }
+                  }}>
+                  <ListItem>
+                    <ListItemText
+                      primary="Share"
+                      primaryTypographyProps={{
+                        variant: 'h3',
+                        color: 'white',
+                        fontWeight: 'bold'
+                      }}
+                    />
+                    <ul
+                      style={{
+                        listStyle: 'none',
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        padding: '0'
+                      }}>
+                      <li>
+                        <Link
+                          href={`mailto:?subject=Check out this article&body=Check out this article:+${title}+${schemaData.url}`}
+                          target="_blank"
+                          rel="noopener noreferrer">
+                          <EmailIcon sx={{ marginRight: 2, fontSize: '2.5rem' }} />
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          href={`https://twitter.com/share?url=${schemaData.url}&text=Check this article:+${title}`}
+                          target="_blank"
+                          rel="noopener noreferrer">
+                          <TwitterIcon sx={{ fontSize: '2.5rem' }} />
+                        </Link>
+                      </li>
+                    </ul>
+                  </ListItem>
+                  {relatedLinks ? (
+                    <ListItem>
+                      <ListItemText
+                        primary="Learn more"
+                        primaryTypographyProps={{
+                          variant: 'h3',
+                          color: 'white',
+                          fontWeight: 'bold'
+                        }}
+                      />
+                      <ul
+                        style={{
+                          listStyle: 'none',
+                          padding: 0
+                        }}
+                        {...sidekick(sidekickLookup?.relatedLinks)}>
+                        {relatedLinks?.map((link, i) => (
+                          <li
+                            key={link?.id}
+                            style={{
+                              display: 'flex',
+                              marginBottom: i !== relatedLinks.length - 1 ? 16 : undefined
+                            }}>
+                            <Link {...(link as any)} variant="text" />
+                          </li>
+                        ))}
+                      </ul>
+                    </ListItem>
+                  ) : null}
+                  {topics ? (
+                    <ListItem>
+                      <ListItemText
+                        primary="Topics"
+                        primaryTypographyProps={{
+                          fontWeight: 'bold',
+                          variant: 'h3',
+                          color: 'white'
+                        }}
+                      />
+                      <ul
+                        style={{
+                          listStyle: 'none',
+                          display: 'flex',
+                          flexWrap: 'wrap',
+                          padding: '0'
+                        }}
+                        {...sidekick(sidekickLookup?.topics)}>
+                        {topics.map((topic: any, i: React.Key | null | undefined) => (
+                          <li
+                            key={i}
+                            style={{ whiteSpace: 'nowrap', marginRight: i !== topics.length - 1 ? 5 : undefined }}>
+                            <Link href={`/blog/${topic?.slug}`}>{topic?.title}</Link>
+                            {i !== topics.length - 1 ? ', ' : ''}
+                          </li>
+                        ))}
+                      </ul>
+                    </ListItem>
+                  ) : null}
+                  {topics ? (
+                    <ListItem>
+                      <ListItemText
+                        primary="Topics"
+                        primaryTypographyProps={{
+                          fontWeight: 'bold',
+                          variant: 'h3',
+                          color: 'white'
+                        }}
+                      />
+                      <ul
+                        style={{
+                          listStyle: 'none',
+                          display: 'flex',
+                          flexWrap: 'wrap',
+                          padding: '0'
+                        }}
+                        {...sidekick(sidekickLookup?.topics)}>
+                        {topics.map((topic: any, i: React.Key | null | undefined) => (
+                          <li
+                            key={i}
+                            style={{ whiteSpace: 'nowrap', marginRight: i !== topics.length - 1 ? 5 : undefined }}>
+                            <Link href={`/blog/${topic?.slug}`}>{topic?.title}</Link>
+                            {i !== topics.length - 1 ? ', ' : ''}
+                          </li>
+                        ))}
+                      </ul>
+                    </ListItem>
+                  ) : null}
+                  {tags ? (
+                    <ListItem>
+                      <ListItemText
+                        primary="Tags"
+                        primaryTypographyProps={{
+                          fontWeight: 'bold',
+                          variant: 'h3',
+                          color: 'white'
+                        }}
+                      />
+                      <ul
+                        style={{
+                          listStyle: 'none',
+                          display: 'flex',
+                          flexWrap: 'wrap',
+                          padding: '0'
+                        }}
+                        {...sidekick(sidekickLookup?.tags)}>
+                        {tags.map((tag: string, i: React.Key | null | undefined) => (
+                          <li
+                            key={tag}
+                            style={{ whiteSpace: 'nowrap', marginRight: i !== tags.length - 1 ? 5 : undefined }}>
+                            <Link text={tag} href={`/blog?tags=${kebabCase(tag.toLowerCase())}`} />
+                            {i !== tags.length - 1 ? ', ' : ''}
+                          </li>
+                        ))}
+                      </ul>
+                    </ListItem>
+                  ) : null}
+                  <Box my={4}>
+                    <form name="email-subscribe" method="POST" data-netlify="true">
+                      <InputLabel htmlFor="email-input" sx={{ py: 1 }}>
+                        <TextField
+                          id="email-input"
+                          label="Email"
+                          type="email"
+                          name="email"
+                          autoComplete="email"
+                          sx={{
+                            '&::placeholder': {
+                              color: 'red'
+                            }
+                          }}
+                        />
+                      </InputLabel>
+                      <Button type="submit" variant="contained" disableElevation size="small">
+                        Send
+                      </Button>
+                    </form>
+                  </Box>
+                </List>
+              </Box>
+            </Grid>
+          </Grid>
+        </ContentContainer>
+      </Root>
+      {footer ? <ContentModule {...(footer as any)} /> : null}
+    </ErrorBoundary>
+  );
+};
 
-Developer Questions:
-- How are the props for the "PageBlog" component passed from the parent component?
-- What is the purpose of the "sidekickLookup" prop and how is it used?
-- How is the schema data generated and where is it used?
-- How are the header and footer components rendered conditionally based on the provided props?
-- How is the body text of the blog post rendered using the "Text" component?
-- How are the related links and tags rendered as lists?
-- How is the email subscription form handled and submitted?
+const Root = styled(Box, {
+  name: 'PageBlog',
+  slot: 'Root',
+  overridesResolver: (_, styles) => [styles.root]
+})<{ variant?: string }>(({ theme }) => ({
+  display: 'block',
 
-Known Issues / Todo:
-- None
+  [theme.breakpoints.down('lg')]: {
+    paddingTop: theme.spacing(4)
+  }
+}));
+
+const ContentContainer = styled(Container, {
+  name: 'PageBlog',
+  slot: 'ContentContainer',
+  overridesResolver: (_, styles) => [styles.contentContainer]
+})<{ variant?: string }>(({ theme }) => ({
+  [theme.breakpoints.down('xl')]: {
+    padding: theme.spacing(0, 4)
+  },
+  [theme.breakpoints.down('md')]: {
+    padding: theme.spacing(0, 2)
+  }
+}));
+
+const MediaWrap = styled(Box, {
+  name: 'PageBlog',
+  slot: 'MediaWrap'
+})<{ variant?: string }>(({ theme }) => ({
+  'paddingTop': theme.spacing(4),
+  'paddingBottom': theme.spacing(4),
+  '& img': {
+    'width': '100%',
+    'min-height': '50vh'
+  },
+  '& iframe': {
+    'width': '100%',
+    'min-height': '50vh'
+  },
+  [theme.breakpoints.down('md')]: {
+    'paddingTop': theme.spacing(2),
+    'paddingBottom': theme.spacing(2),
+    '& img': {
+      'min-height': 'auto'
+    },
+    '& iframe': {
+      'width': '100%',
+      'min-height': '50vh'
+    }
+  }
+}));
+
+const ContentsWrapper = styled(Box, {
+  name: 'PageBlog',
+  slot: 'ContentsWrapper',
+  overridesResolver: (_, styles) => [styles.contentsWrapper]
+})<{ variant?: string }>(() => ({}));
+
+export default PageBlog;

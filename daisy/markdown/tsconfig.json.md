@@ -1,26 +1,49 @@
-{{prompt}}
-{{fileContents}}
-Summary:
-The provided file is a configuration file for a larger application. It contains various settings and options that define the behavior and functionality of the application's compiler. These settings include options for strict type-checking, module resolution, advanced options, and more.
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "outDir": "dist",
+    "baseUrl": ".",
 
-Service:
-The configuration file is specific to the application's compiler. It defines how the compiler should handle different aspects of the code, such as type-checking, module resolution, and strictness of the code.
+    /* Basic Operations */
+    "target": "es5",
+    "module": "esnext",
+    "lib": ["esnext", "DOM"],
+    "declaration": true,
+    "declarationMap": true,
 
-Configuration Summary:
-The configuration file overrides the default settings of the compiler. It enables strict type-checking, enforces strict null checks, strict function types, and strict property initialization in classes. It also enables additional checks for unused locals, unused parameters, implicit returns, and fallthrough cases in switch statements. The module resolution is set to "node" and it allows synthetic default imports and esModuleInterop. The configuration also includes paths for module resolution, type roots, and specific types to be used. Advanced options like resolveJsonModule and forceConsistentCasingInFileNames are also enabled.
+    "jsx": "react",
+    // "sourceMap": true,
+    "inlineSourceMap": true,
 
-Configuration Breakdown:
-- compilerOptions: This section contains various compiler options that define the behavior of the compiler.
-- traceResolution: This option enables tracing of module resolution.
+    /* Strict Type-Checking Options */
+    "strict": true /* Enable all strict type-checking options. */,
+    "noImplicitAny": true /* Raise error on expressions and declarations with an implied 'any' type. */,
+    "strictNullChecks": true /* Enable strict null checks. */,
+    "strictFunctionTypes": true /* Enable strict checking of function types. */,
+    "strictBindCallApply": true /* Enable strict 'bind', 'call', and 'apply' methods on functions. */,
+    "strictPropertyInitialization": true /* Enable strict checking of property initialization in classes. */,
+    "noImplicitThis": true /* Raise error on 'this' expressions with an implied 'any' type. */,
+    "alwaysStrict": true /* Parse in strict mode and emit "use strict" for each source file. */,
 
-Interaction Summary:
-The configuration file interacts with the rest of the application by defining how the code is compiled and checked. It affects the type-checking process, module resolution, and other compiler-related operations. The settings in this file can impact the behavior and correctness of the compiled code.
+    /* Additional Checks */
+    "noUnusedLocals": true /* Report errors on unused locals. */,
+    "noUnusedParameters": true /* Report errors on unused parameters. */,
+    "noImplicitReturns": true /* Report error when not all code paths in function return a value. */,
+    "noFallthroughCasesInSwitch": true /* Report errors for fallthrough cases in switch statement. */,
 
-Developer Questions:
-1. What are the implications of enabling strict type-checking and strict null checks?
-2. How does the module resolution affect the application's ability to import and use external modules?
-3. What are the benefits of enabling additional checks for unused locals, unused parameters, implicit returns, and fallthrough cases in switch statements?
-4. How does the configuration handle module resolution for paths starting with "@starter/"?
-5. What are the specific types included in the "types" option and how do they affect the compilation process?
-6. What is the purpose of the "resolveJsonModule" option and how does it impact the handling of JSON files?
-7. How does the "forceConsistentCasingInFileNames" option ensure consistent casing in file names and what are its implications?
+    /* Module Resolution Options */
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "paths": {
+      "@starter/*": ["packages/*/src"]
+    },
+    "typeRoots": ["node_modules/@types"],
+    "types": ["jest", "node"],
+
+    /* Advanced Options */
+    "resolveJsonModule": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "traceResolution": true
+}

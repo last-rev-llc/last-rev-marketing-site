@@ -1,37 +1,108 @@
-Summary:
-This code is a configuration file for a Storybook setup. Storybook is a development environment for UI components, allowing developers to view and interact with components in isolation. This file sets up the theme, layout, and options for Storybook, as well as defines the content mapping for the components used in the application.
+import { addDecorator, addParameters } from '@storybook/react';
+import { ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import { StyledEngineProvider } from '@mui/material/styles';
+import { INITIAL_VIEWPORTS } from '@storybook/addon-viewport';
+import { ContentModuleProvider } from '@last-rev/component-library/dist/components/ContentModule/ContentModuleContext';
+import Card from '@last-rev/component-library/dist/components/Card/Card';
+import Header from '@last-rev/component-library/dist/components/Header/Header';
+import Section from '@last-rev/component-library/dist/components/Section/Section';
+import Collection from '@last-rev/component-library/dist/components/Collection/Collection';
+import Link from '@last-rev/component-library/dist/components/Link/Link';
+import Hero from '@last-rev/component-library/dist/components/Hero/Hero';
+import Text from '../src/components/Text';
+import Media from '@last-rev/component-library/dist/components/Media/Media';
+import NavigationItem from '@last-rev/component-library/dist/components/NavigationItem/NavigationItem';
+import Quote from '../src/components/Quote';
+import theme from '../src/theme';
+import './styles.css';
 
-Import statements:
-- `addDecorator` and `addParameters` are functions imported from the `@storybook/react` package. They are used to add decorators and parameters to the Storybook configuration.
-- `ThemeProvider` is a component imported from the `@mui/material/styles` package. It is used to provide a theme to the components in the application.
-- `CssBaseline` is a component imported from the `@mui/material` package. It provides a baseline CSS reset for the application.
-- `StyledEngineProvider` is a component imported from the `@mui/material/styles` package. It is used to inject the MUI styled engine and set the order of styles injection.
-- `INITIAL_VIEWPORTS` is an object imported from the `@storybook/addon-viewport` package. It provides a set of predefined viewport sizes for testing responsive components.
-- `ContentModuleProvider` is a component imported from the `@last-rev/component-library/dist/components/ContentModule/ContentModuleContext` package. It provides a context for the content mapping used in the application.
-- `Card`, `Header`, `Section`, `Collection`, `Link`, `Hero`, `Text`, `Media`, `NavigationItem`, and `Quote` are components imported from the `@last-rev/component-library` package. These components are used in the application to display various types of content.
-- `theme` is an object imported from the `../src/theme` file. It contains the theme configuration for the application.
-- `styles.css` is a CSS file imported from the local directory. It contains additional styles for the Storybook setup.
+const contentMapping = {
+  Header,
+  Section,
+  Collection,
+  Card,
+  Quote,
+  Quote: Card,
+  NavigationItem,
+  Text,
+  Media,
+  Link,
+  Hero
+};
 
-Script Summary:
-The script defines a `contentMapping` object that maps component names to their corresponding components imported from the `@last-rev/component-library` package. This mapping is used in the `ContentModuleProvider` component to provide the appropriate component for each content module in the application.
+const StorybookWrapper = (storyFn) => {
+  return (
+    <StyledEngineProvider injectFirst>
+      <ThemeProvider theme={theme}>
+        <ContentModuleProvider contentMapping={contentMapping}>
+          <CssBaseline />
+          {storyFn()}
+        </ContentModuleProvider>
+      </ThemeProvider>
+    </StyledEngineProvider>
+  );
+};
 
-The `StorybookWrapper` function is defined as a wrapper component for the Storybook stories. It wraps the stories with the necessary providers and sets up the theme and baseline CSS.
+addDecorator(StorybookWrapper);
 
-The `addDecorator` function is called to add the `StorybookWrapper` as a decorator for all stories. This ensures that the stories are rendered with the necessary providers and theme.
-
-The `addParameters` function is called to set various parameters for Storybook, including the layout, options, backgrounds, and viewports.
-
-Internal Functions:
-- `StorybookWrapper`: A wrapper component for the Storybook stories. It takes a `storyFn` function as a parameter and returns the wrapped stories with the necessary providers and theme.
-
-External Functions:
-None
-
-Interaction Summary:
-This script interacts with the Storybook environment by adding decorators and parameters to configure the layout, options, backgrounds, and viewports. It also interacts with the `@last-rev/component-library` package by importing and mapping the components used in the application.
-
-Developer Questions:
-- How can I add a new component to the `contentMapping`?
-- How can I customize the theme for the application?
-- How can I add additional options or parameters to Storybook?
-- How can I modify the viewports for testing responsive components?
+addParameters({
+  layout: 'fullscreen',
+  options: {
+    isToolshown: true,
+    storySort: {
+      method: 'alphabetical',
+      order: ['Intro', 'Modules']
+    }
+  },
+  backgrounds: {
+    default: 'light',
+    values: [
+      {
+        name: 'light',
+        value: '#ffffff'
+      },
+      {
+        name: 'dark',
+        value: '#222222'
+      }
+    ]
+  },
+  viewport: {
+    viewports: {
+      '684px': {
+        name: 'Grid sm 684px',
+        styles: {
+          height: '100%',
+          width: '684px'
+        },
+        type: 'mobile'
+      },
+      '768px': {
+        name: 'Grid md 768px',
+        styles: {
+          height: '100%',
+          width: '768px'
+        },
+        type: 'mobile'
+      },
+      '1024px': {
+        name: 'Grid lg 1024px',
+        styles: {
+          height: '100%',
+          width: '1024px'
+        },
+        type: 'mobile'
+      },
+      '1440px': {
+        name: 'Grid xl 1440px',
+        styles: {
+          height: '100%',
+          width: '1440px'
+        },
+        type: 'mobile'
+      },
+      ...INITIAL_VIEWPORTS
+    }
+  }
+});

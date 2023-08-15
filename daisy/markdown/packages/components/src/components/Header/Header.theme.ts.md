@@ -1,23 +1,53 @@
-Summary:
-This code is a module that exports a function that returns a ThemeOptions object for customizing the MUI (Material-UI) theme. It specifically customizes the Header component by providing default props, style overrides, and variants.
+import { Theme, ThemeOptions, ComponentsProps, ComponentsOverrides, ComponentsVariants } from '@mui/material/styles';
 
-Import statements:
-- `Theme`, `ThemeOptions`, `ComponentsProps`, `ComponentsOverrides`, and `ComponentsVariants` are imported from the `@mui/material/styles` package. These are types used for customizing the MUI theme.
+// https://mui.com/customization/theme-components/#default-props
+export const defaultProps: ComponentsProps['Header'] = {};
 
-Script Summary:
-The script exports a function that takes a `theme` parameter of type `Theme` and returns a `ThemeOptions` object. The `ThemeOptions` object contains a `components` property, which is an object that customizes specific MUI components. In this case, it customizes the `Header` component.
+// https://mui.com/customization/theme-components/#global-style-overrides
+export const styleOverrides: ComponentsOverrides<Theme>['Header'] = {
+  // Set some static styles
+  contentContainer: ({ theme }) => ({
+    height: '100px'
+  })
+  //
+  // Use the ownerState to set dynamic styles
+  // root: ({ ownerState, theme }) => {
+  //   return {
+  //     backgroundColor: ownerState.variant === 'example' ? 'red' : theme.palette.background.paper
+  //   };
+  // }
+};
 
-Internal Functions:
-- `createVariants`: This function takes a `_theme` parameter of type `Theme` and returns an array of objects representing different variants of the `Header` component. Each object in the array specifies props and styles for a specific variant.
+// https://mui.com/customization/theme-components/#adding-new-component-variants
+const createVariants = (_theme: Theme): ComponentsVariants['Header'] => [
+  // Use prop matching to set variant styles
+  // {
+  //   props: {
+  //     variant: 'example'
+  //   },
+  //   style: {
+  //     backgroundColor: theme.palette.primary.main
+  //   }
+  // }
+  // Other props are also valid
+  // {
+  //   props: {
+  //     backgroundColor: 'primary.main',
+  //   },
+  //   style: {
+  //     color: theme.palette.primary.contrastText
+  //   }
+  // }
+];
 
-External Functions:
-None.
-
-Interaction Summary:
-This code interacts with the MUI library by customizing the `Header` component. It can be used as part of a broader MUI theme customization process.
-
-Developer Questions:
-- How can I customize the `Header` component using this code?
-- What are the available props and styles for the `Header` component?
-- How can I add new variants to the `Header` component?
-- How can I use this code in my application to customize the MUI theme?
+export default (theme: Theme): ThemeOptions => ({
+  components: {
+    Header: {
+      // @ts-expect-error
+      height: 100,
+      defaultProps,
+      styleOverrides,
+      variants: createVariants(theme)
+    }
+  }
+});

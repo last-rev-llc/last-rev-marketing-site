@@ -1,29 +1,31 @@
-Summary:
-This file is a React component that enhances the functionality of the CollectionFiltered component from the @last-rev/component-library package. It adds a fetchItems function to the wrapped component, which allows it to fetch items from a server based on provided filter, limit, and offset parameters. The component is a client-side component.
+import React from 'react';
+export type {
+  CollectionFilteredProps,
+  CollectionFilteredClassKey,
+  CollectionFilteredClasses
+} from '@last-rev/component-library/dist/components/CollectionFiltered';
+import CollectionFiltered from '@last-rev/component-library/dist/components/CollectionFiltered';
 
-Import statements:
-- React: The React library is imported to enable the use of React components and hooks.
-- CollectionFiltered: The CollectionFiltered component is imported from the @last-rev/component-library package to be wrapped and enhanced.
+const preview = !!process.env.CONTENTFUL_USE_PREVIEW;
 
-Component:
-The withFetchItems function is a higher-order component (HOC) that takes a component as an argument and returns a new component. It wraps the provided component with additional functionality related to fetching items from a server.
+const withFetchItems = (Wrapped: any) => (props: any) => {
+  const fetchItems = async ({ filter, limit, offset }: { filter: any; limit?: number; offset?: number }) => {
+    const client = await import('@last-rev-marketing-site/utils').then((module) => module.client);
+    const { data } = await client.CollectionItems({ id: props.id, limit, offset, filter, preview });
 
-Hooks:
-- None
+    if (data?.content?.__typename == 'Collection') {
+      const items = data?.content?.itemsConnection?.items;
+      const options = data?.content?.itemsConnection?.pageInfo?.options;
+      const allOptions = data?.content?.itemsConnection?.pageInfo?.allOptions;
+      return { items, options, allOptions };
+    }
+    return null;
+  };
+  return (
+    <div>
+      <Wrapped fetchItems={fetchItems} loadMoreText={'VIEW MORE POSTS'} {...props} />
+    </div>
+  );
+};
 
-Event Handlers:
-- None
-
-Rendered components:
-- Wrapped: The provided component is rendered within the withFetchItems component.
-
-Interaction Summary:
-This file enhances the CollectionFiltered component by adding a fetchItems function that can be used to fetch items from a server. The fetchItems function is passed as a prop to the wrapped component, allowing it to make server requests and update its state accordingly. The wrapped component also receives additional props such as loadMoreText.
-
-Developer Questions:
-- How does the fetchItems function work and what parameters does it accept?
-- How does the wrapped component use the fetchItems function to fetch items from a server?
-- What is the purpose of the preview variable and how is it used in the fetchItems function?
-
-Known Issues / Todo:
-- None
+export default withFetchItems(CollectionFiltered);

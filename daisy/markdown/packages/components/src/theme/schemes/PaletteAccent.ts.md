@@ -1,25 +1,21 @@
-Summary:
-This code is a TypeScript module that defines a class called `PaletteAccent`. The purpose of this class is to create a palette accent object that can be used in a broader software application. The `PaletteAccent` class takes in two parameters: `schemeOptions` and `baseSchemeOptions`. It uses these options to set the `main` and `contrastText` properties of the `PaletteAccent` object.
+import set from 'lodash/set';
+import get from 'lodash/get';
+import { Palette } from '@mui/material/styles/createPalette';
 
-Import statements:
-- `set` from 'lodash/set': This import is used to set the properties of the `PaletteAccent` object.
-- `get` from 'lodash/get': This import is used to get the values of certain properties from the `schemePalette` and `basePalette` objects.
-- `Palette` from '@mui/material/styles/createPalette': This import is used to define the type of the `palette` property in the `schemeOptions` and `baseSchemeOptions` parameters.
+export class PaletteAccent {
+  palette!: Palette;
 
-Script Summary:
-The script defines a class called `PaletteAccent` with a constructor that takes in two parameters: `schemeOptions` and `baseSchemeOptions`. It sets the `main` and `contrastText` properties of the `PaletteAccent` object based on the values in the `schemePalette` and `basePalette` objects.
+  constructor(
+    schemeOptions: {
+      buildOptions?: { key: string; name: string; createScheme: boolean; createPaletteAccent: boolean };
+      palette: any;
+    },
+    baseSchemeOptions: { palette: any }
+  ) {
+    const { palette: schemePalette } = schemeOptions;
+    const { palette: basePalette } = baseSchemeOptions;
 
-Internal Functions:
-- None
-
-External Functions:
-- None
-
-Interaction Summary:
-This script can be used in a broader software application by creating instances of the `PaletteAccent` class and using the created objects to define palette accents.
-
-Developer Questions:
-- What are the available options for the `schemeOptions` and `baseSchemeOptions` parameters?
-- What happens if the `schemePalette` or `basePalette` objects do not have the expected properties?
-- How can I use the created `PaletteAccent` object in the rest of the application?
-- Can I modify the `PaletteAccent` class to add more properties or functionality?
+    set(this, 'main', get(schemePalette, 'backgroundDefault', basePalette.backgroundDefault));
+    set(this, 'contrastText', get(schemePalette, 'primaryTextColor', basePalette.primaryTextColor));
+  }
+}

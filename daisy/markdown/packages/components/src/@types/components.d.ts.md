@@ -1,23 +1,220 @@
-Summary:
-This code is a TypeScript module that extends the Material-UI library's theme components. It declares and defines overrides and variants for various components such as Page, Accordion, Card, and more. These overrides and variants allow for customization and theming of the components.
+// import { ComponentsProps, ComponentsOverrides, ComponentsVariants } from '@mui/material/styles';
 
-Import statements:
-- `ComponentsOverrides`, `ComponentsProps`, and `ComponentsVariants` are imported from the `@mui/material` library. These types define the structure of the component overrides and variants.
+import { ComponentsOverrides, ComponentsProps, ComponentsVariants } from '@mui/material';
 
-Script Summary:
-This script extends the Material-UI theme components by declaring and defining overrides and variants for various components. It provides default props, style overrides, and variants for each component.
+declare module '@mui/material/styles' {
+  interface Components {
+    Page?: {
+      defaultProps?: ComponentsProps['Page'];
+      styleOverrides?: ComponentsOverrides<Theme>['Page'];
+      /**
+       * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
+       */
+      variants?: ComponentsVariants['Page'];
+    };
+    Accordion?: {
+      defaultProps?: ComponentsProps['Accordion'];
+      styleOverrides?: ComponentsOverrides<Theme>['Accordion'];
+      /**
+       * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
+       */
+      variants?: ComponentsVariants['Accordion'];
+    };
+    Card?: {
+      defaultProps?: ComponentsProps['Card'];
+      styleOverrides?: ComponentsOverrides<Theme>['Card'];
+      /**
+       * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
+       */
+      variants?: ComponentsVariants['Card'];
+    };
 
-Internal Functions:
-There are no internal functions in this script.
+    ContentModule?: {
+      defaultProps?: ComponentsProps['ContentModule'];
+      styleOverrides?: ComponentsOverrides<Theme>['ContentModule'];
+      /**
+       * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
+       */
+      variants?: ComponentsVariants['ContentModule'];
+    };
+    ErrorBoundary?: {
+      defaultProps?: ComponentsProps['ErrorBoundary'];
+      styleOverrides?: ComponentsOverrides<Theme>['ErrorBoundary'];
+      /**
+       * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
+       */
+      variants?: ComponentsVariants['ErrorBoundary'];
+    };
+    SEO?: {
+      defaultProps?: ComponentsProps['SEO'];
+      styleOverrides?: ComponentsOverrides<Theme>['SEO'];
+      /**
+       * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
+       */
+      variants?: ComponentsVariants['SEO'];
+    };
 
-External Functions:
-There are no external functions in this script.
+    ContentPreview?: {
+      defaultProps?: ComponentsProps['ContentPreview'];
+      styleOverrides?: ComponentsOverrides<Theme>['ContentPreview'];
+      /**
+       * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
+       */
+      variants?: ComponentsVariants['ContentPreview'];
+    };
+    NavigationItem?: {
+      defaultProps?: ComponentsProps['NavigationItem'];
+      styleOverrides?: ComponentsOverrides<Theme>['NavigationItem'];
+      /**
+       * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
+       */
+      variants?: ComponentsVariants['NavigationItem'];
+    };
+    TableOfContents?: {
+      defaultProps?: ComponentsProps['TableOfContents'];
+      styleOverrides?: ComponentsOverrides<Theme>['TableOfContents'];
+      /**
+       * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
+       */
+      variants?: ComponentsVariants['TableOfContents'];
+    };
+    Text?: {
+      defaultProps?: ComponentsProps['Text'];
+      styleOverrides?: ComponentsOverrides<Theme>['Text'];
+      /**
+       * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
+       */
+      variants?: ComponentsVariants['Text'];
+    };
+    Image?: {
+      defaultProps?: ComponentsProps['Image'];
+      styleOverrides?: ComponentsOverrides<Theme>['Image'];
+      /**
+       * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
+       */
+      variants?: ComponentsVariants['Image'];
+    };
+    Link?: {
+      defaultProps?: ComponentsProps['Link'];
+      styleOverrides?: ComponentsOverrides<Theme>['Link'];
+      /**
+       * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
+       */
+      variants?: ComponentsVariants['Link'];
+    };
+    Header?: {
+      defaultProps?: ComponentsProps['Header'];
+      styleOverrides?: ComponentsOverrides<Theme>['Header'];
+      /**
+       * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
+       */
+      variants?: ComponentsVariants['Header'];
+    };
+    Hero?: {
+      defaultProps?: ComponentsProps['Hero'];
+      styleOverrides?: ComponentsOverrides<Theme>['Hero'];
+      /**
+       * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
+       */
+      variants?: ComponentsVariants['Hero'];
+    };
 
-Interaction Summary:
-This script does not have any direct interaction with the rest of the application. It is meant to be used as a module that extends the Material-UI theme components.
+    Media?: {
+      defaultProps?: ComponentsProps['Media'];
+      styleOverrides?: ComponentsOverrides<Theme>['Media'];
+      /**
+       * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
+       */
+      variants?: ComponentsVariants['Media'];
+    };
+    Section?: {
+      defaultProps?: ComponentsProps['Section'];
+      styleOverrides?: ComponentsOverrides<Theme>['Section'];
+      /**
+       * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
+       */
+      variants?: ComponentsVariants['Section'];
+    };
+    Collection?: {
+      defaultProps?: ComponentsProps['Collection'];
+      styleOverrides?: ComponentsOverrides<Theme>['Collection'];
+      /**
+       * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
+       */
+      variants?: ComponentsVariants['Collection'];
+    };
 
-Developer Questions:
-- How can I customize the style of the Page component?
-- How can I define variants for the Accordion component?
-- How can I override the default props of the Card component?
-- How can I use these overrides and variants in my application?
+    CollectionFiltered?: {
+      defaultProps?: ComponentsProps['CollectionFiltered'];
+      styleOverrides?: ComponentsOverrides<Theme>['CollectionFiltered'];
+      /**
+       * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
+       */
+      variants?: ComponentsVariants['CollectionFiltered'];
+    };
+    CollectionAccordion?: {
+      defaultProps?: ComponentsProps['CollectionAccordion'];
+      styleOverrides?: ComponentsOverrides<Theme>['CollectionAccordion'];
+      /**
+       * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
+       */
+      variants?: ComponentsVariants['CollectionAccordion'];
+    };
+    NavigationBar?: {
+      defaultProps?: ComponentsProps['NavigationBar'];
+      styleOverrides?: ComponentsOverrides<Theme>['NavigationBar'];
+      /**
+       * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
+       */
+      variants?: ComponentsVariants['NavigationBar'];
+    };
+    Footer?: {
+      defaultProps?: ComponentsProps['Footer'];
+      styleOverrides?: ComponentsOverrides<Theme>['Footer'];
+      /**
+       * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
+       */
+      variants?: ComponentsVariants['Footer'];
+    };
+    // MailchimpForm?: {
+    //   defaultProps?: ComponentsProps['MailchimpForm'];
+    //   styleOverrides?: ComponentsOverrides<Theme>['MailchimpForm'];
+    //   /**
+    //    * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
+    //    */
+    //   variants?: ComponentsVariants['MailchimpForm'];
+    // };
+    CollectionCarousel?: {
+      defaultProps?: ComponentsProps['CollectionCarousel'];
+      styleOverrides?: ComponentsOverrides<Theme>['CollectionCarousel'];
+      /**
+       * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
+       */
+      variants?: ComponentsVariants['CollectionCarousel'];
+    };
+    // BackToTop?: {
+    //   defaultProps?: ComponentsProps['BackToTop'];
+    //   styleOverrides?: ComponentsOverrides<Theme>['BackToTop'];
+    //   /**
+    //    * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
+    //    */
+    //   variants?: ComponentsVariants['BackToTop'];
+    // };
+    // FormMarketoEmbed?: {
+    //   defaultProps?: ComponentsProps['FormMarketoEmbed'];
+    //   styleOverrides?: ComponentsOverrides<Theme>['FormMarketoEmbed'];
+    //   /**
+    //    * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
+    //    */
+    //   variants?: ComponentsVariants['FormMarketoEmbed'];
+    // };
+    Quote?: {
+      defaultProps?: ComponentsProps['Quote'];
+      styleOverrides?: ComponentsOverrides<Theme>['Quote'];
+      /**
+       * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
+       */
+      variants?: ComponentsVariants['Quote'];
+    };
+  }
+}

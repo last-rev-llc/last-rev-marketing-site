@@ -1,33 +1,104 @@
-Summary:
-The provided React file is a component called "Image" that is used to render images in a larger application. It handles different types of images, such as SVG and regular images, and supports various props for customization.
+import React from 'react';
+// import Head from 'next/head';
+import NextImage from 'next/image';
+import ErrorBoundary from '../ErrorBoundary';
+// import getImgSrcTag from '../../utils/getImgSrcTag';
+import { ImageProps } from './Image.types';
 
-Import statements:
-- React: The core React library.
-- NextImage: A component from the Next.js framework used for optimizing and rendering images.
-- ErrorBoundary: A custom error boundary component.
-- ImageProps: A type definition for the props used by the Image component.
+const Image = React.forwardRef<any, ImageProps>((props, ref) => {
+  const {
+    src,
+    className,
+    media,
+    columns = 12,
+    priority = true,
+    itemProp,
+    testId,
+    disableInlineSVG,
+    nextImageOptimization,
+    q,
+    unoptimized,
+    width,
+    height,
+    alt,
+    ...imageProps
+  } = props;
+  if (!src) return null;
+  // const imgPreload = React.useMemo(
+  //   () => (
+  //     <Head>
+  //       <link
+  //         rel="preload"
+  //         href={src}
+  //         // @ts-ignore
+  //         imagesrcset={getImgSrcTag({ src, numColumns: columns, q, unoptimized })?.srcSet}
+  //         as="image"
+  //         media={media}
+  //       />
+  //     </Head>
+  //   ),
+  //   [src, columns, q, unoptimized]
+  // );
+  const imgContent = React.useMemo(() => {
+    const isSVG = src?.endsWith('.svg');
 
-Component:
-The Image component is a functional component that renders different types of images based on the provided props. It uses React.forwardRef to forward the ref to the underlying DOM element.
+    let content;
+    if (isSVG && !disableInlineSVG && imageProps.svgContent) {
+      content = (
+        <>
+          <svg
+            ref={ref}
+            className={className}
+            data-testid={testId}
+            height={height}
+            width={width}
+            focusable={false}
+            role="img"
+            // TODO: Figure out better a11y support for svg
+            dangerouslySetInnerHTML={{ __html: `<title>${alt}</title>${imageProps.svgContent}` }}
+          />
+        </>
+      );
+    } else if (!isSVG && nextImageOptimization) {
+      content = (
+        <NextImage
+          src={src}
+          // TODO: NextImage doesn't support ref
+          // ref={ref}
+          data-testid={testId}
+          className={className}
+          itemProp={itemProp}
+          priority={priority}
+          loading={priority ? 'eager' : 'lazy'}
+          height={height}
+          width={width}
+          sizes={imageProps.sizes}
+          alt={alt}
+        />
+      );
+    } else {
+      content = (
+        <>
+          <img
+            src={src}
+            ref={ref}
+            data-testid={testId}
+            className={className}
+            itemProp={itemProp}
+            loading={priority ? 'eager' : 'lazy'}
+            height={height}
+            width={width}
+            alt={alt}
+            {...imageProps}
+          />
+          {/* {imgPreload} */}
+        </>
+      );
+    }
+    return content;
+  }, [props]);
 
-Hooks:
-- React.useMemo: Used to memoize the image content based on the props. It ensures that the content is only recomputed when the relevant props change.
+  return <ErrorBoundary>{imgContent}</ErrorBoundary>;
+});
 
-Event Handlers:
-None.
-
-Rendered components:
-- ErrorBoundary: Wraps the image content to catch and handle any errors that may occur during rendering.
-
-Interaction Summary:
-The Image component can be used in other components to render images. It supports different types of images, such as SVG and regular images, and provides props for customization, such as width, height, alt text, and more. The component handles the rendering of images based on the provided props and optimizes the rendering using NextImage if specified.
-
-Developer Questions:
-- How can I customize the image rendering, such as setting the width, height, or alt text?
-- How does the component handle different types of images, such as SVG?
-- How can I optimize the rendering of images using NextImage?
-- How can I handle errors that may occur during image rendering?
-
-Known Issues / Todo:
-- The component currently has commented out code related to image preloading. This functionality needs to be implemented and tested.
-- The NextImage component does not support the ref prop. This limitation should be addressed if ref functionality is required.
+export default Image;

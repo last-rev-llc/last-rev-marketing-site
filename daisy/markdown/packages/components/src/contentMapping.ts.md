@@ -1,28 +1,70 @@
-Summary:
-This code is a module that exports a mapping of component names to their corresponding dynamic imports. It allows for lazy loading of components in a Next.js application. The purpose of this module is to provide a centralized location for importing and dynamically loading components, which helps improve performance by only loading components when they are needed.
+import dynamic from 'next/dynamic';
 
-Import statements:
-- `dynamic` from 'next/dynamic': This is a function provided by the Next.js framework that allows for dynamic imports of components.
+import Section from './components/Section';
+// import Card from './components/Card';
+import Collection from './components/Collection';
+import PageBlog from './components/PageBlog';
 
-- `Section`, `Collection`, `PageBlog`: These are custom components defined in separate files.
+const Card = dynamic(() => import('./components/Card'));
+const CollectionAccordion = dynamic(() => import('./components/CollectionAccordion'));
 
-- `Card`, `CollectionAccordion`, `NavigationBar`, `Media`, `Link`, `NavigationItem`, `Header`, `Hero`, `Text`, `Footer`, `BackToTop`, `TableOfContents`, `CollectionFiltered`, `CalendlyInlineWidget`, `Quote`, `Page`, `CollectionCarousel`, `Topic`: These are custom components defined in separate files.
+const NavigationBar = dynamic(() => import('./components/NavigationBar'));
 
-Script Summary:
-This script exports a mapping of component names to their corresponding dynamic imports. The `contentMapping` object is defined as a dictionary where the keys are component names and the values are the corresponding dynamic imports. This allows for easy access to the dynamically loaded components throughout the application.
+const Media = dynamic(() => import('./components/Media'));
 
-Internal Functions:
-None
+const Link = dynamic(() => import('./components/Link'));
 
-External Functions:
-None
+const NavigationItem = dynamic(() => import('./components/NavigationItem'));
 
-Interaction Summary:
-This module can be imported and used in other parts of the application to dynamically load components. By using the `contentMapping` object, developers can easily access and render the desired components without having to import them directly.
+const Header = dynamic(() => import('./components/Header'));
 
-Developer Questions:
-- How do I add a new component to the `contentMapping`?
-- How do I use the dynamically loaded components in my code?
-- How do I handle errors when dynamically loading components?
-- How do I handle loading states when dynamically loading components?
-- How do I handle server-side rendering with dynamically loaded components?
+const Hero = dynamic(() => import('./components/Hero'));
+
+const Text = dynamic(() => import('./components/Text'));
+
+const Footer = dynamic(() => import('./components/Footer'));
+const Form = dynamic(() => import('./components/Form'));
+
+const BackToTop = dynamic(() => import('@last-rev/component-library/dist/components/BackToTop'));
+
+const TableOfContents = dynamic(() => import('./components/TableOfContents'));
+
+// Custom components
+const CollectionFiltered = dynamic(() => import('./components/CollectionFiltered'));
+
+const CalendlyInlineWidget = dynamic(() => import('./components/CalendlyInlineWidget'));
+
+// Custom components
+const Quote = dynamic(() => import('./components/Quote'));
+const Page = dynamic(() => import('./components/Page'));
+const CollectionCarousel = dynamic(() => import('./components/CollectionCarousel'));
+const Topic = dynamic(() => import('./components/PageTopic'));
+
+const contentMapping: {
+  [key: string]: any;
+} = {
+  'Collection:accordion': CollectionAccordion,
+  'Collection:carousel': CollectionCarousel,
+  'Collection:filtered': CollectionFiltered,
+  'Collection:navigation-bar': NavigationBar,
+  'ModuleIntegration:calendly-inline-widget': CalendlyInlineWidget,
+  BackToTop,
+  Card,
+  Collection,
+  Footer,
+  Header,
+  Hero,
+  Link,
+  Media,
+  NavigationItem,
+  Page,
+  PageBlog,
+  Quote,
+  Section,
+  TableOfContents,
+  Text,
+  Topic,
+  Form
+};
+
+export default contentMapping;

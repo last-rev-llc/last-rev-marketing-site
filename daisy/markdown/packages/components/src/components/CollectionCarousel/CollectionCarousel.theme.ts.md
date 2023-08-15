@@ -1,26 +1,53 @@
-Summary:
-This code is a module that exports a default function that returns a ThemeOptions object. The purpose of this module is to customize the theme and components of a Material-UI application. It provides default props, style overrides, and component variants for a specific component called "CollectionCarousel".
+import { Theme, ThemeOptions, ComponentsOverrides, ComponentsVariants } from '@mui/material/styles';
 
-Import statements:
-- `Theme`, `ThemeOptions`, `ComponentsOverrides`, and `ComponentsVariants` are imported from the `@mui/material/styles` package. These are types used for customizing the Material-UI theme and components.
+// https://mui.com/customization/theme-components/#default-props
+export const defaultProps = {};
 
-Script Summary:
-- The `defaultProps` object is exported as an empty object. It is used to provide default props for the "CollectionCarousel" component.
-- The `styleOverrides` object is exported as an empty object. It is used to override the default styles of the "CollectionCarousel" component. It can be customized by setting static styles or using the `ownerState` and `theme` variables to set dynamic styles.
-- The `createVariants` function is defined to create component variants for the "CollectionCarousel" component. It takes a `Theme` object as a parameter and returns an array of variant objects. Each variant object specifies props and styles for a specific variant of the component.
-- The default export of the module is a function that takes a `theme` object as a parameter and returns a `ThemeOptions` object. Inside the function, the `CollectionCarousel` component is customized by providing the `defaultProps`, `styleOverrides`, and `variants` properties.
+// https://mui.com/customization/theme-components/#global-style-overrides
+export const styleOverrides: ComponentsOverrides<Theme>['CollectionCarousel1'] = {
+  // Set some static styles
+  // root: {
+  //   backgroundColor: 'red'
+  // }
+  //
+  // Use the ownerState to set dynamic styles
+  // root: ({ ownerState, theme }) => {
+  //   return {
+  //     backgroundColor: ownerState.variant === 'example' ? 'red' : theme.palette.background.paper
+  //   };
+  // }
+};
 
-Internal Functions:
-- None
+// https://mui.com/customization/theme-components/#adding-new-component-variants
+const createVariants = (_theme: Theme): ComponentsVariants['CollectionCarousel1'] => [
+  {
+    props: {
+      variant: 'carousel'
+    },
+    style: {
+      'overflow': 'hidden',
+      '& [class*="CollectionCarousel-carouselItem"]': {
+        '& .MuiPaper-root': {
+          boxShadow: 'none',
+          borderRadius: 0,
+          [_theme.breakpoints.down('md')]: {
+            padding: '0px 32px 40px 32px'
+          },
+          [_theme.breakpoints.down('sm')]: {
+            padding: '0px'
+          }
+        }
+      }
+    }
+  }
+];
 
-External Functions:
-- None
-
-Interaction Summary:
-This module can be used in a Material-UI application to customize the theme and components. It provides default props, style overrides, and component variants for the "CollectionCarousel" component. Other parts of the application can import and use the customized theme and components.
-
-Developer Questions:
-- How can I customize the default props of the "CollectionCarousel" component?
-- How can I override the default styles of the "CollectionCarousel" component?
-- How can I create additional variants for the "CollectionCarousel" component?
-- How can I use the customized theme and components in my application?
+export default (_theme: any): ThemeOptions => ({
+  components: {
+    CollectionCarousel: {
+      defaultProps,
+      styleOverrides,
+      variants: createVariants(_theme)
+    }
+  }
+});

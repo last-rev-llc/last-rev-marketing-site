@@ -1,44 +1,138 @@
-Summary:
-The provided React file is a functional component called "CollectionCarousel" that renders a carousel of content modules. It uses the Material-UI library for styling and the Swiper library for the carousel functionality. The component receives props such as "items", "variant", "itemsWidth", "itemsVariant", and "sidekickLookup" to customize its behavior.
+import React, { useEffect, useState } from 'react';
+import { Container, Box } from '@mui/material';
+import styled from '@mui/system/styled';
+import { Swiper, SwiperSlide } from 'swiper/react';
 
-Import statements:
-- React, { useEffect, useState }: Imports the necessary React hooks for managing state and side effects.
-- { Container, Box }: Imports components from the Material-UI library for layout and styling.
-- styled from '@mui/system/styled': Imports the styled component utility from the Material-UI library.
-- { Swiper, SwiperSlide }: Imports components from the Swiper library for creating the carousel.
-- { Autoplay, A11y }: Imports specific modules from the Swiper library for autoplay and accessibility features.
-- ErrorBoundary: Imports a custom ErrorBoundary component.
-- ContentModule: Imports a custom ContentModule component.
-- sidekick from '@last-rev/contentful-sidekick-util': Imports a utility function for sidekick integration.
-- { CollectionCarouselProps }: Imports the type definition for the props of the CollectionCarousel component.
+import { Autoplay, A11y } from 'swiper';
 
-Component:
-The CollectionCarousel component is a functional component that receives props and renders a carousel of content modules. It uses the useState and useEffect hooks to manage the state of the carouselLoaded variable. If the items prop is empty, the component returns null. Otherwise, it maps over the items array and renders a SwiperSlide for each item, wrapping it with a CarouselItem component.
+import ErrorBoundary from '../ErrorBoundary';
+import ContentModule from '../ContentModule';
+import sidekick from '@last-rev/contentful-sidekick-util';
+import { CollectionCarouselProps } from './CollectionCarousel.types';
 
-Hooks:
-- useState: The useState hook is used to manage the state of the carouselLoaded variable, which determines whether the carousel has finished loading.
-- useEffect: The useEffect hook is used to set the carouselLoaded state to true when the component mounts.
+export const CollectionCarousel = ({
+  items,
+  variant,
+  itemsWidth,
+  itemsVariant,
+  sidekickLookup
+}: CollectionCarouselProps) => {
+  const [carouselLoaded, setCarouselLoaded] = useState(false);
 
-Event Handlers:
-None.
+  useEffect(() => {
+    setCarouselLoaded(true);
+  }, []);
 
-Rendered components:
-- ErrorBoundary: Wraps the entire component to catch and handle any errors that occur within it.
-- Root: A styled Box component from Material-UI that serves as the root container for the carousel. It receives the variant prop and applies custom styles.
-- ContentContainer: A styled Container component from Material-UI that serves as the container for the carousel content. It receives the maxWidth prop and applies custom styles.
-- CarouselContainer: A styled Swiper component from the Swiper library that serves as the container for the carousel slides. It receives various props for configuring the carousel behavior and applies custom styles.
-- CarouselItem: A styled Box component from Material-UI that serves as the container for each carousel item. It applies custom styles.
+  if (!items?.length) return null;
+  const itemsWithVariant = items.map((item: any) => ({ ...item, variant: itemsVariant ?? item?.variant }));
 
-Interaction Summary:
-The CollectionCarousel component is a client-side component that renders a carousel of content modules. It receives props to customize its behavior, such as the items to display, the variant of the carousel, the width of the items container, the variant of the items, and a sidekick lookup object. The component uses the Swiper library for the carousel functionality and the Material-UI library for styling. It manages the state of the carouselLoaded variable to determine when the carousel has finished loading.
+  return (
+    <ErrorBoundary>
+      <Root
+        {...sidekick(sidekickLookup)}
+        variant={variant}
+        style={!carouselLoaded ? { opacity: 0 } : undefined}
+        data-testid="CollectionCarousel">
+        <ContentContainer maxWidth={itemsWidth} disableGutters>
+          <CarouselContainer
+            modules={[Autoplay, A11y]}
+            {...{
+              loop: true,
+              slidesPerView: 4,
+              spaceBetween: 80,
+              loopedSlides: items?.length,
+              pagination: false,
+              navigation: false,
+              speed: 10000,
+              autoplay: {
+                delay: 1,
+                disableOnInteraction: false
+              },
+              breakpoints: {
+                684: {
+                  slidesPerView: 1,
+                  spaceBetween: 40
+                },
+                780: {
+                  slidesPerView: 2,
+                  spaceBetween: 80
+                },
+                1024: {
+                  slidesPerView: 3
+                },
+                1440: {
+                  slidesPerView: 4
+                }
+              }
+            }}>
+            {itemsWithVariant.map((item: any, idx: number) => (
+              <SwiperSlide key={idx}>
+                <CarouselItem>
+                  <ContentModule {...item} />
+                </CarouselItem>
+              </SwiperSlide>
+            ))}
+          </CarouselContainer>
+        </ContentContainer>
+      </Root>
+    </ErrorBoundary>
+  );
+};
 
-Developer Questions:
-- How can I customize the appearance of the carousel?
-- How can I change the number of items displayed per slide?
-- How can I add navigation buttons to the carousel?
-- How can I handle errors that occur within the carousel?
-- How can I integrate sidekick functionality into the carousel?
+const Root = styled(Box, {
+  name: 'CollectionCarousel',
+  slot: 'Root',
+  shouldForwardProp: (prop) => prop !== 'variant',
+  overridesResolver: (_, styles) => [styles.root]
+})<{ variant?: string }>(() => ({
+  display: 'flex',
+  justifyContent: 'center'
+}));
 
-Known Issues / Todo:
-- No known issues or bugs.
-- Todo: Add support for custom navigation buttons.
+const ContentContainer = styled(Container, {
+  name: 'CollectionCarousel',
+  slot: 'ContentContainer',
+  overridesResolver: (_, styles) => [styles.contentContainer]
+})<{ variant?: string }>(() => ({}));
+
+const CarouselContainer = styled(Swiper, {
+  name: 'CollectionCarousel',
+  slot: 'CarouselContainer',
+  overridesResolver: (_, styles) => [styles.carouselContainer]
+})<{ variant?: string }>(({ theme }) => ({
+  'width': '100%',
+  'overflow': 'hidden',
+  [theme.breakpoints.down('sm')]: {
+    minWidth: 'calc(200vw - 20%)'
+  },
+  '--swiper-theme-color': theme.palette.primary.main,
+  '& > .swiper-pagination-bullets span.swiper-pagination-bullet': {
+    margin: '0 10px'
+  },
+  '& .swiper-pagination-bullet': {
+    width: 10,
+    height: 10
+  },
+  '& .swiper-button-prev, .swiper-button-next': {
+    [theme.breakpoints.down('lg')]: {
+      display: 'none'
+    }
+  },
+  '& .swiper-wrapper': {
+    alignItems: 'center'
+  }
+}));
+
+const CarouselItem = styled(Box, {
+  name: 'CollectionCarousel',
+  slot: 'CarouselItem',
+  overridesResolver: (_, styles) => [styles.carouselItem]
+})<{ variant?: string }>(() => ({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  height: '100%',
+  width: '100%'
+}));
+
+export default CollectionCarousel;
