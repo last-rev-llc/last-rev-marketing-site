@@ -1,27 +1,438 @@
-Summary:
-This code is responsible for creating and exporting a theme for a software application. The theme is based on the Material-UI library and includes customizations for various components such as headers, cards, media, and sections. The theme is created using a base theme and additional theme configurations for each component. The final theme is then exported for use in the application.
+import { responsiveFontSizes, ThemeOptions, createTheme } from '@mui/material/styles';
+import Hero from '../components/Hero/Hero.theme';
+import Card from '../components/Card/Card.theme';
+import Media from '../components/Media/Media.theme';
+import Quote from '../components/Quote/Quote.theme';
+import Header from '../components/Header/Header.theme';
+import Section from '../components/Section/Section.theme';
+import Link from '../components/Link/Link.theme';
+import TableOfContents from '../components/TableOfContents/TableOfContents.theme';
+import Text from '../components/Text/Text.theme';
+import NavigationBar from '../components/NavigationBar/NavigationBar.theme';
+import NavigationItem from '../components/NavigationItem/NavigationItem.theme';
+import Collection from '../components/Collection/Collection.theme';
+import CollectionCarousel from '../components/CollectionCarousel/CollectionCarousel.theme';
+import merge from 'lodash/merge';
+import camelCase from 'lodash/camelCase';
 
-Import statements:
-- `responsiveFontSizes`, `ThemeOptions`, `createTheme` from `@mui/material/styles`: These are functions and types from the Material-UI library that are used to create and customize the theme.
-- `Hero`, `Card`, `Media`, `Quote`, `Header`, `Section`, `Link`, `TableOfContents`, `Text`, `NavigationBar`, `NavigationItem`, `Collection`, `CollectionCarousel` from various component files: These are custom component themes that are imported and merged into the base theme to create the final theme.
-- `merge` from `lodash/merge`: This function is used to merge multiple theme configurations into a single theme.
-- `camelCase` from `lodash/camelCase`: This function is used to convert a string to camel case.
+const baseTheme: ThemeOptions = {
+  spacing: 8,
+  shape: {
+    borderRadius: 8
+  },
+  breakpoints: {
+    // Add any custom breakpoints here
+    values: {
+      xs: 0,
+      sm: 600,
+      md: 900,
+      lg: 1200,
+      xl: 1536
+    }
+  },
+  typography: {
+    fontSize: 16,
+    // fontFamily: "'Open Sans', 'sans-serif'",
+    h1: {
+      fontSize: '2.65rem',
+      fontWeight: 600,
+      lineHeight: 1.25
+    },
+    h2: {
+      fontSize: '2.25rem',
+      fontWeight: 600,
+      lineHeight: 1.25,
+      paddingBottom: 16
+    },
+    h3: {
+      fontSize: '1.55rem',
+      fontWeight: 600,
+      lineHeight: 1.5
+    },
+    h4: {
+      fontSize: '1.25rem',
+      fontWeight: 600,
+      lineHeight: 1.5
+    },
+    h5: {
+      fontSize: '1.15rem',
+      fontWeight: 600,
+      lineHeight: 1.5
+    },
+    h6: {
+      fontSize: '1.15rem',
+      fontWeight: 600,
+      lineHeight: 1.5555
+    },
+    body1: {
+      fontSize: '1rem',
+      fontWeight: 400,
+      lineHeight: 1.5
+    },
+    body2: {
+      fontSize: '1rem',
+      fontWeight: 400,
+      lineHeight: 1.5
+    },
+    body3: {
+      fontSize: '0.875rem',
+      fontWeight: 400,
+      lineHeight: '21px'
+    },
+    body: {
+      // fontFamily: "'Open Sans', 'sans-serif'",
+      fontWeight: 400
+    },
+    heading: {
+      // fontFamily: "'Open Sans', 'sans-serif'",
+      fontWeight: 700
+    }
+  },
+  palette: {
+    mode: 'light',
+    ...{
+      white: {
+        main: '#FFF',
+        contrastText: 'rgba(0, 0, 0, 0.87)'
+      },
+      black: {
+        main: '#000',
+        contrastText: '#FFF'
+      }
+    },
+    primary: {
+      main: '#9146ff',
+      light: '#a76aff',
+      dark: '#6530b2',
+      contrastText: 'white'
+    },
+    secondary: {
+      main: '#ffff55',
+      light: '#ffff55',
+      dark: '#c6b300',
+      contrastText: 'black'
+    },
 
-Script Summary:
-The script starts by defining a base theme object that includes configurations for spacing, breakpoints, typography, palette, and other theme options. It then defines specific configurations for each component by importing their respective theme functions and passing the base theme as an argument. These component themes are merged into the base theme using the `merge` function. Finally, a `createSchemeTheme` function is defined to create the final theme by merging the base scheme theme with the component themes. The `createSchemeTheme` function is called with the base theme, and the resulting theme is exported as the default theme.
+    text: {
+      primary: '#170262',
+      secondary: '#E5E5E5',
+      disabled: 'rgba(0, 0, 0, 0.38)'
+    },
+    error: {
+      main: '#ff1744',
+      light: 'rgb(255, 69, 105)',
+      dark: 'rgb(178, 16, 47)',
+      contrastText: '#fff'
+    },
+    common: {
+      black: '#00030B',
+      white: '#FFFFFF'
+    },
+    warning: {
+      main: '#ed6c02',
+      light: '#ff9800',
+      dark: '#e65100',
+      contrastText: '#fff'
+    },
+    info: {
+      main: '#0288d1',
+      light: '#03a9f4',
+      dark: '#01579b',
+      contrastText: '#fff'
+    },
+    success: {
+      main: '#2e7d32',
+      light: '#4caf50',
+      dark: '#1b5e20',
+      contrastText: '#fff'
+    },
+    backgroundOption: {
+      main: '#FFF',
+      light: '#F7F7F7',
+      dark: '#000'
+    }
+  }
+};
 
-Internal Functions:
-- `createSchemeTheme(schemeKey?: string)`: This function takes an optional `schemeKey` parameter and returns a theme object. It first creates a base scheme theme by calling `createTheme` with the base theme. Then, it merges the base scheme theme with the component themes using the `merge` function. The function also includes style overrides for specific components. The resulting theme is then passed to `responsiveFontSizes` to enable responsive font sizes. The final theme is returned.
+const createSchemeTheme = (schemeKey?: string) => {
+  const baseSchemeTheme = createTheme(baseTheme);
 
-External Functions:
-- None
+  const schemeTheme = createTheme(
+    merge(
+      { scheme: camelCase(schemeKey) },
+      baseSchemeTheme,
+      ...[
+        Header(baseSchemeTheme),
+        Text(baseSchemeTheme),
+        Card(baseSchemeTheme),
+        Quote(baseSchemeTheme),
+        Media(baseSchemeTheme),
+        Hero(baseSchemeTheme),
+        NavigationItem(baseSchemeTheme),
+        NavigationBar(baseSchemeTheme),
+        Link(baseSchemeTheme),
+        Section(baseSchemeTheme),
+        Collection(baseSchemeTheme),
+        CollectionCarousel(baseSchemeTheme),
+        TableOfContents(baseSchemeTheme)
+      ],
+      {
+        createSchemeTheme,
+        components: {
+          MuiContainer: {
+            styleOverrides: {
+              root: {
+                [baseSchemeTheme.breakpoints.up('lg')]: {
+                  paddingLeft: baseSchemeTheme.spacing(10),
+                  paddingRight: baseSchemeTheme.spacing(10)
+                },
+                '& .MuiContainer-disableGutters': {
+                  paddingLeft: 0,
+                  paddingRight: 0
+                }
+              }
+            }
+          },
+          Header: {
+            height: 80,
+            styleOverrides: {
+              root: {
+                '& img': {
+                  width: 180,
+                  height: 'auto'
+                },
+                '&::before': {
+                  backgroundColor: 'black'
+                }
+              },
+              contentContainer: {
+                'backgroundColor': 'black',
+                'width': '100%',
+                'maxWidth': baseSchemeTheme.breakpoints.values.xl,
+                'margin': 'auto',
+                'paddingLeft': baseSchemeTheme.spacing(4),
+                'paddingRight': baseSchemeTheme.spacing(4),
+                [baseSchemeTheme.breakpoints.up('sm')]: {
+                  paddingLeft: baseSchemeTheme.spacing(6),
+                  paddingRight: baseSchemeTheme.spacing(6)
+                },
+                [baseSchemeTheme.breakpoints.up('lg')]: {
+                  paddingLeft: baseSchemeTheme.spacing(10),
+                  paddingRight: baseSchemeTheme.spacing(10)
+                },
+                'height': 80,
+                '& svg[class*="Header-logo"]': {
+                  maxHeight: 36
+                },
+                '& img[class*="Header-logo"]': {
+                  height: 33,
+                  width: 'auto'
+                },
+                '& a': {
+                  textDecoration: 'none',
+                  [baseSchemeTheme.breakpoints.down('md')]: {
+                    display: 'flex',
+                    justifyContent: 'center'
+                  }
+                },
+                '& .MuiSvgIcon-root': {
+                  color: 'white'
+                },
+                '[data-csk-entry-type="collection"]': {
+                  padding: '24px 0px'
+                }
+              }
+            }
+          },
+          NavigationBar: {
+            styleOverrides: {
+              root: {
+                '& .MuiButton-contained': {
+                  textTransform: 'capitalize',
+                  fontSize: 17
+                },
+                '& .MuiLink-root': {
+                  'display': 'flex',
+                  'alignItems': 'center',
+                  'padding': 10,
+                  'color': 'white',
+                  '&.MuiLink-selected': {
+                    fontWeight: 400
+                  },
+                  '&:hover': {
+                    color: baseSchemeTheme.palette.primary.light
+                  }
+                },
+                '[data-csk-entry-type="navigationItem"]': {
+                  [baseSchemeTheme.breakpoints.down('md')]: {
+                    color: 'white',
+                    textAlign: 'center'
+                  }
+                }
+              }
+            }
+          },
+          Footer: {
+            styleOverrides: {
+              root: {
+                '& a': {
+                  textDecoration: 'none'
+                },
+                'backgroundColor': 'black',
+                '& .MuiGrid-container': {
+                  'paddingTop': baseSchemeTheme.spacing(2),
+                  '& .MuiGrid-root': {
+                    display: 'flex',
+                    alignSelf: 'flex-start'
+                  }
+                },
+                '& [class*="Media-root"]': {
+                  padding: '40px 0px',
+                  display: 'flex',
+                  maxWidth: '150px'
+                },
+                '[data-csk-entry-type="navigationItem"]': {
+                  [baseSchemeTheme.breakpoints.down('md')]: {
+                    color: 'white',
+                    textAlign: 'center'
+                  }
+                }
+              }
+            }
+          },
+          Hero: {
+            styleOverrides: {
+              contentContainer: {
+                '& > .MuiGrid-container': {
+                  alignItems: 'center'
+                },
+                '& [class*="Hero-actionsRoot"]': {
+                  '& a': {
+                    textDecoration: 'none'
+                  },
+                  [baseSchemeTheme.breakpoints.down('md')]: {
+                    'maxWidth': 200,
+                    'margin': 'auto',
+                    'flexDirection': 'column',
+                    '& :nth-child(n)': {
+                      marginBottom: baseSchemeTheme.spacing(2)
+                    },
+                    '& :last-child': {
+                      marginBottom: baseSchemeTheme.spacing(0)
+                    }
+                  }
+                }
+              }
+            }
+          },
+          Media: {
+            styleOverrides: {
+              root: {
+                display: 'block',
+                width: '100%',
+                height: 'auto'
+              }
+            }
+          },
+          Section: {
+            styleOverrides: {
+              root: {
+                padding: baseSchemeTheme.spacing(4, 0),
+                [baseSchemeTheme.breakpoints.up('xl')]: {
+                  paddingTop: baseSchemeTheme.spacing(5),
+                  paddingBottom: baseSchemeTheme.spacing(5)
+                },
+                [baseSchemeTheme.breakpoints.up('md')]: {
+                  paddingLeft: baseSchemeTheme.spacing(10),
+                  paddingRight: baseSchemeTheme.spacing(10)
+                },
+                [baseSchemeTheme.breakpoints.down('md')]: {
+                  '& > [class*="Section-gridContainer"] > [class*="Section-gridItem"]': {
+                    flex: '0 100%'
+                  }
+                }
+              }
+            }
+          },
+          Card: {
+            styleOverrides: {
+              root: {
+                'width': '100%',
+                'backgroundColor': baseSchemeTheme.palette.background.default,
+                '& .MuiTypography-h3': {
+                  paddingBottom: baseSchemeTheme.spacing(2)
+                },
+                '& .MuiCardMedia-root': {
+                  '& img': {
+                    width: '100%',
+                    maxWidth: '100%',
+                    objectFit: 'cover'
+                  },
+                  '& svg': {
+                    width: '100%',
+                    maxWidth: '100%',
+                    objectFit: 'cover'
+                  }
+                },
+                '& .MuiCard-root': {
+                  height: '100%'
+                },
+                '& .MuiCardContent-root': {
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'flex-start',
+                  height: '100%'
+                },
+                '& .MuiCardActions-root': {
+                  marginTop: 'auto'
+                }
+              }
+            }
+          },
+          Collection: {
+            styleOverrides: {
+              root: {
+                'margin': '0 auto',
+                '[class*="Section-gridContainer"]': {
+                  'display': 'grid',
+                  'gridAutoRows': '1fr',
+                  '[class*="Box-content"]': {
+                    display: 'block'
+                  }
+                },
+                '[class*="Section-gridItem"]': {
+                  display: 'flex',
+                  justifyContent: 'center',
+                  flexBasis: '100%',
+                  maxWidth: '100%',
+                  height: '100%',
+                  [baseSchemeTheme.breakpoints.up('md')]: {
+                    flexBasis: '50%'
+                  },
+                  [baseSchemeTheme.breakpoints.up('lg')]: {
+                    flexBasis: '33.333333%'
+                  }
+                }
+              }
+            }
+          },
+          Quote: {
+            styleOverrides: {
+              root: {}
+            }
+          },
+          TableOfContents: {
+            styleOverrides: {
+              root: {}
+            }
+          }
+        }
+      }
+    )
+  );
 
-Interaction Summary:
-This script creates a theme that can be used by other components in the software application. The theme provides consistent styling and customization options for various components such as headers, cards, media, and sections. Other components can import and use this theme to ensure a consistent look and feel throughout the application.
+  return responsiveFontSizes(schemeTheme);
+};
 
-Developer Questions:
-- How can I customize the theme for a specific component?
-- How can I add additional components to the theme?
-- How can I override the default styles for a specific component?
-- How can I add custom breakpoints to the theme?
-- How can I use the theme in my application?
+const theme = createSchemeTheme();
+export default theme;

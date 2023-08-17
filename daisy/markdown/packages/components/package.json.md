@@ -1,35 +1,101 @@
-**Summary:**
-This configuration file is used in a larger application and contains various settings and dependencies for the application. It includes information such as the name, version, description, main file, license, scripts, dependencies, devDependencies, and peerDependencies.
-
-**Service:**
-The configuration file is not specific to a known service. It is used to configure and manage the dependencies and settings of the application.
-
-**Configuration Summary:**
-The configuration file sets up the necessary dependencies and scripts for the application. It specifies the main file, license, and version of the application. It also defines various scripts for development, building, testing, and running the application. Additionally, it lists the dependencies and devDependencies required by the application.
-
-**Configuration Breakdown:**
-- "name": Specifies the name of the application.
-- "version": Specifies the version of the application.
-- "description": Provides a brief description of the application.
-- "main": Specifies the main file of the application.
-- "files": Lists the files that should be included when publishing the application.
-- "license": Specifies the license under which the application is distributed.
-- "scripts": Defines various scripts for development, building, testing, and running the application.
-- "dependencies": Lists the dependencies required by the application.
-- "peerDependencies": Lists the peer dependencies required by the application.
-- "devDependencies": Lists the development dependencies required by the application.
-
-**Interaction Summary:**
-The configuration file defines the dependencies and scripts required for the application to function properly. It ensures that the correct versions of dependencies are installed and provides convenient scripts for development, building, testing, and running the application.
-
-**Developer Questions:**
-1. What is the purpose of each script defined in the "scripts" section?
-2. How do I add or update a dependency in the "dependencies" section?
-3. What is the difference between dependencies, devDependencies, and peerDependencies?
-4. How do I run the application in development mode?
-5. How do I build the application for production?
-6. How do I run tests for the application?
-7. How do I open the Cypress test runner?
-8. How do I configure the application to work with a specific service or API?
-9. How do I add or update a script in the "scripts" section?
-10. How do I add or update a development dependency in the "devDependencies" section?
+{
+  "name": "@last-rev-marketing-site/components",
+  "version": "0.0.1",
+  "description": "Components",
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "dev-no-run": "cross-env NODE_ENV=development rollup -cw",
+    "build-no-run": "cross-env NODE_ENV=production rollup -c",
+    "storybook": "start-storybook -p 6006 -s public",
+    "build-storybook": "build-storybook -s public",
+    "test": "cross-env NODE_ENV=test percy exec -- cypress run --component",
+    "cypress:open": "cross-env NODE_ENV=test cypress open --component",
+    "postinstall": "cd ../../ && yarn postinstall"
+  },
+  "dependencies": {
+    "@contentful/rich-text-react-renderer": "^15.0.0",
+    "@contentful/rich-text-types": "^15.0.0",
+    "@last-rev-marketing-site/graphql-sdk": "^0.1.0",
+    "@last-rev-marketing-site/utils": "^0.1.0",
+    "@last-rev/contentful-sidekick-util": "^0.1.3",
+    "@last-rev/rollup-config": "^0.1.4",
+    "@last-rev/testing-library": "^0.1.10",
+    "@rollup/plugin-typescript": "^8.3.0",
+    "framer-motion": "^4.1.17",
+    "lodash": "^4.17.21",
+    "react-calendly": "^4.1.1",
+    "react-context-composer": "^0.0.4",
+    "react-hook-form": "^7.12.1",
+    "react-hubspot-form": "^1.3.7",
+    "react-lazyload": "^3.2.0",
+    "react-mailchimp-subscribe": "^2.1.3",
+    "swiper": "^8.4.5",
+    "swr": "^1.1.0",
+    "xss": "^1.0.9"
+  },
+  "peerDependencies": {
+    "@emotion/react": "^11.7.1",
+    "@emotion/styled": "^11.6.0",
+    "@mui/icons-material": "^5.0.0",
+    "@mui/material": "^5.10.17",
+    "@mui/styles": "^5.10.16",
+    "@mui/system": "^5.10.17",
+    "@sentry/react": "^7.47.0",
+    "next": "^13.0.6",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.13",
+    "@babel/plugin-proposal-nullish-coalescing-operator": "^7.14.5",
+    "@cypress/code-coverage": "^3.10.0",
+    "@mui/icons-material": "^5.2.4",
+    "@mui/material": "^5.10.17",
+    "@mui/styles": "^5.10.16",
+    "@percy/cli": "^1.6.0",
+    "@percy/cypress": "^3.1.1",
+    "@percy/storybook": "^4.1.0",
+    "@sentry/react": "^7.47.0",
+    "@storybook/addon-a11y": "^6.4.9",
+    "@storybook/addon-actions": "^6.4.9",
+    "@storybook/addon-docs": "^6.4.9",
+    "@storybook/addon-essentials": "^6.4.9",
+    "@storybook/addon-links": "^6.4.9",
+    "@storybook/addon-storysource": "^6.4.9",
+    "@storybook/addon-viewport": "^6.4.9",
+    "@storybook/addons": "^6.4.9",
+    "@storybook/builder-webpack5": "^6.4.9",
+    "@storybook/manager-webpack5": "^6.4.9",
+    "@storybook/preset-scss": "^1.0.3",
+    "@storybook/react": "^6.4.9",
+    "@storybook/theming": "^6.4.9",
+    "@testing-library/jest-dom": "^5.14.1",
+    "@testing-library/react": "^12.0.0",
+    "@types/faker": "^5.5.7",
+    "@types/react": "^17.0.11",
+    "@types/react-dom": "^17.0.7",
+    "@types/react-lazyload": "^3.1.0",
+    "@types/react-mailchimp-subscribe": "^2.1.1",
+    "babel-plugin-istanbul": "^6.0.0",
+    "css-loader": "^5.2.0",
+    "cypress": "^10.3.0",
+    "cypress-real-events": "^1.6.0",
+    "faker": "^5.5.3",
+    "html-webpack-plugin": "5",
+    "jest-next-dynamic": "^1.0.1",
+    "next": "^13.0.6",
+    "node-sass": "^7.0.0",
+    "process": "^0.11.10",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "sass": "^1.37.0",
+    "sass-loader": "^10",
+    "style-loader": "^2.0.0",
+    "webpack": "5",
+    "webpack-dev-server": "3"
+  }
+}

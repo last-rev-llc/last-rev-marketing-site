@@ -1,30 +1,169 @@
-Summary:
-This code is a script that is part of a larger software application. Its purpose is to generate paths for pages and topics based on their slugs and other properties. It also includes resolvers for retrieving page and topic contents from a data source. The script uses various utility functions and imports from external libraries to accomplish its tasks.
+import gql from 'graphql-tag';
+import capitalize from 'lodash/capitalize';
+import { getDefaultFieldValue, getLocalizedField } from '@last-rev/graphql-contentful-core';
+import { ApolloContext, ContentfulPathsGenerator, Mappers } from '@last-rev/types';
+import { Page } from '@last-rev/graphql-contentful-extensions';
+import createType from './utils/createType';
 
-Import statements:
-- `gql from 'graphql-tag'`: This import is used to define GraphQL type definitions.
-- `capitalize from 'lodash/capitalize'`: This import is used to capitalize strings.
-- `getDefaultFieldValue, getLocalizedField from '@last-rev/graphql-contentful-core'`: These imports are used to retrieve field values from a Contentful CMS.
-- `ApolloContext, ContentfulPathsGenerator, Mappers from '@last-rev/types'`: These imports are types used in the script.
-- `Page from '@last-rev/graphql-contentful-extensions'`: This import provides mappers for the Page type.
-- `createType from './utils/createType'`: This import is a utility function for creating a new object with a specified type.
+export const typeMappings = {};
 
-Script Summary:
-The script defines several constants, functions, and resolvers. It also exports some of these functions and constants for use in other parts of the application. The script includes type definitions for the Page and Topic types, as well as mappers for these types. It also defines two functions for generating paths for pages and topics.
+const BLOGS_LANDING_ID = '36E6TQCwE9QNOkT7YkLgdy';
 
-Internal Functions:
-- `createPath`: This function takes a variable number of slug strings and joins them together to create a path. It removes any duplicate slashes and ensures that the path starts with a slash.
+// TODO: Move this function to utilities
+export const createPath = (...slug: string[]) => {
+  const path = slug.join('/').replace(/\/\//g, '/');
+  if (path[0] === '/') return path;
+  else return '/' + path;
+};
 
-External Functions:
-- `pageContentsResolver`: This function is a resolver for the `contents` field of a Page type. It retrieves the contents of a page from a data source and maps them to the appropriate format.
-- `topicContentsResolver`: This function is a resolver for the `contents` field of a Topic type. It retrieves the contents of a topic from a data source and maps them to the appropriate format.
+const WRAPPER_SECTION_SETTINGS: any = {
+  Collection: { contentWidth: 'xl', contentSpacing: 4 },
+  Card: { contentWidth: 'xl' }
+};
 
-Interaction Summary:
-This script interacts with a data source to retrieve page and topic contents. It uses utility functions and imports from external libraries to accomplish its tasks. The generated paths can be used to navigate to specific pages and topics within the application.
+const pageContentsResolver = async (page: any, _args: any, ctx: ApolloContext) => {
+  // Get the Page contents
+  const contentsRef = getLocalizedField(page?.fields, 'contents', ctx);
+  if (contentsRef?.length) {
+    // Load the Page contents
+    const contents = await ctx.loaders.entryLoader.loadMany(
+      contentsRef.map((content: any) => ({ id: content?.sys?.id, preview: !!ctx.preview }))
+    );
+    // Map the Page contents (if not a Section wrap it)
+    return contents
+      ?.filter((content) => !!content)
+      .map((content: any) => {
+        if (!content) return null;
+        const variant = getLocalizedField(content.fields, 'variant', ctx);
+        const itemsWidth = getLocalizedField(content.fields, 'itemsWidth', ctx);
+        const contentType = capitalize(content?.sys?.contentType?.sys?.id);
+        const settings =
+          WRAPPER_SECTION_SETTINGS[contentType] ||
+          WRAPPER_SECTION_SETTINGS[`${contentType}_${variant ?? 'default'}`] ||
+          {};
 
-Developer Questions:
-- How are the `contents` fields of the Page and Topic types resolved?
-- What are the possible values for the `variant` and `itemsWidth` fields?
-- How are the `header`, `footer`, and `hero` fields of the Page and Topic types resolved?
-- How are the `slug` and `defaultLocale` values obtained for generating paths?
-- How are the generated paths used in the application?
+        return contentType === 'Section'
+          ? content
+          : createType('Section', {
+              contents: [content],
+              variant: `${contentType}_${variant ?? 'default'}_section-wrapper`,
+              ...settings,
+              // Avoid duplicating itemsWidth
+              contentWidth: itemsWidth ? undefined : settings.contentWidth
+            });
+      });
+  }
+  return [];
+};
+
+const topicContentsResolver = async (_: any, _args: any, ctx: ApolloContext) => {
+  const blogsLanding = await ctx.loaders.entryLoader.load({ id: BLOGS_LANDING_ID, preview: !!ctx.preview });
+  const contentsRef = getLocalizedField(blogsLanding?.fields, 'contents', ctx);
+  if (contentsRef?.length) {
+    // Load the Page contents
+    const contents = await ctx.loaders.entryLoader.loadMany(
+      contentsRef.map((content: any) => ({ id: content?.sys?.id, preview: !!ctx.preview }))
+    );
+    // Map the Page contents (if not a Section wrap it)
+    return contents
+      ?.filter((content) => !!content)
+      .map((content: any) => {
+        if (!content) return null;
+        const variant = getLocalizedField(content.fields, 'variant', ctx);
+        const itemsWidth = getLocalizedField(content.fields, 'itemsWidth', ctx);
+        const contentType = capitalize(content?.sys?.contentType?.sys?.id);
+        const settings =
+          WRAPPER_SECTION_SETTINGS[contentType] ||
+          WRAPPER_SECTION_SETTINGS[`${contentType}_${variant ?? 'default'}`] ||
+          {};
+
+        return contentType === 'Section'
+          ? content
+          : createType('Section', {
+              contents: [content],
+              variant: `${contentType}_${variant ?? 'default'}_section-wrapper`,
+              ...settings,
+              // Avoid duplicating itemsWidth
+              contentWidth: itemsWidth ? undefined : settings.contentWidth
+            });
+      });
+  }
+  return [];
+};
+
+export const mappers: Mappers = {
+  Page: {
+    Page: {
+      header: Page.mappers.Page.Page.header,
+      footer: Page.mappers.Page.Page.footer,
+      contents: pageContentsResolver,
+      hero: async (page: any, _args: any, ctx: ApolloContext) => {
+        const heroRef: any = getLocalizedField(page.fields, 'hero', ctx);
+        if (heroRef) {
+          return ctx.loaders.entryLoader.load({ id: heroRef?.sys?.id, preview: !!ctx.preview });
+        }
+        return null;
+      }
+    }
+  },
+  Topic: {
+    Topic: {
+      header: Page.mappers.Page.Page.header,
+      footer: Page.mappers.Page.Page.footer,
+      contents: topicContentsResolver,
+      hero: async (_: any, _args: any, ctx: ApolloContext) => {
+        const blogsLanding = await ctx.loaders.entryLoader.load({ id: BLOGS_LANDING_ID, preview: !!ctx.preview });
+        const heroRef: any = getLocalizedField(blogsLanding?.fields, 'hero', ctx);
+        const hero = await ctx.loaders.entryLoader.load({ id: heroRef?.sys?.id, preview: !!ctx.preview });
+        if (!hero) return heroRef;
+        return hero;
+      }
+    }
+  }
+};
+
+export const typeDefs = gql`
+  extend type Page {
+    header: Header
+    footer: Footer
+    hero: Hero
+    contents: [Content]
+  }
+  extend type Topic {
+    header: Header
+    footer: Content
+    contents: [Content]
+    hero: Hero
+  }
+`;
+
+const page: ContentfulPathsGenerator = async (pageItem, _loaders, defaultLocale, _locales, _preview = false, _site) => {
+  const slug = getDefaultFieldValue(pageItem, 'slug', defaultLocale);
+  const fullPath = createPath(slug);
+  return {
+    [fullPath]: {
+      fullPath,
+      isPrimary: true,
+      contentId: pageItem?.sys?.id,
+      excludedLocales: []
+    }
+  };
+};
+
+const topic: ContentfulPathsGenerator = async (topicItem, _loaders, defaultLocale, _locales, _preview = true) => {
+  const slug = getDefaultFieldValue(topicItem, 'slug', defaultLocale);
+  const fullPath = createPath('blog', slug);
+  return {
+    [fullPath]: {
+      fullPath,
+      isPrimary: true,
+      contentId: topicItem.sys.id,
+      excludedLocales: []
+    }
+  };
+};
+
+export const pathsConfigs = {
+  page,
+  topic
+};

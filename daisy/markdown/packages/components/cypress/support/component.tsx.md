@@ -1,32 +1,41 @@
-Summary:
-This file is a support file for a React application. It imports various dependencies and sets up global configuration and behavior for Cypress, a testing framework. It also declares a custom command for mounting components and adds it to the Cypress namespace.
+// ***********************************************************
+// This example support/component.ts is processed and
+// loaded automatically before your test files.
+//
+// This is a great place to put global configuration and
+// behavior that modifies Cypress.
+//
+// You can change the location of this file or turn off
+// automatically serving support files with the
+// 'supportFile' configuration option.
+//
+// You can read more here:
+// https://on.cypress.io/configuration
+// ***********************************************************
 
-Import statements:
-- `@percy/cypress`: A library for visual regression testing.
-- `faker`: A library for generating fake data.
-- `@last-rev/component-library/dist/styles.css`: Styles for a component library.
-- `mount`: A function for mounting components.
+// Import commands.js using ES2015 syntax:
+import '@percy/cypress';
 
-Component:
-There is no specific component defined in this file. It is a support file for Cypress tests.
+import faker from 'faker';
+import '@last-rev/component-library/dist/styles.css';
+import mount from '../mount';
 
-Hooks:
-There are no hooks defined in this file.
+// TODO: Enable code-coverage when https://github.com/cypress-io/code-coverage/issues/580 is fixed
+// import '@cypress/code-coverage/support';
 
-Event Handlers:
-There are no event handlers defined in this file.
+// import './commands';
 
-Rendered components:
-There are no rendered components in this file.
+declare global {
+  namespace Cypress {
+    interface Chainable {
+      mount: typeof mount;
+    }
+  }
+}
 
-Interaction Summary:
-This file interacts with other components in the application indirectly through the Cypress testing framework. It sets up global configuration and behavior for Cypress, such as importing necessary libraries and declaring custom commands. It also imports styles for a component library, which may be used by components in the application.
+faker.seed(123);
 
-Developer Questions:
-- How can I configure global behavior and configuration for Cypress?
-- How can I import styles for a component library?
-- How can I declare custom commands for Cypress?
+Cypress.Commands.add('mount', mount);
 
-Known Issues and Todo Items:
-- No known issues or bugs with the component.
-- The todo item is to enable code coverage when a specific issue is fixed.
+// Example use:
+// cy.mount(<MyComponent />)

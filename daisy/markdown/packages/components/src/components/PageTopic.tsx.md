@@ -1,45 +1,225 @@
-Summary:
-The provided React file is a functional component called "PageTopic" that renders a page topic in a larger application. It imports various dependencies and components from external libraries and modules. The component receives props related to the page topic, such as header, hero, contents, id, title, footer, disableBackToTop, sidekickLookup, and slug. It also uses React hooks to manage state and event handlers for user interactions. The component renders different sub-components based on the received props and handles the rendering of the page topic content.
+import React from 'react';
+import Router from 'next/router';
+import { ContentModule } from '@last-rev/component-library';
+import { Page } from '../../../graphql-sdk/dist';
+import BackToTop from '@last-rev/component-library/dist/components/BackToTop/BackToTop';
+import Head from 'next/head';
+import { styled } from '@mui/material/styles';
+import sidekick from '@last-rev/contentful-sidekick-util';
 
-Import statements:
-- React: The core React library.
-- Router: The Next.js router library.
-- ContentModule: A component from the "@last-rev/component-library" module.
-- Page: A type definition from the "../../../graphql-sdk/dist" module.
-- BackToTop: A component from the "@last-rev/component-library/dist/components/BackToTop/BackToTop" module.
-- Head: A component from the Next.js "next/head" module.
-- styled: A function from the "@mui/material/styles" module.
-- sidekick: A function from the "@last-rev/contentful-sidekick-util" module.
+const PageTopic = ({
+  header,
+  hero,
+  contents,
+  id,
+  title,
+  footer,
+  disableBackToTop,
+  sidekickLookup,
+  slug
+}: Page & { __typename: string; title?: string; onClearFilter: any }) => {
+  const schemaData = {
+    '@context': 'https://schema.org',
+    '@type': 'Blog',
+    '@id': 'https://lastrev.com/blog/', //add topic
+    'mainEntityOfPage': `https://lastrev.com/blog/${slug}`,
+    'name': 'LastRev Blog',
+    'description': 'Thoughts about technology',
+    'publisher': {
+      '@type': 'Organization',
+      '@id': 'https://lastrev.com',
+      'name': 'LastRev',
+      'logo': {
+        '@type': 'ImageObject',
+        '@id':
+          'https://images.ctfassets.net/imglmb3xms7o/1VUPTATYD3ZMlFk4KQDJxl/12006d2bc2c51df42430a4765aff7042/Lastrev_logotype_trimmed.svg',
+        'url':
+          'https://images.ctfassets.net/imglmb3xms7o/1VUPTATYD3ZMlFk4KQDJxl/12006d2bc2c51df42430a4765aff7042/Lastrev_logotype_trimmed.svg',
+        'width': '344',
+        'height': '58'
+      }
+    }
+  };
 
-Component:
-The "PageTopic" component is a functional component that receives props related to a page topic. It renders the page topic content using various sub-components and handles user interactions.
+  // This code asumes there's going to be a Collection in the contents
+  const collectionProps = React.useMemo(
+    () => ({
+      // onFilterChange: (newFilter: any) => {
+      //   // if (!newFilter?.topics?.length) {
+      //   //   Router.push('/blog');
+      //   // }
+      // },
+      options: {
+        topics: [
+          {
+            label: title,
+            value: id
+          }
+        ]
+      },
+      filter: { topics: [id] },
+      onClearFilter: () => Router.push('/blog')
+    }),
+    [id]
+  );
+  const isBlogLanding = `/blog/${slug}`;
+  if (isBlogLanding) {
+    // NOTE: contents is required
+    // @ts-ignore
+    const sections = contents[0]?.contents;
+    if (sections) {
+      const collection = sections
+        ?.find((item: any) => item?.__typename === 'Collection')
+        .items?.filter((card: any) => card?.id !== hero?.id);
+      if (collection) {
+        sections?.forEach((item: any, i: number) => {
+          if (item?.__typename === 'Collection') sections[i].items = collection;
+        });
+      }
+    }
+  }
 
-Hooks:
-- React.useMemo: This hook is used to memoize the "collectionProps" object, which is used as a prop for a sub-component.
-- React.useState: This hook is not used in the provided code.
+  return (
+    <>
+      <Head>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }} />
+      </Head>
 
-Event Handlers:
-- onClearFilter: This event handler is called when the user clears a filter. It uses the Router to navigate to the "/blog" page.
+      {header ? <ContentModule {...(header as any)} /> : null}
+      {hero && <BlogLandingHero {...(hero as any)} />}
+      <Main {...sidekick({ ...sidekickLookup, fieldName: 'contents' })} className={'blogLanding'}>
+        {contents?.map((content: any) => (
+          <ContentModule
+            key={content?.id}
+            {...recursiveAddDataToType({ content, data: collectionProps, type: 'Collection' })}
+            component="section"
+          />
+        ))}
+        {!disableBackToTop ? <BackToTop /> : null}
+      </Main>
+      {footer ? <ContentModule {...(footer as any)} /> : null}
+    </>
+  );
+};
 
-Rendered components:
-- Head: This component is used to add a script tag with JSON-LD data to the page head for schema.org structured data.
-- ContentModule: This component is used to render the "header", "hero", and "footer" content.
-- BlogLandingHero: This component is a styled version of the ContentModule component used specifically for rendering the hero section of the page topic.
-- Main: This component is a styled version of the "main" HTML element used as the main content container for the page topic. It renders the "contents" using the ContentModule component and includes a BackToTop component.
-- BackToTop: This component is used to render a back-to-top button.
+//TODO: Improve this, probably by moving into GQL
+// Used to recurse through all the content children and add the data to a matching type
+// DANGER: If there is more than one Collection it will also have this filter
+const recursiveAddDataToType = ({ content, data, type }: { content: any; data: any; type: string }) => {
+  return {
+    ...content,
+    ...(type === content?.__typename ? data : null),
+    contents: content?.contents?.map((item: any) => recursiveAddDataToType({ content: item, data, type }))
+  };
+};
 
-Interaction Summary:
-The "PageTopic" component interacts with other components in the application by rendering different sub-components based on the received props. It uses the Router to navigate to different pages and includes structured data in the page head. It also handles user interactions related to clearing filters.
+const Main = styled('main', {
+  name: 'Page',
+  slot: 'Main',
+  overridesResolver: (_, styles) => [styles.root]
+  // })``;
+})<{}>(({ theme }) => ({
+  '&.blogLanding': {
+    '[variant=collection_three-per-row_section-wrapper]': {
+      background: '#FFFBFF'
+    },
+    [theme.breakpoints.up('md')]: {
+      '[variant=three-per-row]': {
+        paddingLeft: 0,
+        paddingRight: 0
+      }
+    },
+    [theme.breakpoints.down('md')]: {
+      '[class$=Collection-root]': {
+        paddingLeft: theme.spacing(2),
+        paddingRight: theme.spacing(2)
+      }
+    },
+    '[class*=Section-gridContainer]': {
+      gap: theme.spacing(2)
+    },
+    '[class*=Collection-introText] h2': {
+      padding: `${theme.spacing(4)} 0 0`,
+      fontSize: '3rem',
+      lineHeight: '3.5rem'
+    },
+    '[class$=Card-root]': {
+      'display': 'flex',
+      'flexDirection': 'column',
+      'background': theme.palette.common.white,
+      'borderRadius': theme.shape.borderRadius + 4,
+      'transition': 'background-color 0.25s linear',
 
-Developer Questions:
-- How are the props for the "PageTopic" component passed from the parent component?
-- What are the possible values for the "type" prop in the "recursiveAddDataToType" function?
-- How does the "collectionProps" object affect the rendering of the sub-components?
-- How does the "sidekick" function work and what does it return?
-- How can I customize the styling of the rendered components?
+      '&:hover': {
+        // @ts-ignore
+        backgroundColor: theme.palette.backgroundOption.light,
+        transition: 'background-color 0.25s linear'
+      },
 
-Known Issues / Todo:
-- The code includes commented-out code related to filtering that needs to be improved.
-- The "recursiveAddDataToType" function could be improved and moved into a GraphQL query.
-- There may be issues with rendering the "collection" based on the "hero" and "contents" props.
-- The styling of the rendered components may need further adjustments.
+      'h3': {
+        color: theme.palette.common.black,
+        fontSize: '1.5rem',
+        fontWeight: 400,
+        lineHeight: '2rem'
+      },
+
+      '[class$=Text-root]': {
+        '[class*=MuiTypography-root]': {
+          paddingBottom: 0,
+          color: theme.palette.common.black,
+          fontSize: '0.9rem',
+          fontWeight: 400,
+          lineHeight: '1.25rem'
+        }
+      }
+    },
+
+    '[class*=MuiCardContent-root]:last-child': {
+      paddingBottom: theme.spacing(2)
+    },
+
+    '[class*=MuiCardMedia-root] img': {
+      aspectRatio: '16/9',
+      padding: 0
+    },
+
+    '[class*=MuiCardActions-root] a': {
+      'fontWeight': 600,
+
+      '&:after': {
+        content: '""',
+        display: 'inline-block',
+        width: '0.5em',
+        height: '0.5em',
+        marginLeft: '0.25rem',
+        borderRight: `2px solid ${theme.palette.primary.main}`,
+        borderTop: `2px solid ${theme.palette.primary.main}`,
+        verticalAlign: 'middle',
+        transform: 'rotate(45deg)',
+        transition: 'margin 0.2s ease'
+      },
+
+      '&:hover:after': {
+        marginLeft: '0.4rem',
+        transition: 'margin 0.2s ease'
+      }
+    }
+  }
+}));
+
+const BlogLandingHero = styled(ContentModule, {
+  name: 'Page',
+  slot: 'BlogLandingHero'
+})<{ variant?: string }>(({ theme }) => ({
+  'background': theme.palette.primary.dark,
+  'color': theme.palette.primary.contrastText,
+
+  '[class*=MuiTypography-h2]': {
+    marginBottom: '1rem',
+    fontSize: '1.25rem',
+    fontWeight: 400,
+    lineHeight: '1.5rem'
+  }
+}));
+
+export default PageTopic;

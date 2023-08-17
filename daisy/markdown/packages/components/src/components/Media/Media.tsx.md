@@ -1,33 +1,74 @@
-Summary:
-The provided React file is a component called "Media" that is used to display media files, such as images or videos, within a larger application. It handles both image and video files, with special handling for videos using the Intersection Observer API for lazy loading and autoplay functionality. The component is styled using the Material-UI system.
+import React from 'react';
+import { MediaProps } from '@last-rev/component-library/dist/components/Media';
+import LRMedia from './LRMedia';
+import { styled } from '@mui/system';
+import sidekick from '@last-rev/contentful-sidekick-util';
+export type { MediaProps, MediaClassKey, MediaClasses } from '@last-rev/component-library/dist/components/Media';
 
-Import statements:
-- React: The main React library.
-- MediaProps: A type definition for the props used by the Media component.
-- LRMedia: A custom component for displaying images.
-- styled: A function from the Material-UI system for creating styled components.
-- sidekick: A utility function for handling sidekick lookup.
+const isVideo = (src?: string) => src && /mp4|webm/.test(src);
+let lazyVideoObserver: IntersectionObserver | null = null;
 
-Component:
-The Media component is a functional component that takes in a set of props (MediaProps) and renders either a video or an image based on the type of file provided. If the file is a video, it sets up an Intersection Observer to lazy load and autoplay the video when it becomes visible in the viewport. If the file is an image, it renders the LRMedia component.
+const Media = (props: MediaProps) => {
+  if (isVideo(props?.file?.url)) {
+    const ref = React.useRef<HTMLVideoElement>(null);
+    React.useEffect(() => {
+      if (ref?.current) {
+        if ('IntersectionObserver' in window) {
+          if (!lazyVideoObserver) {
+            lazyVideoObserver = new IntersectionObserver(function (entries, observer) {
+              entries.forEach(function (video) {
+                if (video.isIntersecting) {
+                  for (var source in video?.target?.children) {
+                    var videoSource = video?.target?.children[source as any] as HTMLSourceElement;
 
-Hooks:
-- useRef: Used to create a ref for the video element.
-- useEffect: Used to set up the Intersection Observer and handle the lazy loading and autoplay functionality for videos.
+                    if (
+                      typeof videoSource.tagName === 'string' &&
+                      videoSource.tagName === 'SOURCE' &&
+                      videoSource?.dataset?.src
+                    ) {
+                      videoSource.src = videoSource.dataset.src;
+                    }
+                  }
+                  // @ts-ignore
+                  video?.target?.load();
+                  // @ts-ignore
+                  video?.target?.play();
+                  if (ref.current) lazyVideoObserver?.unobserve(ref.current);
+                }
+              });
+            });
+          }
 
-Event Handlers:
-None.
+          lazyVideoObserver.observe(ref?.current);
+        }
+      }
+    }, [ref]);
 
-Rendered components:
-- VideoRoot: A styled video component that wraps the video element and applies custom styles.
+    return (
+      <VideoRoot
+        ref={ref}
+        {...sidekick(props.sidekickLookup)}
+        preload="auto"
+        data-testid={props.testId || 'Media'}
+        {...(props as any)}
+        autoPlay={true}
+        muted
+        loop
+        playsinline={true}
+        sx={{ width: '100%', height: '100%', ...props.sx }}>
+        <source data-src={props?.file?.url} />
+        Your browser does not support the video tag.
+      </VideoRoot>
+    );
+  }
+  return <LRMedia {...props} sx={{ maxWidth: `${props?.file?.width}px` }} />;
+};
 
-Interaction Summary:
-The Media component can be used within other components to display media files. It handles both images and videos, with special handling for videos to enable lazy loading and autoplay functionality. Developers can pass in the necessary props, such as the file URL and dimensions, to customize the displayed media.
+const VideoRoot = styled('video', {
+  name: 'Media',
+  slot: 'VideoRoot',
+  shouldForwardProp: (prop) => prop !== 'variant',
+  overridesResolver: (_, styles) => [styles.root]
+})<{ variant?: string }>``;
 
-Developer Questions:
-- How do I pass in the necessary props to the Media component?
-- How can I customize the styles of the rendered media?
-- How does the lazy loading and autoplay functionality work for videos?
-
-Known Issues / Todo:
-- None.
+export default Media;

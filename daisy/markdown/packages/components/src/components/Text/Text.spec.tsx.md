@@ -1,46 +1,134 @@
-Summary:
-This React file is a component called "Text" that renders text content with various formatting options. It uses the @contentful/rich-text-types library to handle rich text content and renders different variants based on the node type. The component also handles embedded entries, embedded assets, and hyperlinks within the text content.
+import * as React from 'react';
+import { each } from 'lodash';
+import { BLOCKS } from '@contentful/rich-text-types';
+import mount from '../../../cypress/mount';
+import { TextProps } from './Text.types';
+import Text from './Text';
+import * as Router from 'next/router';
 
-Import statements:
-- React: The React library is imported to use React components and hooks.
-- lodash: The "each" function from the lodash library is imported to iterate over the variantNodeTypeMapper object.
-- @contentful/rich-text-types: The BLOCKS object from the @contentful/rich-text-types library is imported to map node types to variant types.
-- mount: The mount function from the "../../../cypress/mount" file is imported to mount the Text component for testing.
-- TextProps: The TextProps type is imported from the "./Text.types" file to define the props for the Text component.
-- Text: The Text component is imported from the "./Text" file.
-- Router: The Router object is imported from the "next/router" library to stub the useRouter hook.
-- mockContent: The mockContent function is imported from the "./Text.mock" file to generate mock text content.
-- formattedMock: The formattedMock function is imported from the "./Text.mock" file to generate mock formatted text content.
-- dynamicMock: The dynamicMock function is imported from the "./Text.mock" file to generate dynamic mock text content.
-- valueNode, contentNode, embeddedEntryInlineNode, embeddedEntryBlockNode, embeddedAssetBlockNode, hyperlinkNode, withLinksMock: Various mock functions and objects are imported from the "./Text.mock" and "../Media/Media.mock" files to generate mock data for testing.
-- assetMock: The assetMock function is imported from the "../Media/Media.mock" file to generate mock asset data.
-- linkMock: The linkMock function is imported from the "../Link/Link.mock" file to generate mock link data.
+import mockContent, {
+  formattedMock,
+  dynamicMock,
+  valueNode,
+  contentNode,
+  embeddedEntryInlineNode,
+  embeddedEntryBlockNode,
+  embeddedAssetBlockNode,
+  hyperlinkNode,
+  withLinksMock
+} from './Text.mock';
+import { assetMock } from '../Media/Media.mock';
+import linkMock from '../Link/Link.mock';
 
-Component:
-The Text component is a React functional component that takes in a TextProps object as its props. It renders the text content based on the props and applies different variants based on the node type. The component also handles embedded entries, embedded assets, and hyperlinks within the text content.
+const variantNodeTypeMapper = {
+  [BLOCKS.PARAGRAPH]: 'body1',
+  [BLOCKS.HEADING_1]: 'h1',
+  [BLOCKS.HEADING_2]: 'h2',
+  [BLOCKS.HEADING_3]: 'h3',
+  [BLOCKS.HEADING_4]: 'h4',
+  [BLOCKS.HEADING_5]: 'h5',
+  [BLOCKS.HEADING_6]: 'h6'
+};
 
-Hooks:
-- useRouter: The useRouter hook from the next/router library is stubbed using the cy.stub function to provide a mock router object.
+const createTextMock = (nodeType: string) => dynamicMock([contentNode([valueNode()], nodeType)]);
 
-Event Handlers:
-None.
+const testNodeType = (variant: string, nodeType: string) => {
+  it(`renders correct text in a ${variant} when nodeType is ${nodeType}`, () => {
+    const testNode: TextProps = { ...createTextMock(nodeType) };
+    mount(<Text {...testNode} />);
+    cy.get(`[data-testid=Text-${variant}]`).each((body, index) => {
+      cy.wrap(body).should(
+        'have.text',
+        testNode?.body?.json.content.filter((c: any) => c.nodeType === nodeType)[index].content[0].value
+      );
+    });
+  });
+};
 
-Rendered components:
-- [data-testid=Text-root]: The root element of the Text component that contains the rendered text content.
-- [data-testid=Text-embedded-entry-inline]: The element that renders the embedded inline entry within the text content.
-- [data-testid=Text-embedded-entry-block]: The element that renders the embedded entry block within the text content.
-- [data-testid=Text-embedded-asset-block]: The element that renders the embedded asset block within the text content.
-- [data-testid=Text-hyperlink]: The element that renders the hyperlink within the text content.
+describe('Text', () => {
+  let router;
 
-Interaction Summary:
-The Text component renders text content with various formatting options and handles embedded entries, embedded assets, and hyperlinks within the text. It can be used in different parts of the application to display rich text content.
+  // stub next/image:
 
-Developer Questions:
-- How can I customize the styling of the Text component?
-- How can I add support for additional node types?
-- How can I handle different variants for different node types?
-- How can I handle user interactions with embedded entries, embedded assets, and hyperlinks?
+  beforeEach(() => {
+    router = {
+      back: cy.stub().as('routerBack')
+    };
 
-Known Issues / Todo:
-- The component does not handle all possible node types. Additional node types may need to be supported.
-- The component may not handle all edge cases for embedded entries, embedded assets, and hyperlinks. Further testing and refinement may be needed.
+    //mock next/image below
+
+    cy.intercept;
+
+    cy.stub(Router, 'useRouter').returns(router);
+  });
+  context('renders correctly', () => {
+    it('renders text with correct information', () => {
+      const mockedContent: TextProps = mockContent();
+      mount(<Text {...mockedContent} />);
+      cy.get('[data-testid=Text-root]').should(
+        'have.text',
+        mockedContent?.body?.json.content.map((c: any) => c.content[0].value).join('')
+      );
+      cy.percySnapshot();
+    });
+
+    it('renders formatted text with correct information', () => {
+      const mockedContent: TextProps = formattedMock();
+      mount(<Text {...mockedContent} />);
+
+      cy.percySnapshot();
+    });
+
+    describe('node types', () => {
+      context('text node types', () => {
+        each(variantNodeTypeMapper, (variant, nodeType) => testNodeType(variant, nodeType));
+      });
+
+      context('other node types', () => {
+        it('renders text with embedded inline entry', () => {
+          const mockedEntry = linkMock();
+          const mockedContent: TextProps = dynamicMock(
+            [contentNode([embeddedEntryInlineNode(mockedEntry.id!)])],
+            [mockedEntry]
+          );
+          mount(<Text {...mockedContent} />);
+          cy.get('[data-testid=Text-embedded-entry-inline]').contains(mockedEntry.text!).should('exist');
+          cy.percySnapshot();
+        });
+
+        it('renders text with embedded entry block', () => {
+          const mockedEntry = linkMock();
+          const mockedContent: TextProps = dynamicMock([embeddedEntryBlockNode(mockedEntry.id!)], [mockedEntry]);
+          mount(<Text {...mockedContent} />);
+          cy.get('[data-testid=Text-embedded-entry-block]').contains(mockedEntry.text!).should('exist');
+          cy.percySnapshot();
+        });
+
+        it('renders text with embedded asset block', () => {
+          const mockedMedia = assetMock();
+          const mockedContent: TextProps = dynamicMock([embeddedAssetBlockNode(mockedMedia.id!)], [], [mockedMedia]);
+          console.log(mockedContent);
+          mount(<Text {...mockedContent} />);
+          cy.get('[data-testid=Text-embedded-asset-block]')
+            .should('exist')
+            .and('have.attr', 'src', `/_next/image/?url=${encodeURIComponent(mockedMedia.file?.url)}&w=1200&q=75`);
+          cy.percySnapshot();
+        });
+
+        it('renders text with hyperlink', () => {
+          const mockedLink = linkMock();
+          const mockedContent: TextProps = dynamicMock([hyperlinkNode(mockedLink.text!, mockedLink.href!)]);
+          mount(<Text {...mockedContent} />);
+          cy.get('[data-testid=Text-hyperlink]').contains(mockedLink.text!).should('exist');
+          cy.percySnapshot();
+        });
+
+        it('renders formatted text with hyperlink', () => {
+          const mockedContent: TextProps = withLinksMock();
+          mount(<Text {...mockedContent} />);
+          cy.percySnapshot();
+        });
+      });
+    });
+  });
+});

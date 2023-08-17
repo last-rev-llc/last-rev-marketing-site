@@ -1,32 +1,64 @@
-**Summary:**
-The provided configuration file is used in a larger application and contains various settings and dependencies for the application. It includes scripts for development, building, testing, and serving the application. It also lists the dependencies required by the application.
-
-**Service:**
-The configuration file is specific to the application and does not relate to a specific external service.
-
-**Configuration Summary:**
-The configuration file sets up the name and version of the application, defines scripts for various tasks, lists the dependencies required by the application, and specifies devDependencies for development purposes.
-
-**Configuration Breakdown:**
-- "name": Specifies the name of the application.
-- "version": Specifies the version of the application.
-- "private": Indicates that the application is private and should not be published.
-- "scripts": Defines various scripts for development, building, testing, and serving the application.
-- "peerDependencies": Specifies any peer dependencies required by the application.
-- "dependencies": Lists the dependencies required by the application.
-- "devDependencies": Lists the development dependencies required for development purposes.
-
-**Interaction Summary:**
-The configuration file defines the necessary settings and dependencies for the application to run and be developed. The scripts defined in the file can be executed to perform various tasks such as running the application in development mode, building the application for production, running tests, and serving the built application.
-
-**Developer Questions:**
-1. How do I start the development server?
-2. How do I build the application for production?
-3. How do I run tests?
-4. How do I serve the built application?
-5. How do I add or update dependencies?
-6. How do I add or update development dependencies?
-7. What is the purpose of each script defined in the file?
-8. How do I configure peer dependencies?
-9. How do I configure environment variables using dotenv?
-10. How do I configure linting rules for the application?
+{
+  "name": "@last-rev-marketing-site/web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build && yarn build:post",
+    "build:static": "next build && next export && rm -rf out/404 && yarn build:post",
+    "build:post": "yarn gen:sitemap",
+    "gen:sitemap": "node scripts/generateSitemap.js",
+    "lint": "next lint",
+    "start": "next start",
+    "test:e2e": "cross-env NODE_ENV=test percy exec -- cypress run --e2e",
+    "serve": "serve out",
+    "cypress:open": "cypress open --e2e"
+  },
+  "peerDependencies": {},
+  "dependencies": {
+    "@emotion/cache": "^11.7.1",
+    "@emotion/react": "^11.7.1",
+    "@emotion/server": "^11.4.0",
+    "@emotion/styled": "^11.6.0",
+    "@last-rev-marketing-site/components": "0.0.1",
+    "@last-rev-marketing-site/graphql-sdk": "^0.1.0",
+    "@last-rev-marketing-site/utils": "^0.1.0",
+    "@last-rev/component-library": "^0.5.15",
+    "@last-rev/contentful-sidekick-util": "^0.1.3",
+    "@last-rev/graphql-contentful-core": "^0.5.14",
+    "@last-rev/logging": "^0.1.3",
+    "@last-rev/sitemap-generator": "^0.2.1",
+    "@last-rev/testing-library": "^0.1.10",
+    "@mui/icons-material": "^5.2.4",
+    "@mui/material": "^5.10.17",
+    "@next/font": "^13.0.6",
+    "@sentry/nextjs": "^7.47.0",
+    "@types/react": "^17.0.37",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "eslint": "^8.6.0",
+    "eslint-config-next": "^12.0.8",
+    "graphql": "^16.6.0",
+    "graphql-request": "^3.6.0",
+    "next": "^13.0.6",
+    "next-compose-plugins": "^2.2.1",
+    "next-transpile-modules": "^10.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "serve": "^12.0.0",
+    "swr": "^1.1.0"
+  },
+  "devDependencies": {
+    "@cypress/code-coverage": "^3.10.0",
+    "@last-rev-marketing-site/graphql-extensions": "0.1.0",
+    "@last-rev-marketing-site/graphql-runner": "0.1.0",
+    "@netlify/plugin-nextjs": "^4.29.2",
+    "@next/bundle-analyzer": "^12.0.7",
+    "@percy/cli": "^1.6.0",
+    "@percy/cypress": "^3.1.1",
+    "@types/cors": "^2.8.13",
+    "cypress": "^10.3.0",
+    "eslint-config-next": "^12.0.8",
+    "netlify-plugin-cypress": "^2.2.0"
+  }
+}

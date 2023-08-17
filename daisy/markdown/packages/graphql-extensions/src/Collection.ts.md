@@ -1,32 +1,144 @@
-Summary:
-This code is a TypeScript module that defines the type definitions, resolvers, and mappers for a Collection in a GraphQL schema. It also includes utility functions for querying content from Contentful and manipulating strings. The module exports the type definitions, resolvers, and mappers for use in a larger GraphQL server.
+import { getLocalizedField } from '@last-rev/graphql-contentful-core';
+import { ApolloContext } from '@last-rev/types';
+import gql from 'graphql-tag';
+import { camelCase, toUpper } from 'lodash';
 
-Import statements:
-- `getLocalizedField` from `@last-rev/graphql-contentful-core`: This function is used to retrieve a localized field value from a Contentful entry.
-- `ApolloContext` from `@last-rev/types`: This type is used to define the context object passed to GraphQL resolvers.
-- `gql` from `graphql-tag`: This function is used to define GraphQL type definitions.
-- `camelCase` and `toUpper` from `lodash`: These functions are used to convert strings to camel case and uppercase, respectively.
-- `collectOptions` from `./utils/collectOptions`: This function is used to collect options from Contentful entries.
-- `queryContentful` from `@last-rev/graphql-contentful-extensions/dist/utils/queryContentful`: This function is used to query content from Contentful.
+import { collectOptions } from './utils/collectOptions';
+import { queryContentful } from '@last-rev/graphql-contentful-extensions/dist/utils/queryContentful';
 
-Script Summary:
-The script defines the type definitions, resolvers, and mappers for a Collection in a GraphQL schema. It also includes utility functions for manipulating strings. The type definitions define the structure of a Collection and its related types. The resolvers define how to resolve fields in a Collection. The mappers define how to map Collection fields to actual data.
+const pascalCase = (str: string) => camelCase(str).replace(/^(.)/, toUpper);
+const COLLECTION_ITEM_TYPES = ['Card', 'Link', 'Media', 'Section', 'NavigationItem'];
 
-Internal Functions:
-- `pascalCase`: This function takes a string and converts it to pascal case.
-- `mappers`: This object defines the mappers for the Collection type. It includes functions for resolving the `items` and `itemsConnection` fields.
-- `ITEM_MAPPING`: This object maps Contentful content types to Collection item types.
-- `resolvers`: This object defines the resolvers for the CollectionItem type. It includes a function for resolving the `__resolveType` field.
+export const typeDefs = gql`
+  extend type Collection {
+    items: [CollectionItem]
+    introText: Text
+    itemsConnection(limit: Int, offset: Int, filter: CollectionFilterInput): CollectionItemConnection
+  }
 
-External Functions:
-- `typeDefs`: This variable defines the GraphQL type definitions for the Collection type and related types.
-- `resolvers`: This variable defines the GraphQL resolvers for the CollectionItem type.
+  type CollectionOptions {
+    tags: [Option]
+    topics: [Option]
+  }
+  type Option {
+    label: String
+    value: String
+  }
+  type ConnectionPageInfo {
+    options: CollectionOptions
+    allOptions: CollectionOptions
+    total: Int
+  }
 
-Interaction Summary:
-This script is part of a larger GraphQL server. It defines the type definitions, resolvers, and mappers for a Collection in the schema. Other parts of the server can use these definitions and resolvers to handle Collection-related queries and mutations.
+  type CollectionItemConnection {
+    pageInfo: ConnectionPageInfo
+    items: [CollectionItem]
+  }
 
-Developer Questions:
-- How are the `items` and `itemsConnection` fields resolved in the Collection type?
-- How are options collected for filtering Collection items?
-- How are Collection items mapped to their respective types?
-- How are Contentful entries queried and loaded?
+  input CollectionFilterInput {
+    topics: [String]
+    tags: [String]
+    body: String
+  }
+
+  union CollectionItem = ${COLLECTION_ITEM_TYPES.join('| ')}
+`;
+
+interface ItemsConnectionArgs {
+  limit?: number;
+  offset?: number;
+  filter?: any;
+}
+
+interface CollectionSettings {
+  contentType: string;
+  limit?: number;
+  offset?: number;
+  filter?: any;
+  order?: string;
+  filters: Array<{
+    id: string;
+    key: string;
+  }>;
+}
+
+export const mappers: any = {
+  Collection: {
+    Collection: {
+      items: async (collection: any, _args: any, ctx: ApolloContext) => {
+        let items = getLocalizedField(collection.fields, 'items', ctx) ?? [];
+        try {
+          const { contentType, limit, offset, order, filter } =
+            (getLocalizedField(collection.fields, 'settings', ctx) as CollectionSettings) || {};
+          if (contentType) {
+            items = await queryContentful({ contentType, ctx, order, filter, limit, skip: offset });
+            return ctx.loaders.entryLoader.loadMany(
+              items?.map((x: any) => ({ id: x?.sys?.id, preview: !!ctx.preview }))
+            );
+          }
+        } catch (error: any) {
+          return 'error from Collection extension';
+        }
+        return items;
+      },
+      itemsConnection: async (collection: any, { limit, offset, filter }: ItemsConnectionArgs, ctx: ApolloContext) => {
+        let items = getLocalizedField(collection.fields, 'items', ctx) ?? [];
+        try {
+          const { contentType, filters } =
+            (getLocalizedField(collection.fields, 'settings', ctx) as CollectionSettings) || {};
+          // Get all possible items from Contentful
+          // Need all to generate the possible options for all items. Not just the current page.
+          if (contentType) {
+            items = await queryContentful({ contentType, filters, filter, ctx });
+            const allItems = await ctx.loaders.entriesByContentTypeLoader.load({
+              id: contentType,
+              preview: !!ctx.preview
+            });
+            const options = {};
+            const allOptions = await collectOptions({ filters, items: allItems, ctx });
+
+            // Paginate results
+            if (offset || limit) {
+              items = items?.slice(offset ?? 0, (offset ?? 0) + (limit ?? items?.length));
+            }
+
+            return {
+              pageInfo: {
+                options,
+                allOptions
+              },
+              items: items?.length
+                ? await ctx.loaders.entryLoader.loadMany(
+                    items.map((x: any) => ({ id: x?.sys?.id, preview: !!ctx.preview }))
+                  )
+                : null
+            };
+          }
+        } catch (error: any) {
+          return 'error from Collection extension';
+        }
+
+        return items;
+      }
+    }
+  }
+};
+
+// TODO: support variant for resolving the CollectionItem type
+const ITEM_MAPPING: { [key: string]: string } = {
+  Page: 'Link',
+  PageBlog: 'Card',
+  Media: 'Card'
+};
+
+export const resolvers = {
+  CollectionItem: {
+    __resolveType: (item: any) => {
+      const type =
+        ITEM_MAPPING[pascalCase(item?.sys?.contentType?.sys?.id) ?? ''] ?? pascalCase(item?.sys?.contentType?.sys?.id);
+      if (COLLECTION_ITEM_TYPES.includes(type)) return type;
+
+      return 'Card';
+    }
+  }
+};

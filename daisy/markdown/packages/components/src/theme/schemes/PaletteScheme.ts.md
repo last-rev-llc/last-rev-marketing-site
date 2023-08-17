@@ -1,26 +1,51 @@
-Summary:
-This code defines a class called `PaletteScheme` that is responsible for creating a custom color palette scheme. The class takes in two options objects, `schemeOptions` and `baseSchemeOptions`, which contain the desired palette colors and the base palette colors respectively. The class then sets the palette colors based on the provided options.
+import { Palette } from '@mui/material/styles/createPalette';
+import set from 'lodash/set';
+import get from 'lodash/get';
 
-Import statements:
-- `Palette` from `@mui/material/styles/createPalette`: This import is used to define the type of the `palette` property in the `PaletteScheme` class.
-- `set` from `lodash/set`: This import is used to set values in nested objects.
-- `get` from `lodash/get`: This import is used to retrieve values from nested objects.
+export class PaletteScheme {
+  palette!: Palette;
 
-Script Summary:
-The script defines a class called `PaletteScheme` that takes in two options objects and sets the palette colors based on the provided options.
+  constructor(schemeOptions: { palette: any }, baseSchemeOptions: { palette: any }) {
+    const { palette: schemePalette } = schemeOptions;
+    const { palette: basePalette } = baseSchemeOptions;
 
-Internal Functions:
-- `constructor(schemeOptions: { palette: any }, baseSchemeOptions: { palette: any })`: This is the constructor function of the `PaletteScheme` class. It takes in `schemeOptions` and `baseSchemeOptions` objects as parameters. Inside the constructor, the palette colors are set based on the provided options using the `set` and `get` functions from lodash.
+    set(this, 'palette.primary.main', get(schemePalette, 'primary', basePalette.primary));
+    if (schemePalette.primaryLight) set(this, 'palette.primary.light', schemePalette.primaryLight);
+    if (schemePalette.primaryDark) set(this, 'palette.primary.dark', schemePalette.primaryDark);
+    if (schemePalette.primaryContrastText) set(this, 'palette.primary.contrastText', schemePalette.primaryContrastText);
 
-External Functions:
-None.
+    set(this, 'palette.secondary.main', get(schemePalette, 'secondary', basePalette.secondary));
+    if (schemePalette.secondaryLight)
+      set(this, 'palette.secondary.light', get(schemePalette, 'secondaryLight', basePalette.secondary));
+    if (schemePalette.secondaryDark)
+      set(this, 'palette.secondary.primaryDark', get(schemePalette, 'secondaryDark', basePalette.secondary));
+    if (schemePalette.secondaryContrastText)
+      set(this, 'palette.secondary.contrastText', get(schemePalette, 'secondaryContrastText', basePalette.secondary));
 
-Interaction Summary:
-This script can be used as a part of a broader software application that requires custom color palette schemes. Other components or modules can create instances of the `PaletteScheme` class and pass in the desired palette options to create custom color schemes.
+    set(this, 'palette.grey.100', get(schemePalette, 'grey100', basePalette.grey100));
+    set(this, 'palette.grey.200', get(schemePalette, 'grey200', basePalette.grey200));
+    set(this, 'palette.grey.300', get(schemePalette, 'grey300', basePalette.grey300));
+    set(this, 'palette.grey.400', get(schemePalette, 'grey400', basePalette.grey400));
+    set(this, 'palette.grey.500', get(schemePalette, 'grey500', basePalette.grey500));
+    set(this, 'palette.grey.600', get(schemePalette, 'grey600', basePalette.grey600));
+    set(this, 'palette.grey.700', get(schemePalette, 'grey700', basePalette.grey700));
 
-Developer Questions:
-- How do I create an instance of the `PaletteScheme` class?
-- What options can I pass to the `PaletteScheme` constructor?
-- How are the palette colors set based on the provided options?
-- Can I extend the `PaletteScheme` class to add more functionality?
-- How does this class interact with other parts of the application?
+    set(this, 'palette.text.primary', get(schemePalette, 'primaryTextColor', basePalette.primaryTextColor));
+    set(this, 'palette.text.secondary', get(schemePalette, 'secondaryTextColor', basePalette.secondaryTextColor));
+
+    set(this, 'palette.error.main', get(schemePalette, 'errorColor', basePalette.errorColor));
+
+    set(this, 'palette.common.black', get(schemePalette, 'commonBlack', basePalette.commonBlack));
+    set(this, 'palette.common.white', get(schemePalette, 'commonWhite', basePalette.commonWhite));
+
+    if (schemePalette.backgroundDefault) {
+      set(this, 'palette.background.default', get(schemePalette, 'backgroundDefault', schemePalette.backgroundDefault));
+      set(this, 'palette.background.light', get(schemePalette, 'backgroundLight', schemePalette.backgroundDefault));
+
+      // TODO: Adjust this
+      set(this, 'palette.background.dark', get(schemePalette, 'backgroundDark', schemePalette.backgroundDefault));
+      // Some MUI and component library styles apply the scheme background color by default, so we want to override it to have more control
+      set(this, 'palette.background.paper', 'transparent');
+    }
+  }
+}

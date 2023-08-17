@@ -1,35 +1,66 @@
-**Summary:**
-This configuration file is used in a larger application for managing dependencies, scripts, and other settings. It specifies the name, version, main file, license, files to include, and whether there are any side effects. It also includes a list of scripts that can be run, peer dependencies, dependencies, and dev dependencies.
-
-**Service:**
-The configuration file is not specific to a known service. It is used in a larger application to manage various aspects of the project.
-
-**Configuration Summary:**
-The configuration file sets up the project's name, version, main file, license, and files to include. It also defines scripts for building, cleaning, installing dependencies, downloading schemas, code generation, formatting, linting, testing, and running the application in development mode. Additionally, it specifies peer dependencies, dependencies, and dev dependencies.
-
-**Configuration Breakdown:**
-- `name`: Specifies the name of the project.
-- `version`: Specifies the version of the project.
-- `main`: Specifies the main file of the project.
-- `license`: Specifies the license under which the project is distributed.
-- `files`: Specifies the files to include in the distribution.
-- `sideEffects`: Specifies whether the project has any side effects.
-- `scripts`: Defines various scripts that can be run, such as building, cleaning, installing dependencies, downloading schemas, code generation, formatting, linting, testing, and running the application in development mode.
-- `peerDependencies`: Specifies the peer dependencies required by the project.
-- `dependencies`: Specifies the dependencies required by the project.
-- `devDependencies`: Specifies the development dependencies required by the project.
-
-**Interaction Summary:**
-The configuration file defines the project's settings and dependencies, and provides scripts for building, testing, and running the application. It interacts with other parts of the application by specifying the main file, dependencies, and scripts that can be executed.
-
-**Developer Questions:**
-1. How do I build the application?
-2. How do I run the application in development mode?
-3. How do I download schemas?
-4. How do I generate code?
-5. How do I format the code?
-6. How do I lint the code?
-7. How do I run tests?
-8. What are the peer dependencies of the project?
-9. What are the dependencies of the project?
-10. What are the development dependencies of the project?
+{
+  "name": "@last-rev-marketing-site/graphql-sdk",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "run-s clean download:schema codegen build:prod",
+    "build:prod": "cross-env NODE_ENV=production rollup -c",
+    "clean": "rimraf dist",
+    "install:rover": "yarn rover -V || node ../../node_modules/@apollo/rover/install",
+    "download:schema:dev": "nodemon -x \"npm run gql:healthcheck && graphql-codegen --config codegen.schema.yml --watch\" -w ../graphql-extensions/dist",
+    "download:schema": "npm run gql:healthcheck && graphql-codegen --config codegen.schema.yml || echo 'GraphQL Server is not available'",
+    "codegen": "graphql-codegen --config codegen.yml",
+    "codegen:watch": "graphql-codegen --config codegen.yml --watch",
+    "gql:healthcheck": "wait-on -c wait-on-config.js || echo 'GraphQL Server is not available'",
+    "dev": "concurrently \"yarn download:schema:dev\" \"cross-env NODE_ENV=development rollup -cw\" \"yarn codegen:watch\"",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "eslint",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch"
+  },
+  "peerDependencies": {
+    "@apollo/client": "^3.3.7",
+    "@types/react": "^17.0.37",
+    "@types/react-dom": "^17.0.11",
+    "@types/react-router-dom": "^5.3.2",
+    "graphql": "^16.6.0",
+    "nodemon": "^2.0.15",
+    "react": "^18.2.0",
+    "react-dom": "^17.0.1",
+    "react-scripts": "^4.0.1",
+    "tsc-watch": "^4.2.9"
+  },
+  "dependencies": {
+    "@graphql-codegen/fragment-matcher": "^3.3.3",
+    "@graphql-codegen/cli": "2.16.1",
+    "@graphql-codegen/schema-ast": "2.6.0",
+    "@graphql-codegen/typescript-graphql-request": "4.5.8",
+    "@graphql-codegen/typescript-operations": "2.5.10",
+    "@last-rev/rollup-config": "^0.1.4",
+    "concurrently": "^5.3.0",
+    "dotenv": "^10.0.0",
+    "graphql-tag": "^2.12.5",
+    "npm-run-all": "^4.1.5"
+  },
+  "devDependencies": {
+    "@apollo/client": "^3.3.7",
+    "@apollo/rover": "0.4.1",
+    "@last-rev-marketing-site/graphql-runner": "^0.1.0",
+    "@types/react": "^17.0.37",
+    "@types/react-dom": "^17.0.11",
+    "@types/react-router-dom": "^5.3.2",
+    "graphql": "^16.6.0",
+    "nodemon": "^2.0.15",
+    "react-scripts": "^4.0.1",
+    "rollup": "^2.75.7",
+    "tsc-watch": "^4.2.9",
+    "react": "^18.2.0",
+    "react-dom": "^17.0.1",
+    "wait-on": "^5.3.0"
+  }
+}

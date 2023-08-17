@@ -1,22 +1,71 @@
-Summary:
-This code is a module that exports two mock objects, `iconCenteredMock` and `blogFeaturedMock`, which are used for testing or mocking data in a larger software application. These mock objects represent different types of cards with predefined properties.
+import mockLink from '../Link/Link.mock';
 
-Import statements:
-- `mockLink` is imported from the `Link.mock` module. It is likely a mock implementation of a link component.
+const cardBase = {
+  __typename: 'Card',
+  media: {
+    __typename: 'Media',
+    file: {
+      url: 'https://images.ctfassets.net/imglmb3xms7o/1LJc7yiUjwgrHh9i52XnV7/266b378620624792e5c4b4d11e5ebf84/Asset_1.svg'
+    },
+    alt: 'Card image'
+  },
+  subtitle: null,
+  actions: null
+};
 
-Script Summary:
-The script defines two mock objects, `iconCenteredMock` and `blogFeaturedMock`, which are used to simulate data for different types of cards. These mock objects have predefined properties such as `variant`, `title`, `body`, and `actions`.
+export const iconCenteredMock = {
+  ...cardBase,
+  variant: 'icon-centered',
+  title: 'Web and Application Development',
+  body: {
+    __typename: 'Text',
+    json: {
+      nodeType: 'document',
+      data: {},
+      content: [
+        {
+          nodeType: 'paragraph',
+          data: {},
+          content: [
+            {
+              nodeType: 'text',
+              value:
+                "We develop with tomorrow's standards in mind. Whether it's React, Gatsby, Next, or whatever's on the horizon, we'll make sure you're ready for the future.",
+              marks: [],
+              data: {}
+            }
+          ]
+        }
+      ]
+    }
+  }
+};
 
-Internal Functions:
-There are no internal functions in this script.
-
-External Functions:
-There are no external functions in this script.
-
-Interaction Summary:
-This script does not have any direct interaction with the rest of the application. It is meant to be imported and used by other modules or components that require mock data for testing or development purposes.
-
-Developer Questions:
-- How can I use these mock objects in my tests or development?
-- Can I modify the properties of these mock objects to fit my specific use case?
-- Are there any other mock objects or data sources available for testing?
+export const blogFeaturedMock = {
+  ...cardBase,
+  variant: 'blog-featured',
+  title: 'Building your website through experimentation',
+  body: {
+    __typename: 'Text',
+    json: {
+      nodeType: 'document',
+      data: {},
+      content: [
+        {
+          nodeType: 'paragraph',
+          data: {},
+          content: [
+            {
+              nodeType: 'text',
+              value:
+                "Historically, experimentation was only done by companies like Amazon, Google, and Facebook. In 2017, brands from across the globe use web experimentation to increase conversions, inform website design and find out what message resonates best with their customers. Brad will talk about Optimizely's experience migrating their major web properties over to Contentful and how they have baked experimentation into the content creation process.",
+              marks: [],
+              data: {}
+            }
+          ]
+        }
+      ]
+    }
+  },
+  actions: [{ ...mockLink, text: 'Watch Now', variant: 'text' }]
+};

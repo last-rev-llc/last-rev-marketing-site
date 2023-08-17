@@ -1,35 +1,70 @@
-Summary:
-This code is a module that provides resolvers for the `href` and `target` fields of a `Link` type in a GraphQL schema. It also exports a `mappers` object that maps these resolvers to the corresponding fields in the schema. The module also extends the schema with additional fields for the `Link` type.
+import { getLocalizedField } from '@last-rev/graphql-contentful-core';
+import { Mappers, ApolloContext } from '@last-rev/types';
+import gql from 'graphql-tag';
+import createPath from './utils/createPath';
+import getPathReader from './utils/getPathReaders';
 
-Import statements:
-- `getLocalizedField` is imported from the `@last-rev/graphql-contentful-core` package. It is used to retrieve localized field values from a Contentful entry.
-- `Mappers` and `ApolloContext` are imported from the `@last-rev/types` package. They are used to define the types of the `mappers` object and the context object passed to the resolvers.
-- `gql` is imported from the `graphql-tag` package. It is used to define the GraphQL type definitions.
-- `createPath` is imported from the `./utils/createPath` module. It is used to create a URL path based on a given input.
-- `getPathReader` is imported from the `./utils/getPathReaders` module. It is used to retrieve a path reader object from the context.
+type TargetMapping = {
+  'New Window': string;
+  'Current Window': string;
+};
 
-Script Summary:
-The script defines a `TARGET_MAPPING` object that maps target values to corresponding HTML target attributes. It then defines an `hrefUrlResolver` function that resolves the `href` field of a `Link` type. The function retrieves the localized `href` and `manualUrl` fields from the `item` object, and if either of them is present, it calls the `createPath` function to create a URL path. If neither `href` nor `manualUrl` is present, it retrieves the localized `linkedContent` field and loads the corresponding content entry. If the content entry is of type 'media', it retrieves the localized `asset` field and loads the corresponding asset entry. It then constructs a URL using the `file` field of the asset entry. Finally, it calls the `getPathReader` function to retrieve a path reader object from the context and uses it to get the paths associated with the content entry. If any paths are found, it returns the first path; otherwise, it returns '#'.
+const TARGET_MAPPING: TargetMapping = {
+  'New Window': '_blank',
+  'Current Window': '_self'
+};
 
-The script also defines a `targetResolver` function that resolves the `target` field of a `Link` type. The function retrieves the localized `target` field from the `link` object and maps it to the corresponding HTML target attribute using the `TARGET_MAPPING` object. If no mapping is found, it defaults to '_self'.
+const hrefUrlResolver = async (item: any, _args: any, ctx: ApolloContext) => {
+  const href = getLocalizedField(item.fields, 'href', ctx);
+  const manualUrl = getLocalizedField(item.fields, 'manualUrl', ctx);
+  if (href || manualUrl) return createPath(href ?? manualUrl);
 
-The script exports the `hrefUrlResolver` function as the default export and the `mappers` object and `typeDefs` as named exports.
+  const contentRef = getLocalizedField(item.fields, 'linkedContent', ctx);
+  if (contentRef) {
+    const content = await ctx.loaders.entryLoader.load({ id: contentRef.sys.id, preview: !!ctx.preview });
+    if (content) {
+      if (content?.sys?.contentType?.sys?.id === 'media') {
+        const assetRef = getLocalizedField(content.fields, 'asset', ctx);
+        if (assetRef?.sys?.id) {
+          const asset = await ctx.loaders.assetLoader.load({ id: assetRef?.sys?.id, preview: !!ctx.preview });
+          if (asset) {
+            return `https:${getLocalizedField(asset.fields, 'file', ctx)?.url}`;
+          }
+        }
+      }
+      const path = await getPathReader(ctx)?.getPathsByContentId(content.sys.id, undefined, process.env.SITE);
 
-Internal Functions:
-- `hrefUrlResolver(item: any, _args: any, ctx: ApolloContext)`: This function resolves the `href` field of a `Link` type. It takes an `item` object representing the current link, `_args` representing any arguments passed to the resolver (not used in this case), and `ctx` representing the Apollo context. It retrieves the localized `href` and `manualUrl` fields from the `item` object and checks if either of them is present. If so, it calls the `createPath` function to create a URL path based on the value. If neither `href` nor `manualUrl` is present, it retrieves the localized `linkedContent` field and loads the corresponding content entry. If the content entry is of type 'media', it retrieves the localized `asset` field and loads the corresponding asset entry. It then constructs a URL using the `file` field of the asset entry. Finally, it calls the `getPathReader` function to retrieve a path reader object from the context and uses it to get the paths associated with the content entry. If any paths are found, it returns the first path; otherwise, it returns '#'.
+      // TODO: Do we need to support more items?
+      if (!!path?.length) return path[0];
+    }
+  }
+  return '#';
+};
 
-- `targetResolver(link: any, _: never, ctx: ApolloContext)`: This function resolves the `target` field of a `Link` type. It takes a `link` object representing the current link, `_: never` representing any arguments passed to the resolver (not used in this case), and `ctx` representing the Apollo context. It retrieves the localized `target` field from the `link` object and maps it to the corresponding HTML target attribute using the `TARGET_MAPPING` object. If no mapping is found, it defaults to '_self'.
+export default hrefUrlResolver;
 
-External Functions:
-- None
+const targetResolver = async (link: any, _: never, ctx: ApolloContext) => {
+  const target = getLocalizedField(link.fields, 'target', ctx);
+  return TARGET_MAPPING[target as keyof TargetMapping] ?? '_self';
+};
 
-Interaction Summary:
-This module provides resolvers for the `href` and `target` fields of a `Link` type in a GraphQL schema. It can be used in a GraphQL server to handle queries and mutations related to links. The `mappers` object can be used to map these resolvers to the corresponding fields in the schema. The module also extends the schema with additional fields for the `Link` type.
+export const mappers: Mappers = {
+  Link: {
+    Link: {
+      href: hrefUrlResolver,
+      target: targetResolver
+    },
+    NavigationItem: {
+      link: (x: any) => ({ ...x, fieldName: 'link' }),
+      children: () => []
+    }
+  }
+};
 
-Developer Questions:
-- How can I use this module to handle queries and mutations related to links in my GraphQL server?
-- How do I map the resolvers provided by this module to the corresponding fields in my GraphQL schema?
-- How can I extend the schema with additional fields for the `Link` type using the `typeDefs` export?
-- How can I customize the behavior of the `href` and `target` resolvers?
-- Are there any known issues or bugs with this module that I should be aware of?
-- Are there any TODO items or future improvements that need to be addressed in this module?
+export const typeDefs = gql`
+  extend type Link {
+    href: String!
+    icon: String
+    iconPosition: String
+  }
+`;

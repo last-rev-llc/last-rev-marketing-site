@@ -1,8 +1,5 @@
-**File Contents:**
-
-```
 {
-  "name": "lastrev-next-starter",
+  "name": "lastrev-marketing-site",
   "version": "0.1.0",
   "main": "index.js",
   "author": "LastRev",
@@ -13,34 +10,34 @@
     ]
   },
   "scripts": {
-    "algolia:update": "lr-algolia-updater https://starter.lastrev.com/.netlify/functions/algolia-background",
-    "algolia:update:local": "lr-algolia-updater http://localhost:8888/.netlify/functions/algolia-background",
+    "algolia:update": "es -- lr-algolia-updater https://starter.lastrev.com/.netlify/functions/algolia-background",
+    "algolia:update:local": "es -- lr-algolia-updater http://localhost:8888/.netlify/functions/algolia-background",
     "build": "es -- ./scripts/build.sh",
     "dev": "es -- ./scripts/dev.sh",
     "installEnvkey": "./scripts/installEnvkey.sh",
-    "turbo:sync:cms": "turbo run sync:cms",
-    "turbo:build": "turbo run build",
-    "build:storybook": "turbo run build-storybook; status=$?; pm2 kill; exit $status",
+    "turbo:sync:cms": "es -- turbo run sync:cms",
+    "turbo:build": "es -- turbo run build",
+    "build:storybook": "es -- turbo run build-storybook; status=$?; pm2 kill; exit $status",
     "clean": "lerna exec 'rm -rf dist/'",
     "deps:check": "echo \"-- depcheck for root --\"; depcheck . --specials=babel,eslint,prettier,webpack,bin,jest; for d in ./packages/*/ ; do (echo \"-- depcheck for $d --\"; depcheck \"$d\" --specials=babel,eslint,prettier,webpack,bin,jest); done;manypkg check",
     "deps:fix": "manypkg fix",
-    "gql:dev": "turbo run dev --scope=*graphql-runner* --no-deps --include-dependencies",
+    "gql:dev": "es -- turbo run dev --scope=*graphql-runner* --no-deps --include-dependencies",
     "gql:pm2:kill": "pm2 delete gql-serve",
-    "gql:start": "turbo run start --scope=*graphql-runner*  --no-deps --include-dependencies && echo 'GQL server started, kill with `yarn gql:pm2:kill`'",
+    "gql:start": "es -- turbo run start --scope=*graphql-runner*  --no-deps --include-dependencies && echo 'GQL server started, kill with `yarn gql:pm2:kill`'",
     "nuclear": "lerna exec 'rm -rf node_modules/ dist/'; rm -rf node_modules/; yarn install",
     "postinstall": "patch-package",
     "prettier": "prettier --write \"**/*.{js,ts,tsx,md,json}\"",
     "propagate:envkey": "node scripts/propagateEnvkey.js",
-    "serve:site": "yarn workspace @last-rev-marketing-site/web serve",
+    "serve:site": "es -- yarn workspace @last-rev-marketing-site/web serve",
     "start": "turbo run start --output-logs=new-only",
     "storybook": "turbo run storybook",
-    "sync:cms": "yarn workspace @last-rev-marketing-site/graphql-runner sync:cms",
+    "sync:cms": "es -- yarn workspace @last-rev-marketing-site/graphql-runner sync:cms",
     "lint": "turbo run lint",
     "lint:prod": "cross-env NODE_ENV=production eslint ./package.json",
     "test": "turbo run test",
-    "test:watch": "turbo run test:watch -- --passWithNoTests",
-    "test:unit": "turbo run test -- --passWithNoTests",
-    "test:e2e": "turbo run test:e2e",
+    "test:watch": "es -- turbo run test:watch -- --passWithNoTests",
+    "test:unit": "es -- turbo run test -- --passWithNoTests",
+    "test:e2e": "es -- turbo run test:e2e",
     "version-packages": "changeset version && yarn prettier",
     "posttest": "yarn combine:reports",
     "combine:reports": "node scripts/combineCoverage.js"
@@ -103,44 +100,3 @@
     }
   }
 }
-```
-
-**Summary:**
-This configuration file is used in a larger application called "lastrev-next-starter". It contains various settings and dependencies for the application.
-
-**Service:**
-The service that this configuration file is for is not explicitly mentioned in the file. However, based on the script names and dependencies, it appears to be a Next.js application with various development and build-related scripts.
-
-**Configuration Summary:**
-The configuration file sets up the name, version, main file, author, license, workspaces, scripts, private flag, resolutions, browserslist, dependencies, packageManager, and husky hooks for the application.
-
-**Configuration Breakdown:**
-- `name`: The name of the application.
-- `version`: The version of the application.
-- `main`: The entry point file of the application.
-- `author`: The author of the application.
-- `license`: The license under which the application is distributed.
-- `workspaces`: Defines the workspaces for the application, specifying the packages directory.
-- `scripts`: Contains various scripts for different tasks such as building, development, testing, linting, etc.
-- `private`: Indicates that the application is a private project.
-- `resolutions`: Specifies the versions of specific dependencies to use.
-- `browserslist`: Defines the supported browsers for the application.
-- `dependencies`: Lists the dependencies required by the application.
-- `packageManager`: Specifies the package manager to use (Yarn in this case).
-- `husky`: Configures Git hooks, specifically the pre-push hook to run the lint:prod script before pushing.
-
-**Interaction Summary:**
-This configuration file sets up the necessary settings and dependencies for the application to run, build, and perform various development tasks. It defines scripts for common tasks like building, testing, linting, and running the application. It also specifies the versions of certain dependencies and sets up Git hooks for linting before pushing.
-
-**Developer Questions:**
-Developers working with this codebase may have the following questions when debugging or changing this file:
-1. What are the available scripts and what do they do?
-2. How are the dependencies managed and which versions are being used?
-3. What is the purpose of the husky configuration and how does it affect the development workflow?
-4. How are the workspaces defined and what is their significance in the application?
-5. What is the purpose of the resolutions section and how does it impact the dependency resolution process?
-6. How is the application built and what are the build-related scripts?
-7. How can I run the application in development mode?
-8. What is the purpose of the browserslist configuration and how does it affect browser compatibility?
-9. How can I run tests and perform linting in the application?
-10. What is the purpose of the private flag and how does it affect the distribution of the application?

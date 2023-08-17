@@ -1,24 +1,39 @@
-Summary:
-This code file contains TypeScript interfaces and types related to text rendering and styling. It defines interfaces for text properties, links, rich text, and text classes. These interfaces are used to define the structure and types of text-related data in the application.
+import { Options } from '@contentful/rich-text-react-renderer';
+import { MediaProps } from '../Media';
 
-Import statements:
-- `Options` is imported from the `@contentful/rich-text-react-renderer` package. It is used to define options for rendering rich text.
-- `MediaProps` is imported from the `../Media` file. It is used to define the structure of media properties.
+interface Content {
+  __typename?: string;
+  id: string;
+}
 
-Script Summary:
-This script defines TypeScript interfaces and types related to text rendering and styling. It includes interfaces for text properties, links, rich text, and text classes. These interfaces are used to define the structure and types of text-related data in the application.
+export interface TextProps {
+  __typename?: string;
+  id?: string;
+  styles?: {
+    root?: any;
+  };
+  sx?: any;
+  body?: RichText;
+  sidekickLookup?: any;
+  variant?: string;
+  align?: 'left' | 'center' | 'right' | any;
+  renderNode?: any;
+  renderMark?: any;
+  renderOptions?: Options;
+}
 
-Internal Functions:
-None
+export interface TextLinks {
+  entries?: Array<Content>;
+  assets?: Array<MediaProps>;
+}
+export interface RichText {
+  json: any;
+  links?: TextLinks;
+}
 
-External Functions:
-None
+export interface TextClasses {
+  /** Styles applied to the root element. */
+  root: string;
+}
 
-Interaction Summary:
-This script does not contain any executable code. It provides interfaces and types that can be used by other parts of the application to define and handle text-related data.
-
-Developer Questions:
-- How can I define the structure of text properties in my application?
-- How can I define the structure of links associated with text?
-- How can I define the structure of rich text in my application?
-- How can I define the structure of text classes for styling purposes?
+export declare type TextClassKey = keyof TextClasses;

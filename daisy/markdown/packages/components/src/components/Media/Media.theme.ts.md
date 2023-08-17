@@ -1,23 +1,64 @@
-Summary:
-This code is a module that exports a function that returns a theme configuration object for the Material-UI library. The theme configuration includes default props, style overrides, and component variants for the Media component.
+import { Theme, ThemeOptions, ComponentsProps, ComponentsOverrides, ComponentsVariants } from '@mui/material/styles';
 
-Import statements:
-- `Theme`, `ThemeOptions`, `ComponentsProps`, `ComponentsOverrides`, and `ComponentsVariants` are imported from the `@mui/material/styles` module. These are types used for defining the theme configuration.
+// https://mui.com/customization/theme-components/#default-props
+export const defaultProps: ComponentsProps['Media'] = {
+  nextImageOptimization: true,
+  disableInlineSVG: true,
+  priority: false,
+  // All images are shown close to full bleed size
+  sizes: '100vw'
+};
 
-Script Summary:
-The script exports a function that takes a `theme` object as a parameter and returns a `ThemeOptions` object. The `ThemeOptions` object contains a `components` property, which is an object that configures the Media component.
+// https://mui.com/customization/theme-components/#global-style-overrides
+export const styleOverrides: ComponentsOverrides<Theme>['Media'] = {
+  // Set some static styles
+  root: {
+    // img default display: inline introduces a line-height space at the bottom
+    display: 'block',
+    maxWidth: `100%`,
+    margin: 'auto',
+    height: 'auto'
+  }
 
-Internal Functions:
-- None
+  // root: {
+  //   backgroundColor: 'red'
+  // }
+  //
+  // Use the ownerState to set dynamic styles
+  // root: ({ ownerState, theme }) => {
+  //   return {
+  //     backgroundColor: ownerState.variant === 'example' ? 'red' : theme.palette.background.paper
+  //   };
+  // }
+};
 
-External Functions:
-- None
+// https://mui.com/customization/theme-components/#adding-new-component-variants
+const createVariants = (_theme: Theme): ComponentsVariants['Media'] => [
+  {
+    props: {
+      variant: 'embed'
+    },
+    style: {
+      minHeight: 400
+    }
+  }
+  // Other props are also valid
+  // {
+  //   props: {
+  //     backgroundColor: 'primary.main',
+  //   },
+  //   style: {
+  //     color: theme.palette.primary.contrastText
+  //   }
+  // }
+];
 
-Interaction Summary:
-This script is a part of a broader software application that uses the Material-UI library for styling. It provides a theme configuration for the Media component, which can be used to customize its appearance and behavior.
-
-Developer Questions:
-- How can I customize the default props for the Media component?
-- How can I override the default styles for the Media component?
-- How can I define additional variants for the Media component?
-- How can I use this theme configuration in my application?
+export default (theme: Theme): ThemeOptions => ({
+  components: {
+    Media: {
+      defaultProps,
+      styleOverrides,
+      variants: createVariants(theme)
+    }
+  }
+});

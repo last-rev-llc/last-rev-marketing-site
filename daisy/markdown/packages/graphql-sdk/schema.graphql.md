@@ -1,25 +1,543 @@
-The purpose of this code is to define the schema for a GraphQL API. It defines various types, interfaces, and input types that can be used to query and manipulate data in the application.
+directive @extends on INTERFACE | OBJECT
 
-The code starts with import statements, which are used to import external modules or dependencies that are required for the code to run. However, there are no import statements in the provided code, so we can assume that all the required modules are already available.
+directive @external on FIELD_DEFINITION | OBJECT
 
-The code then defines various types using the GraphQL schema definition language (SDL). Each type represents a specific entity or object in the application. For example, the "Asset" type represents an asset with properties like description, extension, fileName, etc. Similarly, there are types like "Block", "Blog", "Card", "Collection", etc., each representing a different type of content in the application.
+directive @key(fields: String!) on INTERFACE | OBJECT
 
-There are also interfaces defined in the code, such as "Content", which is implemented by types like "Block", "Blog", "Card", etc. Interfaces define a set of fields that must be implemented by types that implement the interface.
+directive @provides(fields: String!) on FIELD_DEFINITION
 
-The code also defines input types like "CollectionFilterInput", which can be used as input arguments in GraphQL queries or mutations.
+directive @requires(fields: String!) on FIELD_DEFINITION
 
-The code also includes custom scalar types like "Date" and "JSON". Scalar types represent primitive values like strings, numbers, booleans, etc., but custom scalar types allow for more specific or complex values.
+type Asset {
+  description: String
+  extension: String
+  fileName: String
+  height: String
+  id: String
+  svgContent: String
+  title: String
+  url: String
+  width: String
+}
 
-The code also includes a "Query" type, which represents the root query type in the GraphQL schema. It defines various fields that can be queried to fetch data from the application. For example, the "content" field can be used to fetch a specific content item by providing its ID.
+type Block implements Content {
+  animation: JSON
+  body: RichText
+  eyebrow: String
+  id: String
+  internalTitle: String
+  sidekickLookup: JSON
+  subtitle: String
+  theme: [Theme]
+  title: String
+  variant: String
+}
 
-Overall, the code defines the structure and types of data that can be queried or manipulated using the GraphQL API. It provides a clear schema for the application and allows clients to interact with the data in a structured and efficient manner.
+type Blog implements Content {
+  animation: JSON
+  id: String
+  placeholder: String
+  sidekickLookup: JSON
+  theme: [Theme]
+  variant: String
+}
 
-Potential issues or bugs:
-- There are no known issues or bugs in the provided code.
-- However, it's important to note that this code only defines the schema and types for the GraphQL API. The actual implementation of resolvers and data fetching logic is not included in this code. Therefore, it's possible that there may be issues or bugs in the implementation of the API logic that is not visible in this code.
+type Card implements Content {
+  actions: [Link]
+  animation: JSON
+  body: RichText
+  eyebrow: String
+  id: String
+  internalTitle: String
+  link: Link
+  media: [Media]
+  sidekickLookup: JSON
+  subtitle: String
+  theme: [Theme]
+  title: String
+  variant: String
+}
 
-Suggestions for improvement:
-- The code could benefit from adding comments or documentation to explain the purpose and usage of each type, interface, and field.
-- It would be helpful to include examples or usage scenarios for each type or field to provide more context for developers.
-- If there are any known issues or limitations with the API, they should be documented in the code to help developers understand and work around them.
-- It would be beneficial to include a clear and comprehensive summary of the API's capabilities and usage in the code documentation. This would help novice users understand the purpose and functionality of the API.
+type CategoryBlog implements Content {
+  animation: JSON
+  id: String
+  lr__path__: String
+  seo: JSON
+  sidekickLookup: JSON
+  slug: String
+  theme: [Theme]
+  title: String
+}
+
+type Collection implements Content {
+  animation: JSON
+  id: String
+  images: [Media]
+  internalTitle: String
+  introText: Text
+  items: [CollectionItem]
+  itemsConnection(filter: CollectionFilterInput, limit: Int, offset: Int): CollectionItemConnection
+  itemsSpacing: Int
+  itemsVariant: String
+  itemsWidth: String
+  settings: JSON
+  sidekickLookup: JSON
+  styles: JSON
+  theme: [Theme]
+  variant: String
+}
+
+input CollectionFilterInput {
+  body: String
+  tags: [String]
+  topics: [String]
+}
+
+union CollectionItem = Card | Link | Media | NavigationItem | Section
+
+type CollectionItemConnection {
+  items: [CollectionItem]
+  pageInfo: ConnectionPageInfo
+}
+
+type CollectionOptions {
+  tags: [Option]
+  topics: [Option]
+}
+
+type ConfigTableOfContents implements Content {
+  animation: JSON
+  headerLevelToDisplay: [String]
+  id: String
+  internalTitle: String
+  layout: String
+  sidekickLookup: JSON
+  theme: [Theme]
+  variant: String
+}
+
+type ConnectionPageInfo {
+  allOptions: CollectionOptions
+  options: CollectionOptions
+  total: Int
+}
+
+interface Content {
+  animation: JSON
+  id: String
+  sidekickLookup: JSON
+  theme: [Theme]
+}
+
+type ContentfulAppSettings implements Content {
+  animation: JSON
+  id: String
+  internalTitle: String
+  settings: JSON
+  sidekickLookup: JSON
+  theme: [Theme]
+  variant: String
+}
+
+input ContentsFilter {
+  contentTypes: [String]
+  displayType: String
+  ids: [String]
+  locale: String
+  preview: Boolean
+}
+
+"""Date custom scalar type"""
+scalar Date
+
+type Footer implements Content {
+  animation: JSON
+  brandAndYear: String
+  id: String
+  logo: Media
+  logoUrl: String
+  navigationItems: [Collection]
+  sidekickLookup: JSON
+  theme: [Theme]
+  variant: String
+}
+
+type Form implements Content {
+  animation: JSON
+  headerText: RichText
+  hubspotFormId: String
+  hubspotPortalId: String
+  id: String
+  internalTitle: String
+  sidekickLookup: JSON
+  successText: RichText
+  theme: [Theme]
+  variant: String
+}
+
+type Header implements Content {
+  animation: JSON
+  colorScheme: String
+  id: String
+  internalTitle: String
+  logo: Media
+  logoUrl: String
+  navigationItems: [Collection]
+  sidekickLookup: JSON
+  theme: [Theme]
+  variant: String
+}
+
+type Heading {
+  id: String
+  level: Int
+  text: String
+}
+
+type Hero implements Content {
+  actions: [Link]
+  animation: JSON
+  background: Media
+  backgroundColor: String
+  body: RichText
+  contentHeight: String
+  contentWidth: String
+  id: String
+  image: [Media]
+  internalTitle: String
+  sidekickLookup: JSON
+  subtitle: String
+  theme: [Theme]
+  title: String
+  variant: String
+}
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+type Link implements Content {
+  animation: JSON
+  color: String
+  href: String!
+  icon: String
+  iconPosition: String
+  id: String
+  internalTitle: String
+  manualUrl: String
+  sidekickLookup: JSON
+  target: String
+  text: String
+  theme: [Theme]
+  variant: String
+}
+
+type Locales {
+  available: [String!]!
+  default: String!
+}
+
+type Location {
+  lat: String
+  lon: String
+}
+
+type Media implements Content {
+  animation: JSON
+  asset: Media
+  assetURL: String
+  controls: String
+  description: String
+  file: Asset
+  fileMobile: Asset
+  fileTablet: Asset
+  id: String
+  internalTitle: String
+  mobile: Media
+  placeholder: Media
+  sidekickLookup: JSON
+  source: String
+  tablet: Media
+  theme: [Theme]
+  title: String
+  variant: String
+}
+
+type ModuleIntegration implements Content {
+  animation: JSON
+  id: String
+  internalTitle: String
+  settings: JSON
+  sidekickLookup: JSON
+  theme: [Theme]
+  variant: String
+}
+
+type NavigationItem implements Content {
+  animation: JSON
+  href: String!
+  id: String
+  image: Media
+  internalTitle: String
+  manualUrl: String
+  media: Media
+  sidekickLookup: JSON
+  subNavigation: [SubnavigationItem]
+  summary: String
+  text: String
+  theme: [Theme]
+  variant: String
+}
+
+type Option {
+  label: String
+  value: String
+}
+
+type Page implements Content {
+  animation: JSON
+  colorScheme: String
+  contents: [Content]
+  disableBackToTop: Boolean
+  footer: Footer
+  header: Header
+  hero: Hero
+  id: String
+  internalTitle: String
+  listImage: Media
+  lr__path__: String
+  seo: JSON
+  sidekickLookup: JSON
+  slug: String
+  summary: String
+  theme: [Theme]
+  title: String
+}
+
+type PageBlog implements Content {
+  animation: JSON
+  author: String
+  body: RichText
+  creationDate: String
+  featuredMedia: [Media]
+  footer: Content
+  header: Header
+  id: String
+  landingPageSummary: String
+  lr__path__: String
+  relatedLinks: [Link]
+  seo: JSON
+  sidekickLookup: JSON
+  slug: String
+  tags: [String]
+  theme: [Theme]
+  title: String
+  topics: [Topic]
+  variant: String
+}
+
+type PagePathParam {
+  slug: [String!]
+}
+
+type PagePathParams {
+  locale: String
+  params: PagePathParam!
+}
+
+type Person implements Content {
+  animation: JSON
+  body: RichText
+  calendlyUrl: String
+  emailAddress: String
+  id: String
+  image: Media
+  jobTitle: String
+  linkedIn: String
+  listImage: Media
+  lr__path__: String
+  mainImage: Media
+  name: String
+  phone: String
+  rolloverImage: Media
+  sidekickLookup: JSON
+  slug: String
+  summary: String
+  theme: [Theme]
+}
+
+type Query {
+  _service: _Service!
+  availableLocales: Locales
+  content(displayType: String, id: String!, locale: String, preview: Boolean): Content
+  contents(filter: ContentsFilter!): [Content]
+  page(locale: String, path: String!, preview: Boolean, site: String): Content
+  paths(locales: [String!], preview: Boolean, site: String): [PagePathParams!]
+  sitemap(locales: [String!], preview: Boolean, root: String!, site: String): Sitemap
+  sitemapIndex(preview: Boolean, site: String): Sitemap
+  sitemapPage(contentType: String!, locale: String, page: Int, preview: Boolean, site: String): SitemapPage
+}
+
+type Quote implements Content {
+  actions: [Link]
+  animation: JSON
+  authorImage: Media
+  authorName: String
+  authorTitle: String
+  id: String
+  internalTitle: String
+  logo: Media
+  quote: String
+  sidekickLookup: JSON
+  theme: [Theme]
+  variant: String
+}
+
+type RichText {
+  id: String
+  json: JSON
+  links: RichTextLinks
+}
+
+type RichTextLinks {
+  assets: [Media]
+  entries: [Content]
+}
+
+type Section implements Content {
+  anchorName: String
+  animation: JSON
+  background: Media
+  backgroundColor: String
+  contentAlignment: String
+  contentDirection: String
+  contentSpacing: Int
+  contentWidth: String
+  contents: [Content]
+  id: String
+  internalTitle: String
+  introText: Text
+  paddingBottom: Int
+  paddingLeft: Int
+  paddingRight: Int
+  paddingTop: Int
+  settings: JSON
+  sidekickLookup: JSON
+  styles: JSON
+  theme: [Theme]
+  variant: String
+}
+
+type Settings implements Content {
+  animation: JSON
+  id: String
+  internalTitle: String
+  liveEditorSettings: JSON
+  sidekickLookup: JSON
+  theme: [Theme]
+  variant: String
+}
+
+type Site implements Content {
+  animation: JSON
+  id: String
+  internalTitle: String
+  seo: JSON
+  sidekickLookup: JSON
+  siteKey: String
+  theme: [Theme]
+  variant: String
+}
+
+type Sitemap {
+  pages: [SitemapPage]
+}
+
+type SitemapEntry {
+  lastmod: String
+  loc: String
+}
+
+type SitemapPage {
+  contentType: String
+  entries: [SitemapEntry]
+  filename: String
+  lastmod: String
+  loc: String
+  locale: String
+  page: Int
+}
+
+union SubnavigationItem = Link | NavigationItem
+
+type TableOfContents implements Content {
+  animation: JSON
+  content: [Heading]
+  id: String
+  internalTitle: String
+  sidekickLookup: JSON
+  theme: [Theme]
+  variant: String
+}
+
+type Template implements Content {
+  animation: JSON
+  category: String
+  id: String
+  image: Media
+  sidekickLookup: JSON
+  templateName: String
+  theme: [Theme]
+  variant: String
+}
+
+type Text implements Content {
+  align: String
+  animation: JSON
+  body: RichText
+  color: String
+  eyebrow: String
+  id: String
+  internalTitle: String
+  sidekickLookup: JSON
+  styles: JSON
+  subtitle: String
+  theme: [Theme]
+  title: String
+  variant: String
+}
+
+type Theme implements Content {
+  animation: JSON
+  components: JSON
+  description: String
+  id: String
+  internalTitle: String
+  sidekickLookup: JSON
+  theme: [Theme]
+  typography: JSON
+  variant: String
+}
+
+type Topic implements Content {
+  animation: JSON
+  contents: [Content]
+  footer: Content
+  header: Header
+  hero: Hero
+  id: String
+  lr__path__: String
+  seo: JSON
+  sidekickLookup: JSON
+  slug: String
+  theme: [Theme]
+  title: String
+}
+
+type _Service {
+  """
+  The sdl representing the federated service capabilities. Includes federation directives, removes federation types, and includes rest of full schema after schema directives have been applied
+  """
+  sdl: String
+}

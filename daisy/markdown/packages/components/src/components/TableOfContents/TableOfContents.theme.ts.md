@@ -1,23 +1,71 @@
-Summary:
-This code is a module that exports a function that returns a ThemeOptions object for customizing the TableOfContents component in a Material-UI (MUI) application. It provides default props, style overrides, and variants for the TableOfContents component.
+import { Theme, ThemeOptions, ComponentsProps, ComponentsOverrides, ComponentsVariants } from '@mui/material/styles';
 
-Import statements:
-- `Theme`, `ThemeOptions`, `ComponentsProps`, `ComponentsOverrides`, `ComponentsVariants` are imported from the `@mui/material/styles` package. These are types used for customizing MUI components.
+// https://mui.com/customization/theme-components/#default-props
+export const defaultProps: ComponentsProps['TableOfContents'] = {};
 
-Script Summary:
-The script exports a function that takes a `theme` object as a parameter and returns a `ThemeOptions` object. The `ThemeOptions` object contains customization options for the `TableOfContents` component.
+// https://mui.com/customization/theme-components/#global-style-overrides
+export const styleOverrides: ComponentsOverrides<Theme>['TableOfContents'] = {
+  // Set some static styles
+  root: {
+    'ol, ul, li': {
+      // no bullet points
+      listStyle: 'none'
+    },
+    // make links same color as text and not colored diffrenty when visited
+    'a': {
+      'color': 'inherit',
+      'textDecoration': 'none',
+      '&:visited': {
+        color: 'inherit'
+      }
+    }
+  }
+  //
+  // Use the ownerState to set dynamic styles
+  // root: ({ ownerState, theme }) => {
+  //   return {
+  //     backgroundColor: ownerState.variant === 'example' ? 'red' : theme.palette.background.paper
+  //   };
+  // }
+};
 
-Internal Functions:
-- `createVariants`: This function takes a `theme` object as a parameter and returns an array of variant styles for the `TableOfContents` component. It uses prop matching to set variant styles based on the `variant` prop.
+// https://mui.com/customization/theme-components/#adding-new-component-variants
+const createVariants = (_theme: Theme): ComponentsVariants['TableOfContents'] => [
+  // Use prop matching to set variant styles
+  // {
+  //   props: {
+  //     variant: 'example'
+  //   },
+  //   style: {
+  //     backgroundColor: theme.palette.primary.main
+  //   }
+  // }
+  // Other props are also valid
+  // {
+  //   props: {
+  //     backgroundColor: 'primary.main',
+  //   },
+  //   style: {
+  //     color: theme.palette.primary.contrastText
+  //   }
+  // }
+  // {
+  //   props: { variant: 'blog' },
+  //   style: {
+  //     'ol, ul, li': { padding: 'revert' },
+  //     'h1': { paddingTop: 16, paddingBottom: 16 },
+  //     'h2': { paddingTop: 16, paddingBottom: 16 },
+  //     'p': { paddingBottom: 16 }
+  //   }
+  // }
+];
 
-External Functions:
-None.
-
-Interaction Summary:
-This script can be used as part of a broader MUI application to customize the appearance of the `TableOfContents` component. It can be imported and used in the theme configuration of the application to provide default props, style overrides, and variants for the `TableOfContents` component.
-
-Developer Questions:
-- How can I customize the `TableOfContents` component in my MUI application?
-- What are the available default props, style overrides, and variants for the `TableOfContents` component?
-- How can I create new variants for the `TableOfContents` component?
-- How can I use the `createVariants` function to set variant styles based on props?
+export default (theme: Theme): ThemeOptions => ({
+  components: {
+    TableOfContents: {
+      defaultProps,
+      styleOverrides,
+      variants: createVariants(theme)
+    }
+  }
+});

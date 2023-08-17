@@ -1,23 +1,35 @@
-Summary:
-This file is responsible for configuring the initialization of Sentry on the browser. It sets up the necessary tags and options for Sentry and handles specific error cases. The script exports a function called `sharedSentrySetup` which can be called to initialize Sentry.
+// This file configures the initialization of Sentry on the browser.
+// The config you add here will be used whenever a page is visited.
+// https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
-Import statements:
-- `import * as Sentry from '@sentry/nextjs';`: This imports the Sentry library, specifically the `@sentry/nextjs` module, which provides integration with Next.js.
+import * as Sentry from '@sentry/nextjs';
 
-Script Summary:
-The script starts by importing the necessary dependencies and defining some constants. It then defines a function called `sharedSentrySetup` which initializes Sentry and sets up some tags. It also includes a `beforeSend` function that handles specific error cases. Finally, the `sharedSentrySetup` function is exported as the default export of the module.
+const lrns = require('../../lastrev.json');
 
-Internal Functions:
-- `sharedSentrySetup`: This function initializes Sentry and sets up some tags. It also includes a `beforeSend` function that handles specific error cases. It does not take any parameters and does not return anything.
+const knownErrors = ['Redirect', 'ChunkLoadError'];
 
-External Functions:
-None.
+const sharedSentrySetup = () => {
+  Sentry.setTag('lrns_version', lrns.app.version);
 
-Interaction Summary:
-This file is responsible for setting up Sentry for error tracking in a browser environment. It can be called to initialize Sentry and configure its options. Other parts of the application can import and use the `sharedSentrySetup` function to ensure that Sentry is properly initialized.
+  const SENTRY_DSN = process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN;
 
-Developer Questions:
-- How do I configure Sentry for error tracking in a browser environment?
-- How can I handle specific error cases and customize the behavior of Sentry?
-- What tags are set up by default when initializing Sentry with this script?
-- How can I access the Sentry instance after it has been initialized?
+  Sentry.init({
+    dsn: SENTRY_DSN,
+    // Note: if you want to override the automatic release value, do not set a
+    // `release` value here - use the environment variable `SENTRY_RELEASE`, so
+    // that it will also get attached to your source maps
+    beforeSend(event, hint) {
+      let returnedEvent = event;
+      if (
+        (hint?.originalException?.message && knownErrors.includes(hint.originalException.message)) ||
+        (event?.exception?.values?.[0]?.type && event.exception.values[0].type === 'ChunkLoadError')
+      ) {
+        console.log(`Handle ${hint.originalException.message} error on path ${event?.request?.url}`);
+        returnedEvent = null;
+      }
+      return returnedEvent;
+    }
+  });
+};
+
+export default sharedSentrySetup;

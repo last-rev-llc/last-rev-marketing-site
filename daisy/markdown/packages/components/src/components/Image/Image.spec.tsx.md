@@ -1,33 +1,47 @@
-Summary:
-The provided React file is a test file for the Image component. It contains a series of tests that check if the Image component renders correctly with different props.
+import * as React from 'react';
+import mount from '../../../cypress/mount';
+import Image from './Image';
+import mockContent from './Image.mock';
+import { ImageProps } from './Image.types';
 
-Import statements:
-- React: The React library is imported to use React components and JSX syntax.
-- mount: The mount function is imported from the 'cypress/mount' module. It is used to mount the Image component for testing.
-- Image: The Image component is imported from the './Image' module. This is the component being tested.
-- mockContent: The mockContent function is imported from the './Image.mock' module. It is used to generate mocked props for the Image component.
-- ImageProps: The ImageProps type is imported from the './Image.types' module. It defines the props interface for the Image component.
+let mockedContent: ImageProps = {};
 
-Component:
-The Image component is being tested in this file. It is responsible for rendering an image element with various props.
+beforeEach(() => {
+  mockedContent = { ...mockContent() };
+});
 
-Hooks:
-- beforeEach: This hook is used to reset the mockedContent variable before each test. It ensures that each test starts with a clean state.
+describe('Image', () => {
+  context('renders correctly', () => {
+    it('renders an image', () => {
+      mount(<Image {...mockedContent} />);
+      cy.get(`[data-testid=${mockedContent.testId}]`).should('exist').and('have.attr', 'src', mockedContent.src);
+      cy.percySnapshot();
+    });
 
-Event Handlers:
-None
+    it('renders an image with correct class name given', () => {
+      mount(<Image {...mockedContent} />);
+      cy.get(`[data-testid=${mockedContent.testId}]`).should('have.class', mockedContent.className);
+    });
 
-Rendered components:
-- Image: The Image component is rendered with different props in each test.
+    it('renders an image without a class name given', () => {
+      mount(<Image {...mockedContent} className={undefined} />);
+      cy.get(`[data-testid=${mockedContent.testId}]`).should('exist');
+    });
 
-Interaction Summary:
-This file is a test file and does not directly interact with other components in the application. It tests the behavior of the Image component in isolation.
+    it('renders an image with correct itemprop given', () => {
+      const itemProp = 'item-prop';
+      mount(<Image {...mockedContent} itemProp={itemProp} />);
+      cy.get(`[data-testid=${mockedContent.testId}]`).should('have.attr', 'itemprop', itemProp);
+    });
 
-Developer Questions:
-- How does the mount function work and what does it do?
-- What are the possible values for the props used in the tests?
-- How does the Image component handle lazy loading of images?
-- How does the Image component handle the 'itemProp' prop?
+    it('renders an image with lazy loading when priority is false', () => {
+      mount(<Image {...mockedContent} priority={false} />);
+      cy.get(`[data-testid=${mockedContent.testId}]`).should('have.attr', 'loading', 'lazy');
+    });
 
-Known Issues / Todo:
-None mentioned in the provided code.
+    it('renders an image without lazy loading when priority is true', () => {
+      mount(<Image {...mockedContent} priority />);
+      cy.get(`[data-testid=${mockedContent.testId}]`).should('have.attr', 'loading', 'eager');
+    });
+  });
+});

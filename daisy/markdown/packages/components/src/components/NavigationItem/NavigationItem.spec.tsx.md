@@ -1,34 +1,44 @@
-Summary:
-This file is a React component called "NavigationItem" that renders a navigation item and its sub-navigation links. It is part of a larger application and is used to display navigation items in the application's navigation menu.
+import * as React from 'react';
+import * as NextRouter from 'next/router';
+import mount from '../../../cypress/mount';
+import NavigationItem from './NavigationItem';
+import { NavigationItemProps } from './NavigationItem.types';
+import mockContent from './NavigationItem.mock';
 
-Import statements:
-- React: The React library is imported to use React components and hooks.
-- NextRouter: The NextRouter library is imported to mock the useRouter hook.
-- mount: The mount function is imported from the Cypress library to mount the component for testing.
-- NavigationItem: The NavigationItem component is imported from the same file.
-- NavigationItemProps: The NavigationItemProps type is imported from the same file.
-- mockContent: The mockContent function is imported from the same file to generate mocked props for testing.
+let mockedContent: NavigationItemProps = {};
 
-Component:
-The NavigationItem component is a functional component written in React. It takes in props of type NavigationItemProps and renders a navigation item and its sub-navigation links. It uses the useRouter hook from NextRouter to mock the router object.
+beforeEach(() => {
+  mockedContent = { ...mockContent() };
+  cy.stub(NextRouter, 'useRouter').returns({});
+});
 
-Hooks:
-- useRouter: This hook is mocked using the cy.stub function from Cypress to return an empty object.
+describe('NavigationItem', () => {
+  context('renders correctly', () => {
+    it('renders a navigation item and its subnav links', () => {
+      mount(<NavigationItem {...mockedContent} />);
+      const subNav = !!mockedContent?.subNavigation ? mockedContent?.subNavigation : [];
+      cy.get('[data-testid=NavigationItem]').should('exist');
+      cy.get('a')
+        .should('have.length', subNav.length + 1)
+        .each((item, index) => {
+          if (index !== 0) {
+            cy.wrap(item)
+              .should('have.attr', 'href', subNav[index - 1].href)
+              .and('have.text', subNav[index - 1].text);
+          } else {
+            cy.wrap(item).should('have.attr', 'href', mockedContent.href).and('have.text', mockedContent.text);
+          }
+        });
+      // cy.percySnapshot();
+    });
 
-Event Handlers:
-None
-
-Rendered components:
-- NavigationItem: This component is rendered with the props passed to the NavigationItem component.
-
-Interaction Summary:
-This file interacts with other components in the application by rendering the NavigationItem component. It can be used in the application's navigation menu to display navigation items and their sub-navigation links.
-
-Developer Questions:
-- How can I customize the styling of the NavigationItem component?
-- How can I pass additional props to the NavigationItem component?
-- How can I handle click events on the navigation links?
-
-Known Issues / Todo:
-- No known issues or bugs.
-- No todo items.
+    it('renders a navigation item without subnav links', () => {
+      mount(<NavigationItem {...mockedContent} subNavigation={undefined} />);
+      cy.get('[data-testid=NavigationItem]').should('exist');
+      cy.get('a')
+        .should('have.length', 1)
+        .and('have.attr', 'href', mockedContent.href)
+        .and('have.text', mockedContent.text);
+    });
+  });
+});
