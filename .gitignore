@@ -33,3 +33,4 @@ daisy/preview
 .flaskenv*
 !.env.project
 !.env.vault
+**/.env.vault
