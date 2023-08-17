@@ -1,15 +1,15 @@
 [build]
   publish = "packages/web/.next"
-  command = "yarn installEnvkey && yarn build"
+  command = "yarn build"
 
 [dev]
   publish = "packages/web/.next"
-  command = "yarn installEnvkey && yarn dev"
+  command = "yarn dev"
 
 [functions]
   directory = "packages/functions/src"
-  included_files = ["!node_modules/@swc/core-linux-x64-musl/*","!node_modules/@swc/core-linux-x64-gnu/*", "node_modules/envkey/ext/envkey-source_*_linux_amd64/envkey-source"]
-  external_node_modules = ["express", "enveky"]
+  included_files = ["!node_modules/@swc/core-linux-x64-musl/*","!node_modules/@swc/core-linux-x64-gnu/*"]
+  external_node_modules = ["express"]
   node_bundler = "esbuild"
 
 [[plugins]]

@@ -115,6 +115,7 @@ The service that this configuration file is for is not explicitly mentioned in t
 The configuration file sets up the name, version, main file, author, license, workspaces, scripts, private flag, resolutions, browserslist, dependencies, packageManager, and husky hooks for the application.
 
 **Configuration Breakdown:**
+
 - `name`: The name of the application.
 - `version`: The version of the application.
 - `main`: The entry point file of the application.
@@ -134,6 +135,7 @@ This configuration file sets up the necessary settings and dependencies for the 
 
 **Developer Questions:**
 Developers working with this codebase may have the following questions when debugging or changing this file:
+
 1. What are the available scripts and what do they do?
 2. How are the dependencies managed and which versions are being used?
 3. What is the purpose of the husky configuration and how does it affect the development workflow?

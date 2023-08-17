@@ -1,5 +1,9 @@
 #!/bin/bash
 
+set -a
+source .env || echo "No .env file found"
+set +a
+
 function cleanup() {
     rv=$?
     bash "$PWD/scripts/post_build.sh"
@@ -16,7 +20,7 @@ function cleanup() {
 trap "cleanup" EXIT
 
 echo "Preparing environment..."
-yarn propagate:envkey
+yarn propagate:env
 
 bash "$PWD/scripts/pre_build.sh"
 
