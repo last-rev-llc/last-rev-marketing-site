@@ -28,4 +28,8 @@ daisy/preview
 # .envkey will be ignored everywhere except for the root directory
 **/.envkey
 !/.envkey
-/scripts/removeEnvFirstRun
+
+.env*
+.flaskenv*
+!.env.project
+!.env.vault
