@@ -6,11 +6,11 @@
     "dist"
   ],
   "scripts": {
-    "dev": "run-s gql:pm2:kill 'gql:pm2 --watch' gql:healthcheck",
-    "gql:start": "last-rev gql-serve -c ../../lrconfig",
-    "start": "if [ \"$NODE_ENV\" != \"test\" ]; then run-s gql:pm2:kill gql:pm2 gql:healthcheck; fi",
-    "sync:cms": "last-rev cms-sync -c ../../lrconfig.js",
-    "gql:pm2": "pm2 start pm2.json",
+    "dev": "dotenv node ./scripts/loadEnv.js && run-s gql:pm2:kill 'gql:pm2 --watch' gql:healthcheck",
+    "gql:start": "dotenv node ./scripts/loadEnv.js && last-rev gql-serve -c ../../lrconfig",
+    "start": "dotenv node ./scripts/loadEnv.js && if [ \"$NODE_ENV\" != \"test\" ]; then run-s gql:pm2:kill gql:pm2 gql:healthcheck; fi",
+    "sync:cms": "dotenv node ./scripts/loadEnv.js && last-rev cms-sync -c ../../lrconfig.js",
+    "gql:pm2": "dotenv node ./scripts/loadEnv.js && pm2 start pm2.json",
     "gql:healthcheck": "wait-on -c wait-on-config.js || echo 'Healthcheck failed'",
     "gql:pm2:kill": "pm2 kill",
     "logs": "pm2 logs"
@@ -20,7 +20,9 @@
     "@last-rev-marketing-site/graphql-extensions": "^0.1.0",
     "@last-rev/app-config": "^0.5.0",
     "@last-rev/cli": "^0.5.16",
-    "dotenv": "^10.0.0",
+    "dotenv": "^16.3.1",
+    "dotenv-cli": "^7.3.0",
+    "dotenv-vault": "^1.25.0",
     "npm-run-all": "^4.1.5"
   },
   "devDependencies": {
