@@ -6,11 +6,11 @@
     "dist"
   ],
   "scripts": {
-    "dev": "dotenv node ./scripts/loadEnv.js && run-s gql:pm2:kill 'gql:pm2 --watch' gql:healthcheck",
-    "gql:start": "dotenv node ./scripts/loadEnv.js && last-rev gql-serve -c ../../lrconfig",
-    "start": "dotenv node ./scripts/loadEnv.js && if [ \"$NODE_ENV\" != \"test\" ]; then run-s gql:pm2:kill gql:pm2 gql:healthcheck; fi",
-    "sync:cms": "dotenv node ./scripts/loadEnv.js && last-rev cms-sync -c ../../lrconfig.js",
-    "gql:pm2": "dotenv node ./scripts/loadEnv.js && pm2 start pm2.json",
+    "dev": "dotenv node ../../scripts/loadEnv.js && run-s gql:pm2:kill 'gql:pm2 --watch' gql:healthcheck",
+    "gql:start": "dotenv node ../../scripts/loadEnv.js && last-rev gql-serve -c ../../lrconfig",
+    "start": "dotenv node ../../scripts/loadEnv.js && if [ \"$NODE_ENV\" != \"test\" ]; then run-s gql:pm2:kill gql:pm2 gql:healthcheck; fi",
+    "sync:cms": "dotenv node ../../scripts/loadEnv.js && last-rev cms-sync -c ../../lrconfig.js",
+    "gql:pm2": "dotenv node ../../scripts/loadEnv.js && pm2 start pm2.json",
     "gql:healthcheck": "wait-on -c wait-on-config.js || echo 'Healthcheck failed'",
     "gql:pm2:kill": "pm2 kill",
     "logs": "pm2 logs"
