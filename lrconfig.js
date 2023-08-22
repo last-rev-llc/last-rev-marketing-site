@@ -57,7 +57,11 @@ const config = new LastRevAppConfig({
     maxBatchSize: parseNumberEnvVar(process.env.REDIS_MAX_BATCH_SIZE)
   },
   fs: { contentDir: resolve(__dirname, './packages/graphql-runner/cms-sync') },
-  logLevel: 'debug'
+  logLevel: 'debug',
+  sitemap: {
+    domain: `${process.env.DOMAIN}`,
+    excludePages: ['error_404']
+  }
 });
 
 module.exports = config;
