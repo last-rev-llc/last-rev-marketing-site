@@ -32,9 +32,11 @@ const createVariants = (theme: Theme): ComponentsVariants['Card'] => [
       'textAlign': 'center',
       'display': 'flex',
       'flexDirection': 'column',
+
       '& .MuiTypography-h4': {
         fontSize: '1.1rem'
       },
+
       '& .MuiCardMedia-root': {
         'display': 'flex',
         'justifyContent': 'center',
@@ -46,6 +48,11 @@ const createVariants = (theme: Theme): ComponentsVariants['Card'] => [
           minWidth: 200,
           maxWidth: 200
         }
+      },
+
+      '& .MuiCardActions-root': {
+        display: 'flex',
+        justifyContent: 'center'
       }
     }
   },
