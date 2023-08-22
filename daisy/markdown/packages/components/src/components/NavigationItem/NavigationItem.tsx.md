@@ -15,8 +15,9 @@ import { NavigationItemProps } from './NavigationItem.types';
 export const NavigationItem = ({ subNavigation, sidekickLookup, onRequestClose, ...props }: NavigationItemProps) => {
   const [open, setOpen] = React.useState<boolean>(false);
   const theme = useTheme();
-  const menuBreakpoint = theme?.components?.Header?.mobileMenuBreakpoint ?? 'sm';
+  const menuBreakpoint = theme?.components?.Header?.mobileMenuBreakpoint ?? 'lg';
   const isMobile = useMediaQuery(theme.breakpoints.down(menuBreakpoint), { defaultMatches: true });
+
   const handleClick = (evt: any) => {
     if (isMobile && subNavigation?.length) {
       evt.preventDefault();
@@ -30,8 +31,6 @@ export const NavigationItem = ({ subNavigation, sidekickLookup, onRequestClose, 
     setOpen(false);
     if (onRequestClose) onRequestClose();
   };
-
-  // console.log({ handleSubnavClick, onRequestClose });
 
   return (
     <ErrorBoundary>

@@ -1,6 +1,7 @@
 import { responsiveFontSizes, ThemeOptions, createTheme } from '@mui/material/styles';
 import Hero from '../components/Hero/Hero.theme';
 import Card from '../components/Card/Card.theme';
+import Accordion from '../components/Accordion/Accordion.theme';
 import Media from '../components/Media/Media.theme';
 import Quote from '../components/Quote/Quote.theme';
 import Header from '../components/Header/Header.theme';
@@ -12,6 +13,7 @@ import NavigationBar from '../components/NavigationBar/NavigationBar.theme';
 import NavigationItem from '../components/NavigationItem/NavigationItem.theme';
 import Collection from '../components/Collection/Collection.theme';
 import CollectionCarousel from '../components/CollectionCarousel/CollectionCarousel.theme';
+import CollectionAccordion from '../components/CollectionAccordion/CollectionAccordion.theme';
 import merge from 'lodash/merge';
 import camelCase from 'lodash/camelCase';
 
@@ -174,7 +176,9 @@ const createSchemeTheme = (schemeKey?: string) => {
         Section(baseSchemeTheme),
         Collection(baseSchemeTheme),
         CollectionCarousel(baseSchemeTheme),
-        TableOfContents(baseSchemeTheme)
+        TableOfContents(baseSchemeTheme),
+        Accordion(baseSchemeTheme),
+        CollectionAccordion(baseSchemeTheme)
       ],
       {
         createSchemeTheme,
@@ -195,8 +199,10 @@ const createSchemeTheme = (schemeKey?: string) => {
           },
           Header: {
             height: 80,
+            mobileMenuBreakpoint: 'md',
             styleOverrides: {
               root: {
+                'backgroundColor': 'yellow !important',
                 '& img': {
                   width: 180,
                   height: 'auto'
@@ -337,7 +343,7 @@ const createSchemeTheme = (schemeKey?: string) => {
           Section: {
             styleOverrides: {
               root: {
-                padding: baseSchemeTheme.spacing(4, 0),
+                padding: baseSchemeTheme.spacing(8, 0),
                 [baseSchemeTheme.breakpoints.up('xl')]: {
                   paddingTop: baseSchemeTheme.spacing(5),
                   paddingBottom: baseSchemeTheme.spacing(5)

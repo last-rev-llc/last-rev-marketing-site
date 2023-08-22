@@ -9,22 +9,42 @@ export const defaultProps: ComponentsProps['Hero'] = {
 // https://mui.com/customization/theme-components/#global-style-overrides
 export const styleOverrides: ComponentsOverrides<Theme>['Hero'] = {
   // Set some static styles
-  root: {
-    'minHeight': '60vh',
-    'h1': {
-      paddingBottom: 16
-    },
-    '& [class*="Hero-contentContainer"]': {
-      '& .MuiGrid-container': {
-        '@media (max-width: 800px)': {
-          flexDirection: 'column-reverse',
-          textAlign: 'center'
+  root: ({ theme }) => {
+    return {
+      'minHeight': 'initial',
+      'paddingTop': '0 !important',
+      'paddingBottom': '0 !important',
+
+      'h1': {
+        paddingBottom: theme.spacing(2)
+      },
+
+      '& [class*="Hero-contentContainer"]': {
+        'paddingTop': '0',
+        'marginTop': '-6rem',
+        'paddingBottom': '5vh',
+        'backgroundColor': 'rgba(0, 0, 0, .25)',
+
+        [theme.breakpoints.up('md')]: {
+          marginTop: '0',
+          backgroundColor: 'transparent',
+          paddingTop: '20vh',
+          paddingBottom: '20vh'
+        },
+
+        '& .MuiGrid-container': {
+          [theme.breakpoints.down('md')]: {
+            flexDirection: 'column-reverse',
+            textAlign: 'center'
+          }
         }
       }
-    }
+    };
   },
-  mediaRoot: {
-    width: '100%'
+  mediaRoot: () => {
+    return {
+      width: '100%'
+    };
   }
   //
   // Use the ownerState to set dynamic styles
@@ -36,8 +56,35 @@ export const styleOverrides: ComponentsOverrides<Theme>['Hero'] = {
 };
 
 // https://mui.com/customization/theme-components/#adding-new-component-variants
-const createVariants = (_theme: Theme): ComponentsVariants['Hero'] => [
+const createVariants = (theme: Theme): ComponentsVariants['Hero'] => [
   // Use prop matching to set variant styles
+  {
+    props: {
+      variant: 'default'
+    },
+    style: {
+      [theme.breakpoints.down('md')]: {
+        flexDirection: 'column'
+      },
+
+      '[class*="Hero-backgroundRoot"] ': {
+        [theme.breakpoints.down('md')]: {
+          position: 'relative'
+        },
+
+        [theme.breakpoints.up('md')]: {
+          '& img ': {
+            height: '100%',
+            width: 'initial',
+            maxWidth: 'initial',
+            position: 'absolute',
+            right: 0,
+            top: 0
+          }
+        }
+      }
+    }
+  },
   {
     props: {
       variant: 'centered'
@@ -71,13 +118,13 @@ const createVariants = (_theme: Theme): ComponentsVariants['Hero'] => [
       },
       '& img': {
         maxWidth: 450,
-        [_theme.breakpoints.down('md')]: {
+        [theme.breakpoints.down('md')]: {
           margin: 'auto',
           maxWidth: 300
         }
       },
-      [_theme.breakpoints.up('md')]: {
-        padding: _theme.spacing(8, 0)
+      [theme.breakpoints.up('md')]: {
+        padding: theme.spacing(8, 0)
       }
     }
   }
