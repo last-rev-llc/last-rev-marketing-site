@@ -12,7 +12,12 @@ export const styleOverrides: ComponentsOverrides<Theme>['Hero'] = {
   root: {
     'minHeight': '60vh',
     'h1': {
-      paddingBottom: 16
+      'paddingBottom': 16,
+      '@media (max-width: 900px)': {
+        // Apply the background only if screen size is under 800px
+        background: 'rgba(0, 0, 0, 0.8)',
+        borderRadius: '10px'
+      }
     },
     '& [class*="Hero-contentContainer"]': {
       '& .MuiGrid-container': {

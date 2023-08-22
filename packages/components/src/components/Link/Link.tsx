@@ -37,6 +37,9 @@ export const NextLinkComposed = React.forwardRef<HTMLAnchorElement, NextLinkComp
 
     return (
       <NextLink
+        ref={ref}
+        {...other}
+        onClick={onClick}
         href={to}
         prefetch={prefetch}
         as={linkAs}
@@ -45,9 +48,7 @@ export const NextLinkComposed = React.forwardRef<HTMLAnchorElement, NextLinkComp
         shallow={shallow}
         passHref={passHref}
         locale={locale}>
-        <RootLink ref={ref} {...other} onClick={onClick}>
-          {text || children}
-        </RootLink>
+        {text || children}
       </NextLink>
     );
   }
