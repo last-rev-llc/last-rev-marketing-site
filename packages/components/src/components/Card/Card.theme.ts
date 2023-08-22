@@ -27,7 +27,7 @@ const createVariants = (theme: Theme): ComponentsVariants['Card'] => [
       variant: 'icon-centered'
     },
     style: {
-      'background': 'none',
+      'background': 'transparent',
       'color': 'white',
       'textAlign': 'center',
       'display': 'flex',

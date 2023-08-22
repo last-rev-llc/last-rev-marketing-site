@@ -22,7 +22,6 @@ export const NextLinkComposed = React.forwardRef<HTMLAnchorElement, NextLinkComp
     const {
       to = '#',
       linkAs,
-
       replace,
       scroll,
       passHref,

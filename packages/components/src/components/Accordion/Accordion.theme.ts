@@ -13,7 +13,7 @@ export const styleOverrides: ComponentsOverrides<Theme>['Accordion'] = {
   // Use the ownerState to set dynamic styles
   // root: ({ ownerState, theme }) => {
   //   return {
-  //     backgroundColor: ownerState.variant === 'example' ? 'red' : theme.palette.background.paper
+  //     // 'backgroundColor': ownerState.variant === 'example' ? 'red' : theme.palette.background.paper,
   //   };
   // }
 };
@@ -23,10 +23,10 @@ const createVariants = (_theme: Theme): ComponentsVariants['Accordion'] => [
   // Use prop matching to set variant styles
   // {
   //   props: {
-  //     variant: 'example'
+  //     variant: 'default'
   //   },
   //   style: {
-  //     backgroundColor: theme.palette.primary.main
+  //     'backgroundColor': theme.palette.primary.main
   //   }
   // }
   // Other props are also valid

@@ -6,7 +6,7 @@ export const defaultProps: ComponentsProps['Header'] = {};
 // https://mui.com/customization/theme-components/#global-style-overrides
 export const styleOverrides: ComponentsOverrides<Theme>['Header'] = {
   // Set some static styles
-  contentContainer: ({ theme }) => ({
+  contentContainer: ({}) => ({
     height: '100px'
   })
   //
