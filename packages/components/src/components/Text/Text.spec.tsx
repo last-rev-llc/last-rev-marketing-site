@@ -107,7 +107,7 @@ describe('Text', () => {
         it('renders text with embedded asset block', () => {
           const mockedMedia = assetMock();
           const mockedContent: TextProps = dynamicMock([embeddedAssetBlockNode(mockedMedia.id!)], [], [mockedMedia]);
-          console.log(mockedContent);
+          // console.log(mockedContent);
           mount(<Text {...mockedContent} />);
           cy.get('[data-testid=Text-embedded-asset-block]')
             .should('exist')
