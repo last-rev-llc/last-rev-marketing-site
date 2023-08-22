@@ -172,9 +172,9 @@ const Main = styled('main', {
 const BlogLandingHero = styled(ContentModule, {
   name: 'Page',
   slot: 'BlogLandingHero'
-})<{ variant?: string }>(({ theme }) => ({
-  'background': theme.palette.primary.dark,
-  'color': theme.palette.primary.contrastText,
+})<{ variant?: string }>(() => ({
+  // 'background': theme.palette.primary.dark,
+  // 'color': theme.palette.primary.contrastText,
 
   '[class*=MuiTypography-h2]': {
     marginBottom: '1rem',
