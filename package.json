@@ -60,7 +60,7 @@
     "not IE 11"
   ],
   "dependencies": {
-    "@last-rev/app-config": "^0.5.0",
+    "@last-rev/app-config": "^0.5.1",
     "@last-rev/eslint-plugin-last-rev": "^0.1.1",
     "@manypkg/cli": "^0.19.1",
     "cross-env": "^7.0.2",
