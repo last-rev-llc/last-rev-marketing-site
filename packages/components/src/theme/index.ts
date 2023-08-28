@@ -14,6 +14,7 @@ import NavigationItem from '../components/NavigationItem/NavigationItem.theme';
 import Collection from '../components/Collection/Collection.theme';
 import CollectionCarousel from '../components/CollectionCarousel/CollectionCarousel.theme';
 import CollectionAccordion from '../components/CollectionAccordion/CollectionAccordion.theme';
+import CollectionFiltered from '../components/CollectionFiltered/CollectionFiltered.theme';
 import merge from 'lodash/merge';
 import camelCase from 'lodash/camelCase';
 
@@ -34,7 +35,6 @@ const baseTheme: ThemeOptions = {
   },
   typography: {
     fontSize: 16,
-    // fontFamily: "'Open Sans', 'sans-serif'",
     h1: {
       fontSize: '2.65rem',
       fontWeight: 600,
@@ -178,7 +178,8 @@ const createSchemeTheme = (schemeKey?: string) => {
         CollectionCarousel(baseSchemeTheme),
         TableOfContents(baseSchemeTheme),
         Accordion(baseSchemeTheme),
-        CollectionAccordion(baseSchemeTheme)
+        CollectionAccordion(baseSchemeTheme),
+        CollectionFiltered(baseSchemeTheme)
       ],
       {
         createSchemeTheme,
@@ -261,18 +262,19 @@ const createSchemeTheme = (schemeKey?: string) => {
                   'display': 'flex',
                   'alignItems': 'center',
                   'padding': 10,
-                  'color': 'white',
-                  '&.MuiLink-selected': {
-                    fontWeight: 400
-                  },
+                  'color': baseSchemeTheme.palette.common.white,
+
                   '&:hover': {
                     color: baseSchemeTheme.palette.primary.light
-                  }
-                },
-                '[data-csk-entry-type="navigationItem"]': {
+                  },
+
                   [baseSchemeTheme.breakpoints.down('md')]: {
                     color: 'white',
                     textAlign: 'center'
+                  },
+
+                  '&.MuiLink-selected': {
+                    fontWeight: 400
                   }
                 }
               }
@@ -343,15 +345,17 @@ const createSchemeTheme = (schemeKey?: string) => {
           Section: {
             styleOverrides: {
               root: {
-                padding: baseSchemeTheme.spacing(8, 0),
+                padding: baseSchemeTheme.spacing(10, 0),
                 [baseSchemeTheme.breakpoints.up('xl')]: {
-                  paddingTop: baseSchemeTheme.spacing(5),
-                  paddingBottom: baseSchemeTheme.spacing(5)
+                  paddingTop: baseSchemeTheme.spacing(10),
+                  paddingBottom: baseSchemeTheme.spacing(10)
                 },
+
                 [baseSchemeTheme.breakpoints.up('md')]: {
                   paddingLeft: baseSchemeTheme.spacing(10),
                   paddingRight: baseSchemeTheme.spacing(10)
                 },
+
                 [baseSchemeTheme.breakpoints.down('md')]: {
                   '& > [class*="Section-gridContainer"] > [class*="Section-gridItem"]': {
                     flex: '0 100%'

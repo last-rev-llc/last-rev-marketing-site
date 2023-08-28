@@ -138,6 +138,7 @@ const createVariants = (theme: Theme): ComponentsVariants['Card'] => [
           aspectRatio: '16/9'
         }
       },
+
       '& .MuiCardActions-root': {
         marginTop: theme.spacing(1),
         padding: theme.spacing(2, 0)
@@ -152,6 +153,7 @@ const createVariants = (theme: Theme): ComponentsVariants['Card'] => [
       'borderRadius': 0,
       'backgroundColor': 'black',
       'color': 'white',
+
       '& .MuiCardMedia-root': {
         'display': 'flex',
         'justifyContent': 'start',
@@ -163,6 +165,7 @@ const createVariants = (theme: Theme): ComponentsVariants['Card'] => [
           maxWidth: 64
         }
       },
+
       '& .MuiTypography-root': {
         [theme.breakpoints.down('md')]: {
           textAlign: 'center'
@@ -201,6 +204,7 @@ const createVariants = (theme: Theme): ComponentsVariants['Card'] => [
           justifyContent: 'center',
           textAlign: 'center'
         },
+
         '& img': {
           paddingLeft: 20,
           paddingRight: 20,
@@ -212,6 +216,7 @@ const createVariants = (theme: Theme): ComponentsVariants['Card'] => [
           aspectRatio: '1'
         }
       },
+
       '& .MuiTypography-root': {
         [theme.breakpoints.down('md')]: {
           textAlign: 'center'

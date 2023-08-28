@@ -158,9 +158,9 @@ const Main = styled('main', {
 
       'h3': {
         color: theme.palette.common.black,
-        fontSize: '1.5rem',
+        fontSize: '1.25rem',
         fontWeight: 400,
-        lineHeight: '2rem'
+        lineHeight: '1.625rem'
       },
 
       '[class$=Text-root]': {
