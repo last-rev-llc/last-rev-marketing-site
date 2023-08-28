@@ -53,6 +53,7 @@ const Media = (props: MediaProps) => {
         {...(props as any)}
         autoPlay={true}
         muted
+        controls
         loop
         playsinline={true}
         sx={{ width: '100%', height: '100%', ...props.sx }}>

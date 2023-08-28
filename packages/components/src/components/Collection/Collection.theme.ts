@@ -47,12 +47,15 @@ const createVariants = (_theme: Theme): ComponentsVariants['Collection'] => [
       '& > [class*="Section-gridContainer"], & div > [class*="Section-gridContainer"]': {
         'display': 'grid',
         'gridTemplateColumns': '1fr',
+
         [_theme.breakpoints.up('md')]: {
           gridTemplateColumns: 'repeat(2, 1fr)'
         },
+
         [_theme.breakpoints.up('lg')]: {
           gridTemplateColumns: 'repeat(3, 1fr)'
         },
+
         ' > [class*="Section-gridItem"]': {
           maxWidth: '100%',
           height: '100%'

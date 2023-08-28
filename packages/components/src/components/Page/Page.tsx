@@ -85,26 +85,31 @@ const Main = styled('main', {
     '[variant=collection_three-per-row_section-wrapper]': {
       background: '#FFFBFF'
     },
+
     [theme.breakpoints.up('md')]: {
       '[variant=three-per-row]': {
         paddingLeft: 0,
         paddingRight: 0
       }
     },
+
     [theme.breakpoints.down('md')]: {
       '[class$=Collection-root]': {
         paddingLeft: theme.spacing(2),
         paddingRight: theme.spacing(2)
       }
     },
+
     '[class*=Section-gridContainer]': {
       gap: theme.spacing(2)
     },
+
     '[class*=Collection-introText] h2': {
       padding: `${theme.spacing(4)} 0 0`,
       fontSize: '3rem',
       lineHeight: '3.5rem'
     },
+
     '[class$=Card-root]': {
       'display': 'flex',
       'flexDirection': 'column',
@@ -120,9 +125,9 @@ const Main = styled('main', {
 
       'h3': {
         color: theme.palette.common.black,
-        fontSize: '1.5rem',
+        fontSize: '1.25rem',
         fontWeight: 400,
-        lineHeight: '2rem'
+        lineHeight: '1.625rem'
       },
 
       '[class$=Text-root]': {

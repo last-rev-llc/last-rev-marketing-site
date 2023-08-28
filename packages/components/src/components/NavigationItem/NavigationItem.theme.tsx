@@ -9,13 +9,16 @@ export const styleOverrides: ComponentsOverrides<Theme>['NavigationItem'] = {
   root: {
     '& .MuiPaper-root': {
       'paddingLeft': 0,
+
       '& .MuiTypography-root': {
         color: 'black'
       },
+
       '& .MuiMenuItem-root': {
         paddingLeft: 32,
         paddingRight: 32
       },
+
       '& .MuiBox-root': {
         '& :hover': {
           backgroundColor: '#E9E9E9'

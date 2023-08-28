@@ -6,16 +6,13 @@ export const defaultProps = {};
 // https://mui.com/customization/theme-components/#global-style-overrides
 export const styleOverrides: ComponentsOverrides<Theme>['CollectionFiltered'] = {
   // Set some static styles
-  // root: {
-  //   backgroundColor: 'red'
-  // }
-  //
-  // Use the ownerState to set dynamic styles
-  // root: ({ ownerState, theme }) => {
-  //   return {
-  //     backgroundColor: ownerState.variant === 'example' ? 'red' : theme.palette.background.paper
-  //   };
-  // }
+  root: () => {
+    return {
+      // '[class*=CollectionFiltered-contentContainer]': {
+      //   padding: '0 !important'
+      // }
+    };
+  }
 };
 
 // https://mui.com/customization/theme-components/#adding-new-component-variants
