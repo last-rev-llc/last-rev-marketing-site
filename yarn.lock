@@ -29275,9 +29275,9 @@ synchronous-promise@^2.0.15:
   integrity sha512-k8uzYIkIVwmT+TcglpdN50pS2y1BDcUnBPK9iJeGu0Pl1lOI8pD6wtzgw91Pjpe+RxtTncw32tLxs/R0yNL2Mg==
 
 systeminformation@^5.7:
-  version "5.11.1"
-  resolved "https://registry.yarnpkg.com/systeminformation/-/systeminformation-5.11.1.tgz#3fc7f20d7fcbe189d10e9ea372257b1df3734e02"
-  integrity sha512-E8ZGcnW4Pj4boATSdajw0neHh1B+f+3IqL2iAcT9t1DMgc8mdI0NRT04XPrL6oxrpvMzk0A/bSHT9eKd05tQag==
+  version "5.21.8"
+  resolved "https://registry.yarnpkg.com/systeminformation/-/systeminformation-5.21.8.tgz#18395187e5983698619ed07ca8640ae48ec232b2"
+  integrity sha512-Xf1KDMUTQHLOT9Z7MjpSpsbaICOHcm4OZ9c9qqpkCoXuxq5MoyDrgu5GIQYpoiralXNPrqxDz3ND8MdllpXeQA==
 
 table-layout@^1.0.1, table-layout@~1.0.0:
   version "1.0.2"
