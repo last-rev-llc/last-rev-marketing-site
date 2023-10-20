@@ -1,11 +1,9 @@
-const isVercel = !!process.env.VERCEL_URL;
-const isBuild = process.env.STAGE === 'build';
-const isLive = !isBuild;
+// DEPLOY_URL supplied by netlify, VERCEL_URL supplied by vercel
 
-let URL = 'http://localhost:5000/graphql';
+const deployUrl = process.env.DEPLOY_URL || process.env.VERCEL_URL;
 
-if (isLive && isVercel) {
-  URL = `https://${process.env.VERCEL_URL}/api/graphql`;
-}
+const graphqlEndpoint =
+  process.env.STAGE === 'build' || !deployUrl ? 'http://localhost:5000/graphql' : `${deployUrl}/api/graphql`;
+console.log({ STAGE: process.env.STAGE, deployUrl, graphqlEndpoint });
 
-export default URL;
+export default graphqlEndpoint;
