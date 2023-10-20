@@ -1,5 +1,5 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-// require('dotenv').config();
+// require('envkey');
 import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 import Cors from 'cors';
 import { createVercelHandler } from '@last-rev/graphql-contentful-core';
