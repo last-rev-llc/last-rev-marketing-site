@@ -6,12 +6,6 @@ const { resolve } = require('path');
 const config = require('../../../lrconfig');
 const { graphqlEndpoint } = require('@last-rev-marketing-site/utils');
 
-console.log({
-  config,
-  graphqlEndpoint,
-  outdir: resolve(__dirname, '../public'),
-  site: process.env.SITE
-});
 generateSitemap({
   config,
   graphqlEndpoint,

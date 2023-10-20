@@ -8,7 +8,7 @@ import theme from '@last-rev-marketing-site/components/src/theme';
 import { CacheProvider, EmotionCache } from '@emotion/react';
 import { Open_Sans } from '@next/font/google';
 import '@last-rev/component-library/dist/styles.css';
-import SEO from '@last-rev-marketing-site/components/src/components/SEO';
+import SEO from '@last-rev/component-library/dist/components/SEO';
 
 // import { LazyMotion } from 'framer-motion';
 

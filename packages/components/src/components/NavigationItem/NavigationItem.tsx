@@ -68,7 +68,6 @@ const visibleStyles = (open: boolean) => `
   max-height: ${open ? 300 : 0}px;
   box-shadow: ${open ? 'inset 0 0 16px -8px rgb(0 0 0 / 30%)' : 'inset 0 0 0 0 rgb(0 0 0 / 0%)'};
 `;
-
 const shouldForwardProp = (prop: string) =>
   prop !== 'variant' && prop !== 'onRequestClose' && prop !== 'menuBreakpoint';
 
