@@ -8,6 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NODE_ENV: test
+      ENVKEY: ${{ secrets.ENVKEY }}
 
     steps:
       - name: Checkout Repo
