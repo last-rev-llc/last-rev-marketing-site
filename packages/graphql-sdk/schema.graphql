@@ -324,6 +324,7 @@ type PageBlog implements Content {
   footer: Content
   header: Header
   id: String
+  internalTitle: String
   landingPageSummary: String
   lr__path__: String
   relatedLinks: [Link]
@@ -434,6 +435,7 @@ type Settings implements Content {
   id: String
   internalTitle: String
   liveEditorSettings: JSON
+  richtextItem: RichText
   sidekickLookup: JSON
   theme: [Theme]
   variant: String
@@ -517,6 +519,15 @@ type Theme implements Content {
   sidekickLookup: JSON
   theme: [Theme]
   typography: JSON
+  variant: String
+}
+
+type ThsiIsATest implements Content {
+  animation: JSON
+  id: String
+  sidekickLookup: JSON
+  test: String
+  theme: [Theme]
   variant: String
 }
 
