@@ -27,11 +27,20 @@
 #    configFile = "packages/web/cypress.netlify.json"
 
 [[headers]]
-  # Define which paths this header configuration applies to
   for = "/*"
-
   [headers.values]
-  Content-Security-Policy = "default-src 'self' *.sentry.io app.netlify.com *.netlify.app; style-src 'self' 'unsafe-inline' *.sentry.io; script-src 'unsafe-eval' 'self' 'unsafe-inline' *.sentry.io app.netlify.com *.netlify.app; font-src 'self' *.sentry.io fonts.gstatic.com *.fontawesome.com data:; worker-src data: 'self' blob:; img-src * data:; media-src * data:; object-src 'none'"
+  Content-Security-Policy = '''
+    default-src 'self' *.sentry.io app.netlify.com *.netlify.app *.s3.amazonaws.com *.hubapi.com *.hsforms.com *.hs-scripts.com *.hsforms.net *.hscollectedforms.net *.facebook.com *.google-analytics.com *.googleoptimize.com *.googletagmanager.com *.hs-scripts.com code.jquery.com *.hsforms.net;
+    style-src 'self' 'unsafe-inline' *.sentry.io *.hs-scripts.com *.hsforms.net fonts.googleapis.com;
+    script-src 'unsafe-eval' 'self' 'unsafe-inline' *.sentry.io app.netlify.com *.netlify.app *.hs-analytics.net *.hs-banner.com *.hsadspixel.net *.hscollectedforms.net analytics.google.com *.google-analytics.com *.googletagmanager.com *.googleoptimize.com *.jquery.com *.hs-scripts.com *.hsforms.net code.jquery.com;
+    font-src 'self' *.sentry.io fonts.gstatic.com *.fontawesome.com data: *.hs-scripts.com *.hsforms.net;
+    worker-src data: 'self' blob:;
+    frame-src 'self' https://calendly.com https://forms.hsforms.com *.youtube.com;
+    img-src * data:;
+    media-src * data:;
+    object-src 'none';
+    frame-ancestors 'self' https://app.contentful.com https://lastrev.com https://lr-live-editor.netlify.app;
+  '''
   Referrer-Policy = "strict-origin-when-cross-origin"
   Strict-Transport-Security = "max-age=15768000; includeSubdomains"
   X-Content-Type-Options = "nosniff"
