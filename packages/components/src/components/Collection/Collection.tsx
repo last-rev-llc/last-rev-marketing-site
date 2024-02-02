@@ -1,3 +1,4 @@
+//TEST-2 
 import Collection from '@last-rev/component-library/dist/components/Collection';
 export type {
   CollectionProps,
