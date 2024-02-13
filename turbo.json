@@ -1,41 +1,8 @@
 {
   "$schema": "https://turborepo.org/schema.json",
   "baseBranch": "origin/main",
-  "globalDependencies": [".env", "$TURBO_CACHE_KEY"],
-  "globalEnv": [
-    "CONTENTFUL_DELIVERY_TOKEN",
-    "CONTENTFUL_ENV",
-    "CONTENTFUL_PREVIEW_TOKEN",
-    "CONTENTFUL_SETTINGS_ID",
-    "CONTENTFUL_SPACE_ID",
-    "CONTENTFUL_USE_PREVIEW",
-    "DATADOG_API_KEY",
-    "DEFAULT_SITE_ID",
-    "DEPLOY_URL",
-    "VERCEL_URL",
-    "DOMAIN",
-    "GRAPHQL_RUNNER_STRATEGY",
-    "GRAPHQL_SERVER_TIMEOUT",
-    "GRAPHQL_SERVER_URL",
-    "LOG_LEVEL",
-    "NEXT_PUBLIC_CONTENTFUL_ENV",
-    "NEXT_PUBLIC_CONTENTFUL_SPACE_ID",
-    "NEXT_PUBLIC_GTM_ID",
-    "NEXT_PUBLIC_SENTRY_DSN",
-    "OPENAI_API_KEY",
-    "OPEN_ORG",
-    "REDIS_HOST",
-    "REDIS_PASSWORD",
-    "REDIS_PORT",
-    "SENTRY_AUTH_TOKEN",
-    "SENTRY_ORG",
-    "SENTRY_PROJECT",
-    "SENTRY_URL",
-    "SITE",
-    "SITE_ID",
-    "SITE_SETTINGS",
-    "YARN_FLAGS"
-  ],
+  "globalDependencies": [".env"],
+  "globalEnv": ["TURBO_CACHE_KEY", "DEPLOY_URL", "VERCEL_URL"],
   "pipeline": {
     "dev": {
       "dependsOn": ["^build"],
@@ -105,7 +72,7 @@
     },
     "@last-rev-marketing-site/graphql-sdk#build": {
       "dependsOn": ["@last-rev-marketing-site/graphql-sdk#gql:healthcheck", "^build"],
-      "outputs": ["dist/**", "schema.graphql"]
+      "outputs": ["dist/**", "schema.graphql", "src/generated/**"]
     },
     "@last-rev-marketing-site/web#dev": {
       "cache": false,
