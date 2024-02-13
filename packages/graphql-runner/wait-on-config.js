@@ -1,15 +1,15 @@
-require('dotenv').config();
-const URL = `${'http://localhost:8888/api/graphql'.replace(/^http:/, 'http-get:')}?query={__schema{types{name}}}`;
+// require('dotenv').config();
+// const URL = `${'http://localhost:8888/api/graphql'.replace(/^http:/, 'http-get:')}?query={__schema{types{name}}}`;
 
-const resource = `tcp:${URL?.split(':')?.pop()?.split('/')?.shift()}`;
-const timeout = process.env.GRAPHQL_SERVER_TIMEOUT ? parseInt(process.env.GRAPHQL_SERVER_TIMEOUT, 10) : 0;
+// const resource = `tcp:${URL?.split(':')?.pop()?.split('/')?.shift()}`;
+// const timeout = process.env.GRAPHQL_SERVER_TIMEOUT ? parseInt(process.env.GRAPHQL_SERVER_TIMEOUT, 10) : 0;
 
-module.exports = {
-  delay: 100,
-  interval: 100,
-  verbose: false,
-  strictSSL: false,
-  followRedirect: false,
-  timeout,
-  resources: [resource]
-};
+// module.exports = {
+//   delay: 100,
+//   interval: 100,
+//   verbose: false,
+//   strictSSL: false,
+//   followRedirect: false,
+//   timeout,
+//   resources: [resource]
+// };
