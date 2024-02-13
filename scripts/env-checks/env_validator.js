@@ -27,14 +27,7 @@ if (fs.existsSync(skipValidatorFlagPath)) {
 const isCIEnvironment = process.env.NETLIFY === 'true' || process.env.VERCEL === 'true';
 
 // Common environment variables that are not directly related to the app's configuration and can be excluded.
-const envCheckExclusions = [
-  'DEPLOY_URL',
-  'VERCEL_URL',
-  'CONTENTFUL_SETTINGS_ID',
-  'GRAPHQL_SERVER_URL',
-  'SITE_ID',
-  'SITE_SETTINGS'
-];
+const envCheckExclusions = ['DEPLOY_URL', 'VERCEL_URL', 'CONTENTFUL_SETTINGS_ID', 'SITE_ID', 'SITE_SETTINGS'];
 
 // Function to read and parse turbo.json to get required environment variables
 const getRequiredEnvVars = () => {

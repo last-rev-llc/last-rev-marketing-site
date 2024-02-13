@@ -33,6 +33,7 @@ const config = new LastRevAppConfig({
   cmsCacheStrategy: 'redis',
   sites: [process.env.SITE],
   extensions,
+  graphql: { port: 8888 },
   contentful: {
     contentPreviewToken,
     contentDeliveryToken,
@@ -60,6 +61,9 @@ const config = new LastRevAppConfig({
   sitemap: {
     domain: `${process.env.DOMAIN}`,
     excludePages: ['error_404']
+  },
+  apolloServerOptions: {
+    introspection: true
   }
 });
 
