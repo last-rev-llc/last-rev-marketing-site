@@ -29,7 +29,7 @@
     "serve:site": "yarn env:init && dotenv -- yarn workspace @last-rev-marketing-site/web serve",
     "start": "turbo run start --output-logs=new-only",
     "storybook": "turbo run storybook",
-    "sync:cms": "yarn env:init && dotenv -- yarn workspace @last-rev-marketing-site/graphql-runner sync:cms",
+    "sync:cms": "dotenv -- yarn workspace @last-rev-marketing-site/graphql-runner sync:cms",
     "lint": "turbo run lint",
     "lint:prod": "cross-env NODE_ENV=production eslint ./package.json",
     "test": "turbo run test",
