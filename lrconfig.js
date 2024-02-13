@@ -32,6 +32,7 @@ const config = new LastRevAppConfig({
   contentStrategy: 'fs',
   cmsCacheStrategy: 'redis',
   sites: [process.env.SITE],
+  graphql: { port: 8888 },
   extensions,
   contentful: {
     contentPreviewToken,

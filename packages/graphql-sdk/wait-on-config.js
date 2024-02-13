@@ -1,4 +1,8 @@
-const URL = `${'http://localhost:5000/graphql'.replace(/^http:/, 'http-get:')}?query={__schema{types{name}}}`;
+require('dotenv').config();
+const URL = `${(process.env.GRAPHQL_SERVER_URL || 'http://localhost:8888/api/graphql').replace(
+  /^http:/,
+  'http-get:'
+)}?query={__schema{types{name}}}`;
 
 const resource = `tcp:${URL?.split(':')?.pop()?.split('/')?.shift()}`;
 const timeout = process.env.GRAPHQL_SERVER_TIMEOUT ? parseInt(process.env.GRAPHQL_SERVER_TIMEOUT, 10) : 0;
