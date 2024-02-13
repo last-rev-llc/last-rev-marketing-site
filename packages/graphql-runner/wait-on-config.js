@@ -1,4 +1,3 @@
-require('envkey');
 const URL = `${'http://localhost:5000/graphql'.replace(/^http:/, 'http-get:')}?query={__schema{types{name}}}`;
 
 const resource = `tcp:${URL?.split(':')?.pop()?.split('/')?.shift()}`;
