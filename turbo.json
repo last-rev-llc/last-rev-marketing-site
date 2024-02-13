@@ -1,16 +1,15 @@
 {
   "$schema": "https://turborepo.org/schema.json",
   "baseBranch": "origin/main",
-  "globalDependencies": [".env", "$TURBO_CACHE_KEY"],
+  "globalDependencies": [".env"],
   "globalEnv": [
+    "TURBO_CACHE_KEY",
     "CONTENTFUL_DELIVERY_TOKEN",
     "CONTENTFUL_ENV",
     "CONTENTFUL_PREVIEW_TOKEN",
     "CONTENTFUL_SETTINGS_ID",
     "CONTENTFUL_SPACE_ID",
-    "CONTENTFUL_USE_PREVIEW",
     "DEFAULT_SITE_ID",
-    "DEPLOY_URL",
     "DOMAIN",
     "GRAPHQL_RUNNER_STRATEGY",
     "GRAPHQL_SERVER_TIMEOUT",
@@ -23,8 +22,7 @@
     "REDIS_HOST",
     "REDIS_PASSWORD",
     "REDIS_PORT",
-    "SITE_SETTINGS",
-    "YARN_FLAGS"
+    "SITE_SETTINGS"
   ],
   "pipeline": {
     "dev": {

@@ -33,7 +33,8 @@ const envCheckExclusions = [
   'CONTENTFUL_SETTINGS_ID',
   'GRAPHQL_SERVER_URL',
   'SITE_ID',
-  'SITE_SETTINGS'
+  'SITE_SETTINGS',
+  'TURBO_CACHE_KEY'
 ];
 
 // Function to read and parse turbo.json to get required environment variables
