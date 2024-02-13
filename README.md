@@ -1,10 +1,11 @@
 # Last Rev NextJS Starter
- 
-## ENVKEY - Environment Variables
+
+### ENVKEY - Environment Variables
 
 Envkey is now used for storing environment variables securely. You will need to follow the following documentation located at [docs-v2-envkey.com](https://docs-v2.envkey.com/docs/install) before proceeding to run the repo locally and be granted access to Envkey.
 
 ### GUI Install
+
 Visit [Envkey](https://envkey.com), download the appropriate installer, install on your local machine.
 
 You may also try using the following commands locally as these are the two items that need installed. If you run in to any issues, please refer to the documentation above.
@@ -22,7 +23,6 @@ LATEST_VERSION=$(curl https://envkey-releases.s3.amazonaws.com/latest/cli-versio
 ```
 VERSION=$(curl https://envkey-releases.s3.amazonaws.com/latest/envkeysource-version.txt) && curl -s https://envkey-releases.s3.amazonaws.com/envkeysource/release_artifacts/$VERSION/install.sh | bash
 ```
-
 
 The Last Rev NextJS starter helps jump start your project with a standard setup.
 
