@@ -7,7 +7,7 @@ module.exports = {
     service: {
       name: process.env.APOLLO_GRAPH_REF || 'Last-Rev-Next-Starter',
       localSchemaFile: path.resolve(__dirname, './packages/graphql-sdk/schema.graphql'),
-      url: 'http://localhost:5000/graphql'
+      url: process.env.GRAPHQL_SERVER_URL || 'http://localhost:8888/graphql'
     },
     includes: ['./packages/components/**/*.graphql', './packages/graphql-sdk/src/**/*.graphql'],
     excludes: ['**/generated/**']

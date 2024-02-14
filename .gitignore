@@ -29,3 +29,4 @@ daisy/preview
 **/.envkey
 !/.envkey
 /scripts/removeEnvFirstRun
+.env.local.backup
