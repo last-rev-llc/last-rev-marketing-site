@@ -29,6 +29,7 @@ const ContentSecurityPolicy = `
   media-src * data:;
   object-src 'none';
   frame-ancestors 'self' https://app.contentful.com https://lastrev.com https://lr-live-editor.netlify.app;
+  connect-src 'self' *.netlify.app *.vercel.app;
 `;
 
 const securityHeaders = [
