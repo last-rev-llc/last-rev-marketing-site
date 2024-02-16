@@ -1,3 +1,5 @@
+require('envkey');
+
 const LastRevAppConfig = require('@last-rev/app-config');
 const extensions = require('./packages/graphql-extensions/dist');
 const { resolve } = require('path');
@@ -32,7 +34,6 @@ const config = new LastRevAppConfig({
   contentStrategy: 'fs',
   cmsCacheStrategy: 'redis',
   sites: [process.env.SITE],
-  graphql: { port: 8888 },
   extensions,
   contentful: {
     contentPreviewToken,

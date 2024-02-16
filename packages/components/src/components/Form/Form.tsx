@@ -34,7 +34,7 @@ const Form = ({ variant, hubspotPortalId, hubspotFormId, headerText, successText
   const handleReady = () => {
     try {
       const targetForm = document.getElementById(`hsForm_${hubspotFormId}`);
-      // debugger;
+      debugger;
       if (!targetForm) return;
       const ulEls = targetForm.getElementsByClassName('inputs-list');
       const ul = ulEls?.[0] as HTMLUListElement;

@@ -68,8 +68,5 @@ elif [[ ! -z "${VERCEL_ENV}" ]]; then
 
 # If not running on Netlify or Vercel, assume it's running locally and skip the installation
 else
-    # If not running on Netlify or Vercel, assume it's running locally and run the local workflow instead
-    echo "We're assuming you're running locally. If you're not, please set the appropriate environment variables for your CI/CD provider."
-    echo "Starting the local workflow now..."
-    bash ./scripts/env-checks/local/local_workflow.sh
+    log "\033[36m\033[1mEnvkey Install Skipped, we're assuming it's running locally.\033[0m"
 fi
