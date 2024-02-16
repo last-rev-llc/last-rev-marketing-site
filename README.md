@@ -1,5 +1,5 @@
 # Last Rev NextJS Starter
- 
+
 ## ENVKEY - Environment Variables
 
 Envkey is now used for storing environment variables securely. You will need to follow the following documentation located at [docs-v2-envkey.com](https://docs-v2.envkey.com/docs/install) before proceeding to run the repo locally and be granted access to Envkey.

@@ -1,4 +1,5 @@
 const { withSentryConfig } = require('@sentry/nextjs');
+require('envkey');
 const path = require('path');
 const withPlugins = require('next-compose-plugins');
 const withTM = require('next-transpile-modules')([
@@ -127,8 +128,7 @@ const nextConfig = {
     CONTENTFUL_DELIVERY_TOKEN: process.env.CONTENTFUL_DELIVERY_TOKEN,
     CONTENTFUL_PREVIEW_TOKEN: process.env.CONTENTFUL_PREVIEW_TOKEN,
     CONTENTFUL_ENV: process.env.CONTENTFUL_ENV,
-    DEPLOY_URL: process.env.DEPLOY_URL,
-    VERCEL_URL: process.env.VERCEL_URL
+    DEPLOY_URL: process.env.DEPLOY_URL
   },
   productionBrowserSourceMaps: enableAnalyzer,
   images: {
