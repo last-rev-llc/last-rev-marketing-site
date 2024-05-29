@@ -316,6 +316,7 @@ type Page implements Content {
 }
 
 type PageBlog implements Content {
+  aaiSeoSettings: JSON
   animation: JSON
   author: String
   body: RichText
@@ -327,6 +328,7 @@ type PageBlog implements Content {
   internalTitle: String
   landingPageSummary: String
   lr__path__: String
+  outline: String
   relatedLinks: [Link]
   seo: JSON
   sidekickLookup: JSON
