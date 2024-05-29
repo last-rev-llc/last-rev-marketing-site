@@ -6,7 +6,7 @@ import { FullPageChat } from 'aai-embed-react';
 
 export interface ChatFullPageProps {
   settings: {
-    chatflowId: string;
+    chatflowid: string;
     apiHost: string;
     other: any;
     theme?: any;
