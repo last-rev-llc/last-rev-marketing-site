@@ -59,6 +59,9 @@
     "not dead",
     "not IE 11"
   ],
+  "devDependencies": {
+    "@netlify/plugin-nextjs": "4.41.3"
+  },
   "dependencies": {
     "@last-rev/app-config": "^0.5.1",
     "@last-rev/eslint-plugin-last-rev": "^0.1.1",

@@ -25,6 +25,8 @@
     "@last-rev/rollup-config": "^0.1.5",
     "@last-rev/testing-library": "^0.1.10",
     "@rollup/plugin-typescript": "^8.3.0",
+    "aai-embed": "^1.2.1",
+    "aai-embed-react": "^1.0.3",
     "framer-motion": "^4.1.17",
     "lodash": "^4.17.21",
     "react-calendly": "^4.1.1",

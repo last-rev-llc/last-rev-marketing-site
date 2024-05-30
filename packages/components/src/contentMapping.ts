@@ -33,6 +33,8 @@ const TableOfContents = dynamic(() => import('./components/TableOfContents'));
 const CollectionFiltered = dynamic(() => import('./components/CollectionFiltered'));
 
 const CalendlyInlineWidget = dynamic(() => import('./components/CalendlyInlineWidget'));
+const Chat = dynamic(() => import('./components/Chat'));
+const ChatFullPage = dynamic(() => import('./components/ChatFullPage'));
 
 // Custom components
 const Quote = dynamic(() => import('./components/Quote'));
@@ -48,6 +50,8 @@ const contentMapping: {
   'Collection:filtered': CollectionFiltered,
   'Collection:navigation-bar': NavigationBar,
   'ModuleIntegration:calendly-inline-widget': CalendlyInlineWidget,
+  'ModuleIntegration:chat': Chat,
+  'ModuleIntegration:chatFullPage': ChatFullPage,
   BackToTop,
   Card,
   Collection,
