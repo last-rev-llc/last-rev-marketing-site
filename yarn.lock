@@ -11317,17 +11317,17 @@ JSONStream@^1.0.4, JSONStream@^1.3.4, JSONStream@^1.3.5:
     jsonparse "^1.2.0"
     through ">=2.2.7 <3"
 
-aai-embed-react@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/aai-embed-react/-/aai-embed-react-1.0.3.tgz#ca574ad0bd1b11347214e48ef9b04ade2789daae"
-  integrity sha512-6wLk6ppAr4X/ZPPX0k3hWiATMDAiLjgwxae9Py0sVrmpkovSBLMGoh1ifDOUwYOb9l2Wyros2HEkmdsHX9N2HQ==
+aai-embed-react@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/aai-embed-react/-/aai-embed-react-1.0.4.tgz#51373610be1ae0068ff7279eded7f63d58442189"
+  integrity sha512-aY6NLLDQI+YqqvtaP9LvPSBpOnN0fCOdkLYA162ft8+AI23Qnu1R/oFt2MoRMRPUmr6lORnbgzJtdcUS7pmv9g==
   dependencies:
     "@ladle/react" "2.5.1"
 
-aai-embed@^1.2.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/aai-embed/-/aai-embed-1.2.1.tgz#c884a94f966a1c6a78f80bc5f05e6c88159c3787"
-  integrity sha512-WM2Mq1j/Z2Fo4uQCPazLMUFPbqsUCE0I2xfvkPf2BRwgCIHr2CldgWRI5/6gRZQDy4S+EzzqiwscQhteS4uX7w==
+aai-embed@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/aai-embed/-/aai-embed-1.2.2.tgz#8dfdc35dc909ea818b5bc6d081c3944df1eac24d"
+  integrity sha512-VBV653gcgYa9bB7BVxnJjLI+QoBrw5au8v9cdQQKS1QDvh8uE5S4N0Ifeof8T6iC7E8O0P3c5wTLqIFnnW2AZQ==
   dependencies:
     "@babel/core" "^7.22.1"
     "@ts-stack/markdown" "^1.4.0"
