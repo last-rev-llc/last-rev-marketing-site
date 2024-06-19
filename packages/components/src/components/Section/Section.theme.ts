@@ -47,9 +47,12 @@ const createVariants = (_theme: Theme): ComponentsVariants['Section'] => [
     },
     style: {
       '& [class*="Section-gridContainer"]': {
-        alignItems: 'center'
-      },
-      [_theme.breakpoints.down('md')]: {}
+        alignItems: 'center',
+
+        [_theme.breakpoints.down('md')]: {
+          flexDirection: 'column'
+        }
+      }
     }
   },
   {
