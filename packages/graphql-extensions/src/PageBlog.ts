@@ -9,15 +9,21 @@ import createType from './utils/createType';
 const mediaFieldResolver = async ({ fields, ctx }: any) => {
   let mediaField: any = null;
   const featuredImage: any = getFirstOfArray(getLocalizedField(fields, 'featuredMedia', ctx));
-  
+
   if (featuredImage) {
-    const featuredImageEntry: any = await ctx.loaders.entryLoader.load({ id: featuredImage.sys?.id, preview: !!ctx.preview });
+    const featuredImageEntry: any = await ctx.loaders.entryLoader.load({
+      id: featuredImage.sys?.id,
+      preview: !!ctx.preview
+    });
 
     if (featuredImageEntry) {
       const asset: any = getLocalizedField(featuredImageEntry.fields, 'asset', ctx);
 
       if (asset) {
-        const featuredImageMedia: any = await ctx.loaders.assetLoader.load({ id: asset.sys?.id, preview: !!ctx.preview });
+        const featuredImageMedia: any = await ctx.loaders.assetLoader.load({
+          id: asset.sys?.id,
+          preview: !!ctx.preview
+        });
 
         if (featuredImageMedia) {
           const imageFile = getLocalizedField(featuredImageMedia.fields, 'file', ctx);
@@ -26,7 +32,7 @@ const mediaFieldResolver = async ({ fields, ctx }: any) => {
           mediaField = {
             id: asset.sys?.id,
             url: imageFile?.url?.startsWith('//') ? `https:${imageFile?.url}` : imageFile?.url,
-            title: imageTitle,
+            title: imageTitle
           };
         }
       }
@@ -35,7 +41,8 @@ const mediaFieldResolver = async ({ fields, ctx }: any) => {
   return mediaField;
 };
 
-const getSeoValue = (value: string | undefined, defaultValue: string) => value && value?.trim() !== '' ? value : defaultValue;
+const getSeoValue = (value: string | undefined, defaultValue: string) =>
+  value && value?.trim() !== '' ? value : defaultValue;
 
 const getSlug = (topic: any, ctx: ApolloContext) => {
   const title = getLocalizedField(topic.fields, 'title', ctx);
@@ -155,12 +162,15 @@ export const mappers: any = {
         const ogTitle = getSeoValue(seo?.['og:title']?.value, seoTitle);
         const ogDescription = getSeoValue(seo?.['og:description']?.value, seoDescription);
 
-        const canonical = seo?.canonical?.value ?? `${'https//lastrev.com'}${createPath('blog', getLocalizedField(blog.fields, 'slug', ctx))}`;
-        const blogDefaultDescription = body.content[0].content[0].value ?? 'Thought leadership on technology, content management and engineering';
+        const canonical =
+          seo?.canonical?.value ??
+          `${'https//lastrev.com'}${createPath('blog', getLocalizedField(blog.fields, 'slug', ctx))}`;
+        const blogDefaultDescription =
+          body.content[0].content[0].value ?? 'Thought leadership on technology, content management and engineering';
 
         return {
           ...seo,
-          title: {
+          'title': {
             name: 'title',
             value: seoTitle ?? 'Last Rev Blog'
           },
@@ -168,20 +178,19 @@ export const mappers: any = {
             name: 'og:title',
             value: ogTitle ?? 'Last Rev Blog'
           },
-          description: {
+          'description': {
             name: 'description',
-            value:
-              seoDescription ?? blogDefaultDescription
+            value: seoDescription ?? blogDefaultDescription
           },
           'og:description': {
             name: 'og:description',
             value: ogDescription ?? blogDefaultDescription
           },
-          keywords: {
+          'keywords': {
             name: 'keywords',
             value: seoKeywords ?? 'Technology, Content Management, Engineering'
           },
-          canonical: {
+          'canonical': {
             name: 'canonical',
             value: canonical
           },
@@ -195,7 +204,7 @@ export const mappers: any = {
           },
           'og:image': {
             name: 'og:image',
-            value: seo?.['og:image']?.value ?? await mediaFieldResolver({ fields: blog.fields, ctx })
+            value: seo?.['og:image']?.value ?? (await mediaFieldResolver({ fields: blog.fields, ctx }))
           }
         };
       }
@@ -222,24 +231,24 @@ export const mappers: any = {
       },
       actions: async (blog: any, _args: any, ctx: ApolloContext) => {
         // Get all topics from this blog and convert them into links
-        const topicsLinks: any = getLocalizedField(blog.fields, 'topics', ctx);
-        if (topicsLinks) {
-          const topics = await ctx.loaders.entryLoader.loadMany(
-            topicsLinks?.map((topic: any) => ({ id: topic?.sys?.id, preview: !!ctx.preview }))
-          );
+        // const topicsLinks: any = getLocalizedField(blog.fields, 'topics', ctx);
+        // if (topicsLinks) {
+        //   const topics = await ctx.loaders.entryLoader.loadMany(
+        //     topicsLinks?.map((topic: any) => ({ id: topic?.sys?.id, preview: !!ctx.preview }))
+        //   );
 
-          const actions = topics?.map((topic: any) =>
-            !!topic
-              ? createType('Link', {
-                  id: topic?.sys?.id,
-                  text: getLocalizedField(topic.fields, 'title', ctx),
-                  href: `/blog/${getSlug(topic, ctx)}`
-                })
-              : null
-          ) as any; // any used to allow adding __fieldName__
-          actions.__fieldName__ = 'topics';
-          return actions;
-        }
+        //   const actions = topics?.map((topic: any) =>
+        //     !!topic
+        //       ? createType('Link', {
+        //           id: topic?.sys?.id,
+        //           text: getLocalizedField(topic.fields, 'title', ctx),
+        //           href: `/blog/${getSlug(topic, ctx)}`
+        //         })
+        //       : null
+        //   ) as any; // any used to allow adding __fieldName__
+        //   actions.__fieldName__ = 'topics';
+        //   return actions;
+        // }
         const slug = createPath('blog', getLocalizedField(blog.fields, 'slug', ctx));
         const link = createType('Link', {
           href: slug,
