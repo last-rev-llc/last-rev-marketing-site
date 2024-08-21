@@ -81,6 +81,11 @@ const sentryWebpackPluginOptions = {
   // https://github.com/getsentry/sentry-webpack-plugin#options.
 };
 
+const parseBooleanEnvVar = (value) => {
+  const val = value ? value.toString().toLowerCase() : '';
+  return /^(true|1|yes|y)$/.test(val);
+};
+
 const nextConfig = {
   ...(process.env.NODE_ENV === 'production' && {
     async headers() {
@@ -119,7 +124,7 @@ const nextConfig = {
   env: {
     CONTENTFUL_SETTINGS_ID: process.env.CONTENTFUL_SETTINGS_ID,
     GRAPHQL_SERVER_URL: process.env.GRAPHQL_SERVER_URL,
-    CONTENTFUL_USE_PREVIEW: false,
+    CONTENTFUL_USE_PREVIEW: parseBooleanEnvVar(process.env.CONTENTFUL_USE_PREVIEW) || false,
     SITE: process.env.SITE,
     SITE_SETTINGS: process.env.SITE_SETTINGS,
     DEFAULT_SITE_ID: process.env.DEFAULT_SITE_ID || process.env.SITE_ID,
