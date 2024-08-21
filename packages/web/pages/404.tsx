@@ -4,7 +4,7 @@ import { ContentModuleProvider } from '@last-rev/component-library/dist/componen
 import ContentModule from '@last-rev/component-library/dist/components/ContentModule/ContentModule';
 import contentMapping from '@last-rev-marketing-site/components/src/contentMapping';
 
-const preview = parseBooleanEnvVar(process.env.CONTENTFUL_USE_PREVIEW);
+const preview = parseBooleanEnvVar(process.env.CONTENTFUL_USE_PREVIEW) || false;
 const site = process.env.SITE;
 const pagesRevalidate = parseInt(process.env.PAGES_REVALIDATE as string, 10);
 const revalidate = !isNaN(pagesRevalidate) ? pagesRevalidate : false;
