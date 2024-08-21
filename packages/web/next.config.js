@@ -119,7 +119,7 @@ const nextConfig = {
   env: {
     CONTENTFUL_SETTINGS_ID: process.env.CONTENTFUL_SETTINGS_ID,
     GRAPHQL_SERVER_URL: process.env.GRAPHQL_SERVER_URL,
-    CONTENTFUL_USE_PREVIEW: process.env.CONTENTFUL_USE_PREVIEW,
+    CONTENTFUL_USE_PREVIEW: false,
     SITE: process.env.SITE,
     SITE_SETTINGS: process.env.SITE_SETTINGS,
     DEFAULT_SITE_ID: process.env.DEFAULT_SITE_ID || process.env.SITE_ID,
