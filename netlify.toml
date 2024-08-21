@@ -12,8 +12,8 @@
   external_node_modules = ["express", "envkey"]
   node_bundler = "esbuild"
 
-[[plugins]]
-  package = "./packages/cache-netlify-plugin"
+#[[plugins]]
+#  package = "./packages/cache-netlify-plugin"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
