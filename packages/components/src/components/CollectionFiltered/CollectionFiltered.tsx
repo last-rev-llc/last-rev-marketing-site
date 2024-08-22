@@ -6,7 +6,12 @@ export type {
 } from '@last-rev/component-library/dist/components/CollectionFiltered';
 import CollectionFiltered from '@last-rev/component-library/dist/components/CollectionFiltered';
 
-const preview = !!process.env.CONTENTFUL_USE_PREVIEW;
+const parseBooleanEnvVar = (value = '') => {
+  const val = value.toString().toLowerCase();
+  return /^(true|1|yes|y)$/.test(val);
+};
+
+const preview = parseBooleanEnvVar(process.env.CONTENTFUL_USE_PREVIEW) || false;
 
 const withFetchItems = (Wrapped: any) => (props: any) => {
   const fetchItems = async ({ filter, limit, offset }: { filter: any; limit?: number; offset?: number }) => {

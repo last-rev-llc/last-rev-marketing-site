@@ -2,7 +2,7 @@ import { GetServerSideProps } from 'next';
 import { client, parseBooleanEnvVar } from '@last-rev-marketing-site/utils';
 import config from '../../../../lrconfig';
 
-const preview = parseBooleanEnvVar(process.env.CONTENTFUL_USE_PREVIEW);
+const preview = parseBooleanEnvVar(process.env.CONTENTFUL_USE_PREVIEW) || false;
 
 const pageMatcher = /^([^\-]+)-(\d+)-sitemap.xml$/;
 
