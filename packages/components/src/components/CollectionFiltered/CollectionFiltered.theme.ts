@@ -11,6 +11,13 @@ export const styleOverrides: ComponentsOverrides<Theme>['CollectionFiltered'] = 
       // '[class*=CollectionFiltered-contentContainer]': {
       //   padding: '0 !important'
       // }
+      // Temporarily hiding the "All search results" display and "Clear filters" button
+      '& [data-testid="CollectionFiltered-ResultsDisplay"]': {
+        display: 'none' // Hides the results display
+      },
+      '& [data-testid="CollectionFilters-clear"]': {
+        display: 'none' // Hides the clear filters button
+      }
     };
   }
 };
