@@ -34,10 +34,10 @@ function MyApp({ Component, emotionCache = clientSideEmotionCache, pageProps }: 
         {!!pageProps.pageData?.page?.seo?.title ? <title>{pageProps.pageData.page.seo.title.value}</title> : null}
         <meta name="contentful_space" content={process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID} />
         <meta name="contentful_environment" content={process.env.NEXT_PUBLIC_CONTENTFUL_ENV} />
-        <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png" />
-        <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png" />
-        <link rel="manifest" href="images/site.webmanifest" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png" />
+        <link rel="manifest" href="/images/site.webmanifest" />
       </Head>
 
       {process.env.NEXT_PUBLIC_GTM_ID ? (

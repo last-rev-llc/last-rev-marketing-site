@@ -363,6 +363,10 @@ const createSchemeTheme = (schemeKey?: string) => {
                 },
 
                 [baseSchemeTheme.breakpoints.down('md')]: {
+                  '& > [class*="Section-gridContainer"]': {
+                    flexWrap: 'nowrap'
+                  },
+
                   '& > [class*="Section-gridContainer"] > [class*="Section-gridItem"]': {
                     flex: '0 100%'
                   }
