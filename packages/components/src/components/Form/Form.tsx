@@ -28,6 +28,7 @@ const Form = ({ variant, hubspotPortalId, hubspotFormId, headerText, successText
   // const ishubspotFormChecks = variant === 'hubspotFormChecks';
 
   const handleSubmit = () => {
+    console.log(successText);
     setSubmitted(true);
   };
 
@@ -120,7 +121,9 @@ const Form = ({ variant, hubspotPortalId, hubspotFormId, headerText, successText
               loading={<CircularProgress />}
             />
           </FormContainer>
-          {submitted && <SuccessMessage {...sidekick(sidekickLookup, 'successText')} {...successText} />}
+          {submitted && (
+            <SuccessMessage {...sidekick(sidekickLookup, 'successText')} __typename="Text" body={successText} />
+          )}
         </FormOuterContainer>
       </Root>
       {/* {formContainer &&

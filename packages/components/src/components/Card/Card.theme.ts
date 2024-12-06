@@ -28,10 +28,11 @@ const createVariants = (theme: Theme): ComponentsVariants['Card'] => [
     },
     style: {
       'background': 'transparent',
-      'color': 'white',
+      'color': 'inherit',
       'textAlign': 'center',
       'display': 'flex',
       'flexDirection': 'column',
+      'boxShadow': 'none',
 
       '& .MuiTypography-h4': {
         fontSize: '1.1rem'

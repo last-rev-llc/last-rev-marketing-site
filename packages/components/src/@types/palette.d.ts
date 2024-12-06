@@ -10,11 +10,15 @@ declare module '@mui/material/styles' {
   interface Palette {
     'gradient-primary'?: MuiPalette['primary'];
     'backgroundOption'?: MuiPalette['primary'];
+    'white'?: MuiPalette['primary'];
+    'black'?: MuiPalette['primary'];
   }
 
   interface PaletteOptions {
     'gradient-primary'?: PaletteOptions['primary'];
     'backgroundOption'?: PaletteOptions['primary'];
+    'white'?: PaletteOptions['primary'];
+    'black'?: PaletteOptions['primary'];
   }
 
   interface TypographyVariants {

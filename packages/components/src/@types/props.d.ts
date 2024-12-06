@@ -2,7 +2,8 @@ import { AccordionProps } from '../components/Accordion';
 import { CardProps } from '../components/Card';
 import { ContentModuleProps } from '../components/ContentModule';
 import { ErrorBoundaryProps } from '../components/ErrorBoundary';
-import { SEOProps } from '../components/SEO';
+import { FormProps } from '../components/Form';
+import { SEOProps } from '../components/SEO/SEO.types';
 import { ContentPreviewProps } from '../components/ContentPreview';
 import { NavigationItemProps } from '../components/NavigationItem';
 import { TextProps } from '../components/Text';
@@ -38,6 +39,7 @@ declare module '@mui/material/styles' {
     ContentPreview: ContentPreviewProps;
     ErrorBoundary: ErrorBoundaryProps;
     Footer: FooterProps;
+    Form: FormProps;
     Header: HeaderProps;
     Hero: HeroProps;
     Image: ImageProps;

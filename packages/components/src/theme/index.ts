@@ -7,6 +7,7 @@ import Quote from '../components/Quote/Quote.theme';
 import Header from '../components/Header/Header.theme';
 import Section from '../components/Section/Section.theme';
 import Link from '../components/Link/Link.theme';
+import Form from '../components/Form/Form.theme';
 import TableOfContents from '../components/TableOfContents/TableOfContents.theme';
 import Text from '../components/Text/Text.theme';
 import NavigationBar from '../components/NavigationBar/NavigationBar.theme';
@@ -95,10 +96,14 @@ const baseTheme: ThemeOptions = {
     ...{
       white: {
         main: '#FFF',
+        light: '#FFF',
+        dark: '#FFF',
         contrastText: 'rgba(0, 0, 0, 0.87)'
       },
       black: {
         main: '#000',
+        light: '#000',
+        dark: '#000',
         contrastText: '#FFF'
       }
     },
@@ -177,6 +182,7 @@ const createSchemeTheme = (schemeKey?: string) => {
         Collection(baseSchemeTheme),
         CollectionCarousel(baseSchemeTheme),
         TableOfContents(baseSchemeTheme),
+        Form(baseSchemeTheme),
         Accordion(baseSchemeTheme),
         CollectionAccordion(baseSchemeTheme),
         CollectionFiltered(baseSchemeTheme)
@@ -345,7 +351,7 @@ const createSchemeTheme = (schemeKey?: string) => {
           Section: {
             styleOverrides: {
               root: {
-                padding: baseSchemeTheme.spacing(10, 0),
+                'padding': baseSchemeTheme.spacing(10, 0),
                 [baseSchemeTheme.breakpoints.up('xl')]: {
                   paddingTop: baseSchemeTheme.spacing(10),
                   paddingBottom: baseSchemeTheme.spacing(10)
@@ -360,6 +366,11 @@ const createSchemeTheme = (schemeKey?: string) => {
                   '& > [class*="Section-gridContainer"] > [class*="Section-gridItem"]': {
                     flex: '0 100%'
                   }
+                },
+
+                '& [class*=Section-root]': {
+                  paddingLeft: '0',
+                  paddingRight: 0
                 }
               }
             }

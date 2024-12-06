@@ -8,6 +8,7 @@ import { ContentModuleClassKey } from '../components/ContentModule';
 import { ContentPreviewClassKey } from '../components/ContentPreview';
 import { ErrorBoundaryClassKey } from '../components/ErrorBoundary';
 import { FooterClassKey } from '../components/Footer';
+import { FormClassKey } from '../components/Form';
 import { HeaderClassKey } from '../components/Header';
 import { HeroClassKey } from '../components/Hero';
 import { ImageClassKey } from '../components/Image';
@@ -18,7 +19,7 @@ import { NavigationItemClassKey } from '../components/NavigationItem';
 import { PageClassKey } from '../components/Page';
 import { QuoteClassKey } from '../components/Quote';
 import { SectionClassKey } from '../components/Section';
-import { SEOClassKey } from '../components/SEO';
+// import { SEOClassKey } from '../components/SEO';
 import { TableOfContentsClassKey } from '../components/TableOfContents';
 import { TextClassKey } from '../components/Text';
 // import { MailchimpFormClassKey } from '../components/MailchimpForm';
@@ -39,6 +40,7 @@ declare module '@mui/material/styles' {
     ContentModule: ContentModuleClassKey;
     ContentPreview: ContentPreviewClassKey;
     ErrorBoundary: ErrorBoundaryClassKey;
+    Form: FormClassKey;
     Footer: FooterClassKey;
     Header: HeaderClassKey;
     Hero: HeroClassKey;
@@ -50,7 +52,7 @@ declare module '@mui/material/styles' {
     Page: PageClassKey;
     Quote: QuoteClassKey;
     Section: SectionClassKey;
-    SEO: SEOClassKey;
+    // SEO: SEOClassKey;
     TableOfContents: TableOfContentsClassKey;
     Text: TextClassKey;
   }
