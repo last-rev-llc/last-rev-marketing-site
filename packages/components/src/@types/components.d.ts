@@ -176,6 +176,14 @@ declare module '@mui/material/styles' {
        */
       variants?: ComponentsVariants['Footer'];
     };
+    Form?: {
+      defaultProps?: ComponentsProps['Form'];
+      styleOverrides?: ComponentsOverrides<Theme>['Form'];
+      /**
+       * @deprecated pass a callback to the slot in `styleOverrides` instead. [See example](https://mui.com/customization/theme-components/#overrides-based-on-props)
+       */
+      variants?: ComponentsVariants['Form'];
+    };
     // MailchimpForm?: {
     //   defaultProps?: ComponentsProps['MailchimpForm'];
     //   styleOverrides?: ComponentsOverrides<Theme>['MailchimpForm'];

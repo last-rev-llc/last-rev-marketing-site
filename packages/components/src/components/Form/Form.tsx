@@ -120,7 +120,9 @@ const Form = ({ variant, hubspotPortalId, hubspotFormId, headerText, successText
               loading={<CircularProgress />}
             />
           </FormContainer>
-          {submitted && <SuccessMessage {...sidekick(sidekickLookup, 'successText')} {...successText} />}
+          {submitted && (
+            <SuccessMessage {...sidekick(sidekickLookup, 'successText')} __typename="Text" body={successText} />
+          )}
         </FormOuterContainer>
       </Root>
       {/* {formContainer &&

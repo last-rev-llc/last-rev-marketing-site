@@ -154,6 +154,7 @@ type Footer implements Content {
   animation: JSON
   brandAndYear: String
   id: String
+  internalTitle: String
   logo: Media
   logoUrl: String
   navigationItems: [Collection]

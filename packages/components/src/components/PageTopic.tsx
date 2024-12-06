@@ -147,6 +147,7 @@ const Main = styled('main', {
       'display': 'flex',
       'flexDirection': 'column',
       'background': theme.palette.common.white,
+
       'borderRadius': theme.shape.borderRadius + 4,
       'transition': 'background-color 0.25s linear',
 

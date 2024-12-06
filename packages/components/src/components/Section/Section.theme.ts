@@ -7,12 +7,17 @@ export const defaultProps: ComponentsProps['Section'] = {};
 export const styleOverrides: ComponentsOverrides<Theme>['Section'] = {
   // Set some static styles
   root: {
+    'flexWrap': 'wrap',
+
     '[class*="Section-introText"]': {
-      marginBottom: '2rem'
+      width: '100%',
+      marginBottom: '1rem'
     },
+
     '[class*="Media-embedRoot"]': {
       minHeight: 368
     },
+
     '[class*="Section-gridItem"] > img': {
       padding: 8
     }

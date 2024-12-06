@@ -134,7 +134,7 @@ export const styleOverrides: ComponentsOverrides<Theme>['Form'] = {
 
               ...(ownerState?.variant === 'hubspotFormFooter' && {
                 border: 'none',
-                borderBottom: `solid 2px ${theme.palette.white.main}`,
+                borderBottom: `solid 2px ${theme.palette.common.white}`,
                 fontSize: theme.typography.body1
               }),
 
@@ -144,18 +144,18 @@ export const styleOverrides: ComponentsOverrides<Theme>['Form'] = {
               },
 
               '&:focus': {
-                borderColor: theme.palette.drataBlue.main,
+                borderColor: theme.palette.grey[300],
                 boxShadow: theme.shadows[1]
               },
 
               '&:focus-visible': {
-                outline: `${theme.palette.drataBlue.main} auto 0px`
+                outline: `${theme.palette.grey[300]} auto 0px`
               }
             },
 
             'input': {
               '&': {
-                ...theme.typography.formInput,
+                ...theme.typography.body1,
 
                 height: 'auto',
 
@@ -173,7 +173,7 @@ export const styleOverrides: ComponentsOverrides<Theme>['Form'] = {
             },
 
             'textarea': {
-              ...theme.typography.formInput,
+              ...theme.typography.body1,
 
               ...(ownerState?.variant !== 'hubspotFormFooter' && {
                 'height': 300,
@@ -192,7 +192,7 @@ export const styleOverrides: ComponentsOverrides<Theme>['Form'] = {
 
             'select': {
               '&': {
-                ...theme.typography.formInput,
+                ...theme.typography.body1,
 
                 'appearance': 'none',
                 'backgroundImage':
@@ -235,7 +235,7 @@ export const styleOverrides: ComponentsOverrides<Theme>['Form'] = {
               margin: 0
             },
             '& span': {
-              ...theme.typography.formInput,
+              ...theme.typography.body1,
               color: theme.palette.grey[600],
               paddingLeft: theme.spacing(1)
             },
@@ -259,11 +259,11 @@ export const styleOverrides: ComponentsOverrides<Theme>['Form'] = {
 
       '& .actions': {
         '& input': {
-          ...theme.typography.cta2,
+          ...theme.typography.body1,
           'cursor': 'pointer',
-          'backgroundColor': theme.palette.drataBlue.main,
-          'color': theme.palette.white.main,
-          'border': `3px solid ${theme.palette.drataBlue.main}`,
+          'backgroundColor': theme.palette.grey[300],
+          'color': theme.palette.common.white,
+          'border': `3px solid ${theme.palette.grey[300]}`,
           'padding': theme.spacing(0.625, 2.625), // Substract border
           'borderRadius': theme.spacing(0.5),
           'textDecoration': 'none',
@@ -276,18 +276,18 @@ export const styleOverrides: ComponentsOverrides<Theme>['Form'] = {
           }),
 
           '&:hover': {
-            borderColor: theme.palette.black.main,
-            backgroundColor: theme.palette.drataBlue.main,
+            borderColor: theme.palette.common.black,
+            backgroundColor: theme.palette.grey[300],
             ...(ownerState?.variant === 'hubspotFormHighlight' && {
               backgroundColor: theme.palette.common.black,
               borderColor: theme.palette.common.black,
-              color: theme.palette.neonGreen.main
+              color: theme.palette.grey[100]
             })
           },
 
           '&:active': {
-            backgroundColor: theme.palette.bluePress.main,
-            borderColor: theme.palette.black.main
+            backgroundColor: theme.palette.grey[300],
+            borderColor: theme.palette.common.black
           },
 
           [theme.breakpoints.up('md')]: {
@@ -308,7 +308,7 @@ export const styleOverrides: ComponentsOverrides<Theme>['Form'] = {
         'listStyle': 'none',
 
         '& li label': {
-          ...theme.typography.bodySmall,
+          ...theme.typography.body3,
           display: 'block !important',
           padding: theme.spacing(0.25, 0, 0),
           color: ownerState?.variant === 'hubspotFormChecks' ? theme.palette.white : theme.palette.error.main,
@@ -325,7 +325,7 @@ export const styleOverrides: ComponentsOverrides<Theme>['Form'] = {
     ...(ownerState?.variant === 'hubspotFormFooter' && {
       'marginBottom': theme.spacing(1),
 
-      '.MuiTypography-root': { textAlign: 'left', color: theme.palette.white.main }
+      '.MuiTypography-root': { textAlign: 'left', color: theme.palette.common.white }
     })
   }),
 
@@ -339,11 +339,11 @@ export const styleOverrides: ComponentsOverrides<Theme>['Form'] = {
 
     ...(ownerState?.variant === 'hubspotFormChecks' && {
       padding: theme.spacing(4, 3),
-      backgroundColor: theme.palette.drataBlue.main,
-      border: `solid 2px ${theme.palette.drataBlue.main}`,
+      backgroundColor: theme.palette.grey[300],
+      border: `solid 2px ${theme.palette.grey[300]}`,
       borderRadius: 12,
       position: 'relative',
-      color: theme.palette.white.main
+      color: theme.palette.common.white
     }),
 
     ...(ownerState?.variant === 'hubspotFormSidebar' && {
@@ -367,7 +367,7 @@ export const styleOverrides: ComponentsOverrides<Theme>['Form'] = {
 
   formMessage: ({ theme }) => ({
     ...theme.typography.h2,
-    color: theme.palette.white.main,
+    color: theme.palette.common.white,
     textAlign: 'center',
     marginBottom: theme.spacing(3)
   }),
@@ -399,7 +399,7 @@ export const styleOverrides: ComponentsOverrides<Theme>['Form'] = {
   styledFormControlLabel: ({ theme }) => ({
     'border': 'none !important',
     '.MuiFormControlLabel-label': {
-      color: theme.palette.white.main,
+      color: theme.palette.common.white,
       fontSize: '18px'
     },
     ':hover': {
@@ -410,8 +410,8 @@ export const styleOverrides: ComponentsOverrides<Theme>['Form'] = {
   bpIcon: ({ theme }) => ({
     width: 16,
     height: 16,
-    backgroundColor: theme.palette.drataBlue.main,
-    border: `1px solid ${theme.palette.white.main}`,
+    backgroundColor: theme.palette.grey[300],
+    border: `1px solid ${theme.palette.common.white}`,
     borderRadius: 3,
     opacity: 0.4
   }),
@@ -436,7 +436,7 @@ export const styleOverrides: ComponentsOverrides<Theme>['Form'] = {
     'margin': theme.spacing(3.5, 0),
 
     '*': {
-      color: theme.palette.drataBlue.main
+      color: theme.palette.grey[300]
     }
   })
 };
