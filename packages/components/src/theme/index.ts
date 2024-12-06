@@ -358,15 +358,15 @@ const createSchemeTheme = (schemeKey?: string) => {
                 },
 
                 [baseSchemeTheme.breakpoints.up('md')]: {
-                  'paddingLeft': baseSchemeTheme.spacing(10),
-                  'paddingRight': baseSchemeTheme.spacing(10),
-
-                  '[class*=gridContainer': {
-                    flexWrap: 'wrap'
-                  }
+                  paddingLeft: baseSchemeTheme.spacing(10),
+                  paddingRight: baseSchemeTheme.spacing(10)
                 },
 
                 [baseSchemeTheme.breakpoints.down('md')]: {
+                  '& > [class*="Section-gridContainer"]': {
+                    flexWrap: 'nowrap'
+                  },
+
                   '& > [class*="Section-gridContainer"] > [class*="Section-gridItem"]': {
                     flex: '0 100%'
                   }
