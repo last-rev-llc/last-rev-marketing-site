@@ -28,7 +28,6 @@ const Form = ({ variant, hubspotPortalId, hubspotFormId, headerText, successText
   // const ishubspotFormChecks = variant === 'hubspotFormChecks';
 
   const handleSubmit = () => {
-    console.log(successText);
     setSubmitted(true);
   };
 
