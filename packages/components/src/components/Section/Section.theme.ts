@@ -7,8 +7,6 @@ export const defaultProps: ComponentsProps['Section'] = {};
 export const styleOverrides: ComponentsOverrides<Theme>['Section'] = {
   // Set some static styles
   root: {
-    'flexWrap': 'wrap',
-
     '[class*="Section-introText"]': {
       width: '100%',
       marginBottom: '1rem'

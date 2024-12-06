@@ -358,8 +358,12 @@ const createSchemeTheme = (schemeKey?: string) => {
                 },
 
                 [baseSchemeTheme.breakpoints.up('md')]: {
-                  paddingLeft: baseSchemeTheme.spacing(10),
-                  paddingRight: baseSchemeTheme.spacing(10)
+                  'paddingLeft': baseSchemeTheme.spacing(10),
+                  'paddingRight': baseSchemeTheme.spacing(10),
+
+                  '[class*=gridContainer': {
+                    flexWrap: 'wrap'
+                  }
                 },
 
                 [baseSchemeTheme.breakpoints.down('md')]: {
