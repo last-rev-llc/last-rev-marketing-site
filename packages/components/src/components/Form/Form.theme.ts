@@ -8,14 +8,6 @@ export const styleOverrides: ComponentsOverrides<Theme>['Form'] = {
   root: ({ theme, ownerState }) => ({
     'width': '100%',
 
-    '& .legal-consent-container': {
-      'border': 'solid 10px yellow !important',
-      '& *': {
-        ...theme.typography.body3,
-        border: 'solid 10px yellow'
-      }
-    },
-
     ...((ownerState?.variant === 'hubspotFormDefault' || ownerState?.variant === 'hubspotFormDefaultThin') && {
       padding: theme.spacing(2),
 
@@ -41,14 +33,6 @@ export const styleOverrides: ComponentsOverrides<Theme>['Form'] = {
     '& form': {
       'display': 'grid',
       'gap': theme.spacing(3),
-
-      '& .legal-consent-container': {
-        'border': 'solid 10px yellow !important',
-        '& *': {
-          ...theme.typography.body3,
-          border: 'solid 10px yellow'
-        }
-      },
 
       ...(ownerState?.variant === 'hubspotFormSidebar' && {
         gap: theme.spacing(2)
