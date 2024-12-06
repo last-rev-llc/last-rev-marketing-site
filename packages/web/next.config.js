@@ -21,11 +21,12 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 
 const ContentSecurityPolicy = `
   default-src 'self' *.flowise.theanswer.ai *.theanswer.ai *.sentry.io app.netlify.com *.netlify.app *.s3.amazonaws.com *.hubapi.com *.hsforms.com *.hs-scripts.com *.hsforms.net *.hscollectedforms.net *.facebook.com *.google-analytics.com *.googleoptimize.com *.googletagmanager.com *.hs-scripts.com code.jquery.com *.hsforms.net;
+  connect-src 'self' *.flowise.theanswer.ai *.theanswer.ai *.sentry.io app.netlify.com *.netlify.app *.s3.amazonaws.com *.hubapi.com *.hsforms.com *.hs-scripts.com *.hsforms.net *.hscollectedforms.net *.facebook.com *.google-analytics.com *.googleoptimize.com *.googletagmanager.com *.hs-scripts.com code.jquery.com *.hsforms.net https://www.google.com;
   style-src 'self' 'unsafe-inline' *.hs-scripts.com *.hsforms.net *.sentry.io fonts.googleapis.com;
-  script-src 'unsafe-eval' 'self' 'unsafe-inline' *.flowise.theanswer.ai *.theanswer.ai *.sentry.io app.netlify.com *.netlify.app *.hs-analytics.net *.hs-banner.com *.hsadspixel.net *.hscollectedforms.net analytics.google.com *.google-analytics.com *.googletagmanager.com *.googleoptimize.com *.jquery.com *.hs-scripts.com *.hsforms.net *.googletagmanager.com *.hs-scripts.com code.jquery.com *.hsforms.net;
+  script-src 'unsafe-eval' 'self' 'unsafe-inline' *.flowise.theanswer.ai *.theanswer.ai *.sentry.io app.netlify.com *.netlify.app *.hs-analytics.net *.hs-banner.com *.hsadspixel.net *.hscollectedforms.net analytics.google.com *.google-analytics.com *.googletagmanager.com *.googleoptimize.com *.jquery.com *.hs-scripts.com *.hsforms.net *.googletagmanager.com *.hs-scripts.com code.jquery.com *.hsforms.net https://googleads.g.doubleclick.net https://snap.licdn.com;
   font-src 'self' *.sentry.io *.hs-scripts.com *.hsforms.net fonts.gstatic.com data:;
   worker-src data: 'self' blob:;
-  frame-src 'self' https://calendly.com https://forms.hsforms.com *.youtube.com *.theanswer.ai *.flowise.theanswer.ai;
+  frame-src 'self' https://calendly.com https://forms.hsforms.com *.youtube.com *.theanswer.ai *.flowise.theanswer.ai https://td.doubleclick.net https://www.googletagmanager.com;
   img-src * data:;
   media-src * data:;
   object-src 'none';
