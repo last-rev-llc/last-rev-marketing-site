@@ -164,7 +164,7 @@ export const mappers: any = {
 
         const canonical =
           seo?.canonical?.value ??
-          `${'https//lastrev.com'}${createPath('blog', getLocalizedField(blog.fields, 'slug', ctx))}`;
+          `${'https://lastrev.com'}${createPath('blog', getLocalizedField(blog.fields, 'slug', ctx))}`;
         const blogDefaultDescription =
           body.content[0].content[0].value ?? 'Thought leadership on technology, content management and engineering';
 
