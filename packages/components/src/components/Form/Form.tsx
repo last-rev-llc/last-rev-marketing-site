@@ -13,6 +13,11 @@ import { styled } from '@mui/material/styles';
 import { createPortal } from 'react-dom';
 import { Button } from '@mui/material';
 
+declare global {
+  interface Window {
+    dataLayer: Record<string, any>[];
+  }
+}
 // @ts-ignore
 const HSForm = dynamic(() => import('react-hubspot-form'), { ssr: false });
 
@@ -28,11 +33,23 @@ const Form = ({ variant, hubspotPortalId, hubspotFormId, headerText, successText
   // const ishubspotFormChecks = variant === 'hubspotFormChecks';
 
   const handleSubmit = () => {
+    // Trigger a custom event for GTM
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      event: 'hubspotFormSubmit',
+      formId: hubspotFormId
+    });
     setSubmitted(true);
   };
 
   const handleReady = () => {
     try {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: 'hubspotFormReady',
+        formId: hubspotFormId
+      });
+
       const targetForm = document.getElementById(`hsForm_${hubspotFormId}`);
       if (!targetForm) return;
       const ulEls = targetForm.getElementsByClassName('inputs-list');
