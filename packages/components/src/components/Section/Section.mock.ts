@@ -1,5 +1,4 @@
-import { SectionProps } from './Section';
-import mockTheme from '../../theme';
+import { SectionProps } from './Section.types';
 import richTextMock from '../Text/Text.mock';
 
 export const singlePanelMock = (): SectionProps => ({
