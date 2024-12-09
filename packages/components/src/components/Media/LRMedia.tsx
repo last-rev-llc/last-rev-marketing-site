@@ -8,6 +8,7 @@ import Image from '../Image';
 import sidekick from '@last-rev/contentful-sidekick-util';
 
 import useThemeProps from '../../utils/useThemeProps';
+import Box from '@mui/material/Box';
 // import dynamic from 'next/dynamic';
 
 // const Image = dynamic(() => import('../Image'));
@@ -41,16 +42,19 @@ const Media = (inProps: MediaProps) => {
       </ErrorBoundary>
     );
   }
+
   if (variant === 'embed') {
     return (
       <ErrorBoundary>
-        <EmbedRoot
-          {...sidekick(sidekickLookup)}
-          {...(props as React.IframeHTMLAttributes<any>)}
-          src={image?.url}
-          sx={{ width: '100%', height: '100%', ...props.sx }}
-          data-testid={testId || 'Media'}
-        />
+        <EmbedRootWrap>
+          <EmbedRoot
+            {...sidekick(sidekickLookup)}
+            {...(props as React.IframeHTMLAttributes<any>)}
+            src={image?.url}
+            sx={{ width: '100%', height: '100%', ...props.sx }}
+            data-testid={testId || 'Media'}
+          />
+        </EmbedRootWrap>
       </ErrorBoundary>
     );
   }
@@ -124,6 +128,27 @@ const Root = styled(Image, {
 //   slot: 'Root',
 //   overridesResolver: (_, styles) => [styles.root]
 // })<{ variant?: string }>``;
+
+const EmbedRootWrap = styled(Box, {
+  name: 'Media',
+  slot: 'EmbedRootWrap',
+  overridesResolver: (_, styles) => [styles.embedRootWrap]
+})<{}>(({ theme }) => ({
+  'position': 'relative',
+  'paddingBottom': '56.25%', // 16:9 aspect ratio
+  'height': 0,
+  'overflow': 'hidden',
+  'marginTop': theme.spacing(2),
+  'marginBottom': theme.spacing(4),
+
+  '& iframe': {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%'
+  }
+}));
 
 const EmbedRoot = styled('iframe', {
   name: 'Media',
