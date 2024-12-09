@@ -29,7 +29,7 @@ export const styleOverrides: ComponentsOverrides<Theme>['Section'] = {
 };
 
 // https://mui.com/customization/theme-components/#adding-new-component-variants
-const createVariants = (theme: Theme, ownerState: any): ComponentsVariants['Section'] => [
+const createVariants = (theme: Theme, ownerState?: any): ComponentsVariants['Section'] => [
   {
     props: {},
     style: {
