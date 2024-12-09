@@ -77,6 +77,10 @@ const createVariants = (theme: Theme, ownerState?: any): ComponentsVariants['Sec
   {
     props: {},
     style: {
+      '[class*="Media-embedRoot"]': {
+        minHeight: 368
+      },
+
       // 'position': 'relative',
       // 'overflow': 'hidden',
       // '[class*="Section-introTextWrapper"]': {
