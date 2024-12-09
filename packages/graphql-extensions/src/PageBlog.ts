@@ -44,11 +44,11 @@ const mediaFieldResolver = async ({ fields, ctx }: any) => {
 const getSeoValue = (value: string | undefined, defaultValue: string) =>
   value && value?.trim() !== '' ? value : defaultValue;
 
-const getSlug = (topic: any, ctx: ApolloContext) => {
-  const title = getLocalizedField(topic.fields, 'title', ctx);
-  const slug = getLocalizedField(topic.fields, 'slug', ctx);
-  return slug ?? kebabCase(title);
-};
+// const getSlug = (topic: any, ctx: ApolloContext) => {
+//   const title = getLocalizedField(topic.fields, 'title', ctx);
+//   const slug = getLocalizedField(topic.fields, 'slug', ctx);
+//   return slug ?? kebabCase(title);
+// };
 
 export const createPath = (...slug: string[]) => {
   let path = slug.join('/').replace(/\/\//g, '/');

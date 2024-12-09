@@ -225,10 +225,12 @@ const createSchemeTheme = (schemeKey?: string) => {
                 'margin': 'auto',
                 'paddingLeft': baseSchemeTheme.spacing(4),
                 'paddingRight': baseSchemeTheme.spacing(4),
+
                 [baseSchemeTheme.breakpoints.up('sm')]: {
                   paddingLeft: baseSchemeTheme.spacing(6),
                   paddingRight: baseSchemeTheme.spacing(6)
                 },
+
                 [baseSchemeTheme.breakpoints.up('lg')]: {
                   paddingLeft: baseSchemeTheme.spacing(10),
                   paddingRight: baseSchemeTheme.spacing(10)
@@ -254,6 +256,14 @@ const createSchemeTheme = (schemeKey?: string) => {
                 '[data-csk-entry-type="collection"]': {
                   padding: '24px 0px'
                 }
+              }
+            }
+          },
+
+          Section: {
+            styleOverrides: {
+              root: {
+                'main > &': { maxWidth: '100vw' }
               }
             }
           },
@@ -348,37 +358,7 @@ const createSchemeTheme = (schemeKey?: string) => {
               }
             }
           },
-          Section: {
-            styleOverrides: {
-              root: {
-                'padding': baseSchemeTheme.spacing(10, 0),
-                [baseSchemeTheme.breakpoints.up('xl')]: {
-                  paddingTop: baseSchemeTheme.spacing(10),
-                  paddingBottom: baseSchemeTheme.spacing(10)
-                },
 
-                [baseSchemeTheme.breakpoints.up('md')]: {
-                  paddingLeft: baseSchemeTheme.spacing(10),
-                  paddingRight: baseSchemeTheme.spacing(10)
-                },
-
-                [baseSchemeTheme.breakpoints.down('md')]: {
-                  '& > [class*="Section-gridContainer"]': {
-                    flexWrap: 'nowrap'
-                  },
-
-                  '& > [class*="Section-gridContainer"] > [class*="Section-gridItem"]': {
-                    flex: '0 100%'
-                  }
-                },
-
-                '& [class*=Section-root]': {
-                  paddingLeft: '0',
-                  paddingRight: 0
-                }
-              }
-            }
-          },
           Card: {
             styleOverrides: {
               root: {
