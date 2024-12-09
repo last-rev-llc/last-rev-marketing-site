@@ -260,13 +260,13 @@ const createSchemeTheme = (schemeKey?: string) => {
             }
           },
 
-          Section: {
-            styleOverrides: {
-              root: {
-                'main > &': { maxWidth: '100vw' }
-              }
-            }
-          },
+          // Section: {
+          //   styleOverrides: {
+          //     root: {
+          //       'main > &': { maxWidth: '100vw' }
+          //     }
+          //   }
+          // },
           NavigationBar: {
             styleOverrides: {
               root: {

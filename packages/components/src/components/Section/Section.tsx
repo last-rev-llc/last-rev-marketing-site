@@ -40,6 +40,7 @@ const Section = (inProps: SectionProps) => {
     <ErrorBoundary>
       <Root
         {...sidekick(sidekickLookup)}
+        ownerState={ownerState}
         data-testid={testId}
         sx={{
           ...styles?.root,
@@ -117,7 +118,7 @@ const Root = styled(Box, {
   name: 'Section',
   slot: 'Root',
   overridesResolver: (_, styles) => [styles.root]
-})<{ variant?: string; backgroundColor?: string }>(() => ({
+})<{ variant?: string; backgroundColor?: string; ownerState?: any }>(() => ({
   width: '100%',
   display: 'flex',
   flexDirection: 'column',

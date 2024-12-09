@@ -33,6 +33,10 @@ fragment Section_BaseFieldsFragment on Section {
   }
   variant
   styles
+  paddingLeft
+  paddingRight
+  paddingTop
+  paddingBottom
   # Style fields
   backgroundColor
   contentWidth
