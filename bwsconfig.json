@@ -1,0 +1,36 @@
+{
+  "projects": [
+    {
+      "platform": "netlify",
+      "projectName": "bws-secure",
+      "bwsProjectIds": {
+        "prod": "713fd3cf-d0fc-4111-b68d-b2740186d218",
+        "dev": "2565761f-26bb-479b-b565-b2740186da6f",
+        "local": "467a446c-bd75-46bd-9a35-b2740186e3a1"
+      },
+      "preserveVars": ["BWS_ACCESS_TOKEN"],
+      "excludeVars": [
+        "NODE_ENV",
+        "NETLIFY",
+        "NETLIFY_DEV",
+        "DEPLOY_URL",
+        "DEPLOY_PRIME_URL",
+        "DEPLOY_URL_OLD",
+        "URL",
+        "CONTEXT",
+        "BRANCH",
+        "HEAD",
+        "COMMIT_REF",
+        "REVIEW_ID",
+        "INCOMING_HOOK_TITLE",
+        "INCOMING_HOOK_URL",
+        "INCOMING_HOOK_BODY",
+        "__NEXT_IMAGE_OPTS",
+        "NEXT_PUBLIC_ANTI_FLICKER_TIMEOUT",
+        "STAGE",
+        "SENTRY_DSN",
+        "SITE_ID"
+      ]
+    }
+  ]
+}

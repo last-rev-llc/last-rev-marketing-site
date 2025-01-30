@@ -101,7 +101,6 @@ const config = (CODE_BASE_PATH) => {
       '.DS_Store',
       '.gitignore',
       '.depcheckrc',
-      '.envkey',
       'MIGRATION_GUIDE_v2.0.0.md',
       'CHANGELOG.md',
       'pull_request_template.md'
