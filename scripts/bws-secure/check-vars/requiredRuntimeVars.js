@@ -49,7 +49,6 @@ const defaultDirs = [
   // Default folders we always want to check, if not explicitly provided
   'functions',
   'api',
-  'apps/web/src',
   'packages'
 ];
 
@@ -83,16 +82,7 @@ defaultDirs.forEach((d) => {
  * This is used later to skip certain folders/files from scanning.
  */
 function getIgnorePatterns() {
-  const patterns = [
-    'node_modules',
-    'dist',
-    'build',
-    '.next',
-    '.cache',
-    'coverage',
-    '.git',
-    '.turbo'
-  ]; // Ignore common build/cache directories
+  const patterns = ['node_modules', 'dist', 'build', '.next', '.cache', 'coverage', '.git', '.turbo']; // Ignore common build/cache directories
   try {
     const gitignore = fs.readFileSync('.gitignore', 'utf-8');
     const additionalPatterns = gitignore
@@ -125,17 +115,7 @@ function shouldIgnorePath(filePath, ignorePatterns) {
  * List of file extensions we want to scan for environment variables.
  * These are typically files that could contain runtime code.
  */
-const VALID_EXTENSIONS = new Set([
-  '.js',
-  '.jsx',
-  '.ts',
-  '.tsx',
-  '.vue',
-  '.mjs',
-  '.cjs',
-  '.mts',
-  '.cts'
-]);
+const VALID_EXTENSIONS = new Set(['.js', '.jsx', '.ts', '.tsx', '.vue', '.mjs', '.cjs', '.mts', '.cts']);
 
 /**
  * Check if a file should be scanned based on its extension
@@ -240,10 +220,7 @@ async function findEnvVarsInFile(filePath) {
   const multiLinePatterns = commentStyle.multi.map(
     ([start, end]) => `${escapeRegExp(start)}[\\s\\S]*?${escapeRegExp(end)}`
   );
-  const commentRegex = new RegExp(
-    `(${multiLinePatterns.join('|')})|${escapeRegExp(commentStyle.single)}.*$`,
-    'gm'
-  );
+  const commentRegex = new RegExp(`(${multiLinePatterns.join('|')})|${escapeRegExp(commentStyle.single)}.*$`, 'gm');
   noComments = noComments.replace(commentRegex, '');
 
   // Use a more efficient regex with capturing group
@@ -631,10 +608,7 @@ async function main() {
   }
 
   // Calculate total references (actual sum of all variable references)
-  const totalReferences = Array.from(varTotalReferences.values()).reduce(
-    (sum, count) => sum + count,
-    0
-  );
+  const totalReferences = Array.from(varTotalReferences.values()).reduce((sum, count) => sum + count, 0);
 
   // Get unique variables across all directories
   const allEnvVars = new Set();
