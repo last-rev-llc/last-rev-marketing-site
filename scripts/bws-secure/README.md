@@ -558,11 +558,13 @@ The `upload-to-bws` module provides a secure way to manage secrets across your B
 # Upload secrets
 pnpm secure-run --upload-secrets
 
-# Clear existing secrets first, then upload
+# Clear existing secrets first, then upload (either format works)
 pnpm secure-run --upload-secrets --clearvars
+pnpm secure-run --upload-secrets --clear-vars
 ```
 
 Key features:
+
 - Manage multiple projects with `.env.bws.<project-id>` files
 - Clear and verify existing secrets
 - Secure token handling

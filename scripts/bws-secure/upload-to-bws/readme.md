@@ -31,8 +31,9 @@ Prerequisites:
    # Upload only
    pnpm secure-run --upload-secrets
 
-   # Or clear existing first
+   # Or clear existing first (either format works)
    pnpm secure-run --upload-secrets --clearvars
+   pnpm secure-run --upload-secrets --clear-vars
    ```
 
 ## Important Notes

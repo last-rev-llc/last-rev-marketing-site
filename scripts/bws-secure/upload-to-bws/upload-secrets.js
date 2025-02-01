@@ -587,8 +587,9 @@ try {
   process.exit(1);
 }
 
-// Check for --clearvars argument
-const shouldClearFirst = process.argv.includes('--clearvars');
+// Change the check for clearvars to accept both formats
+const shouldClearFirst =
+  process.argv.includes('--clearvars') || process.argv.includes('--clear-vars');
 
 // Start processing with options
 processEnvFiles({ clearFirst: shouldClearFirst });

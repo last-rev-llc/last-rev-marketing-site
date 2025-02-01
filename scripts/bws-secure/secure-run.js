@@ -772,10 +772,10 @@ function cleanupSecureFiles() {
   }
 }
 
-// Add near the top with other helper functions
+// Update handleUploadCommand function to check for both formats
 async function handleUploadCommand() {
-  // Check if --clearvars was passed
-  const clearVars = process.argv.includes('--clearvars');
+  // Check if either --clearvars or --clear-vars was passed
+  const clearVars = process.argv.includes('--clearvars') || process.argv.includes('--clear-vars');
 
   // Run the upload-secrets script with clearvars if specified
   const uploadScript = path.join(__dirname, 'upload-to-bws', 'upload-secrets.js');
