@@ -1,133 +1,307 @@
 # BWS Secure Transfer
 
-This directory contains scripts and helper files to securely manage secrets with BWS (Bitwave Solutions) using a streamlined, automated approach.
+A streamlined tool for managing Bitwarden Secrets Manager (BWS) secrets across multiple projects and environments. The `upload-secrets.js` script automates the process of uploading secrets to your BWS project(s), eliminating the need for manual secret management.
 
-## Upload Secrets Script (`upload-secrets.js`)
+## Quick Start
 
-The [`upload-secrets.js`](./upload-secrets.js) file automates the process of uploading secrets to your BWS project(s). It scans the directory for files following the `.env.bws.*` naming pattern and uploads secrets to the corresponding BWS projects. This eliminates the need for manual secret management.
+Prerequisites:
 
-### Features
+- Node.js installed
+- pnpm/npm/yarn installed
+- BWS account with project(s) created
+- BWS access token with write permissions
 
-- **Automated Uploads:** Processes multiple `.env.bws.*` files in the directory.
-- **Dynamic Project ID Extraction:** Automatically determines the project ID from the filename.
-- **Secure Token Management:** Utilizes `dotenv` or environment variables to load `BWS_ACCESS_TOKEN` securely.
-- **Error Resilience:** Logs errors for individual files without interrupting the overall upload process.
+1. **Create your secret files:**
 
----
+   ```bash
+   # .env.bws.<project-id>
+   echo "MY_SECRET=value" > .env.bws.12345678-1234-1234-1234-123456789abc
+   ```
 
-## Requirements
+2. **Set your token:**
 
-1. **Environment Setup:**
+   ```bash
+   # In .env file
+   echo "BWS_ACCESS_TOKEN=your_token_here" > .env
+   ```
 
-   - Ensure you have a `.env` file containing your `BWS_ACCESS_TOKEN` located in the root of your project or a parent directory:
-     ```env
-     BWS_ACCESS_TOKEN=EXAMPLE_ACCESS_TOKEN
-     ```
-   - The token must have **write or expand permissions** to push new secrets. If you encounter errors, check and update the token’s permissions in the BWS admin portal.
+3. **Upload secrets:**
 
-2. **Dependencies:**
+   ```bash
+   # Upload only
+   pnpm secure-run --upload-secrets
 
-   - Install the required tools:
-     ```bash
-     npm install -g dotenv-cli
-     ```
+   # Or clear existing first
+   pnpm secure-run --upload-secrets --clearvars
+   ```
 
-3. **File Naming Convention:**
-   - Ensure all secret files are named using the pattern `.env.bws.<project-id>`. The `<project-id>` portion should exactly match your BWS project ID. For example:
-     ```
-     .env.bws.1234-project-id-from-bws-567890
-     ```
+## Important Notes
 
----
+- Use `secure-run.js` wrapper (recommended) instead of calling upload-secrets.js directly
+- Project IDs in examples are for illustration - use your own BWS project IDs
+- Token can be in root `.env` or local `.env` (root takes precedence)
 
-## Usage
+Example `.env.bws.*` file:
 
-### Running the Script
+```env
+# Production Environment (.env.bws.467a446c-bd75-46bd-9a35-b2740186e3a1)
+CONTENTFUL_SPACE_ID=your_space_id
+API_KEY=your_api_key
+DATABASE_URL=your_db_url
 
-To upload secrets for all `.env.bws.*` files in the directory:
-
-```bash
-node ./upload-secrets.js
+# Comments and empty lines are ok
+NEXT_PUBLIC_API_URL=https://api.example.com
 ```
 
-The script will:
+## Table of Contents
 
-1. Scan the directory for `.env.bws.*` files.
-2. Extract the project ID from each file’s name.
-3. Upload secrets to the respective BWS projects using the key-value pairs in each file.
+- [Installation & Setup](#installation--setup)
+- [Basic Usage](#basic-usage)
+- [Advanced Features](#advanced-features)
+  - [Multiple Projects](#multiple-projects)
+  - [Clear Vars Mode](#clear-vars-mode)
+  - [Debug Mode](#debug-mode)
+- [Security & Permissions](#security--permissions)
+- [Environment Variables](#environment-variables)
+- [CI/CD Integration](#cicd-integration)
+- [Troubleshooting](#troubleshooting)
+- [Reference](#reference)
 
-### Manual Command Example
+## Installation & Setup
 
-To upload a single secret manually, use the following command:
+1. **Install Dependencies:**
+
+   ```bash
+   pnpm install
+   ```
+
+2. **Configure BWS Token:**
+
+   ```env
+   # In .env
+   BWS_ACCESS_TOKEN=your_token_here
+   BWS_ORG_ID=optional_org_id  # Defaults to Last Rev's
+   ```
+
+3. **Create Secret Files:**
+
+   ```bash
+   # Production secrets
+   .env.bws.467a446c-bd75-46bd-9a35-b2740186e3a1
+
+   # Development secrets
+   .env.bws.713fd3cf-d0fc-4111-b68d-b2740186d218
+   ```
+
+## Basic Usage
+
+Upload secrets using any package manager:
 
 ```bash
-dotenv -- npx bws secret create <key> "<value>" <project-id>
+# Using pnpm (recommended)
+pnpm secure-run --upload-secrets
+
+# Using npm
+npm run secure-run --upload-secrets
+
+# Using yarn
+yarn secure-run --upload-secrets
+
+# Direct node execution
+node ./scripts/bws-secure/upload-to-bws/upload-secrets.js
 ```
 
-For example:
+## Advanced Features
+
+### Multiple Projects
+
+Manage multiple projects with separate files:
 
 ```bash
-dotenv -- npx bws secret create EXAMPLE_VAR_SET "example_value" project-id-1234-548395
+.env.bws.467a446c-bd75-46bd-9a35-b2740186e3a1  # Production
+.env.bws.713fd3cf-d0fc-4111-b68d-b2740186d218  # Development
 ```
 
-Replace `<key>`, `<value>`, and `<project-id>` with your actual values.
+The script:
 
----
+- Processes each file sequentially
+- Shows progress per project
+- Provides verification links
+- Handles rate limiting
 
-## Best Practices
+### Clear Vars Mode
 
-1. **Secure Token Management:**
+Clear existing secrets before upload:
 
-   - Avoid hardcoding sensitive values like `BWS_ACCESS_TOKEN` directly in the script or files. Use environment variables or `.env` files for better security.
+```bash
+pnpm secure-run --upload-secrets --clearvars
+```
 
-2. **File Organization:**
+Process:
 
-   - Group your `.env.bws.*` files logically to match the projects they serve. Use clear and descriptive names for the project ID portion of the file name.
+1. Lists existing secrets
+2. Deletes them one by one
+3. Pauses for verification
+4. Uploads new secrets
 
-3. **Version Control:**
-   - Do not commit `.env` or `.env.bws.*` files to version control systems. Use `.gitignore` to exclude them:
-     ```
-     .env
-     .env.bws.*
-     ```
+### Debug Mode
 
----
+Enable detailed logging:
+
+```bash
+DEBUG=true pnpm secure-run --upload-secrets
+```
+
+Shows:
+
+- API commands
+- Rate limiting info
+- Error details
+- Progress updates
+
+## Security & Permissions
+
+File Permissions:
+
+```bash
+# Secure env files
+chmod 600 .env .env.bws.*
+
+# BWS CLI permissions
+chmod +x ./node_modules/.bin/bws
+```
+
+Security Features:
+
+- Secure API transmission
+- Local-only file reading
+- No secret logging
+- Verification pauses
+- Permission checks
+
+## Environment Variables
+
+Required:
+
+- `BWS_ACCESS_TOKEN`: BWS access token
+
+Optional:
+
+- `DEBUG`: Enable detailed logging
+- `BWS_ORG_ID`: Organization ID
+- `NO_COLOR`: Disable colors
+- `FORCE_COLOR`: Force disable colors
+
+## CI/CD Integration
+
+GitHub Actions:
+
+```yaml
+name: Upload Secrets
+on:
+  push:
+    branches: [main]
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: pnpm/action-setup@v2
+
+      - name: Upload
+        env:
+          BWS_ACCESS_TOKEN: ${{ secrets.BWS_ACCESS_TOKEN }}
+        run: pnpm secure-run --upload-secrets
+```
+
+GitLab CI:
+
+```yaml
+upload_secrets:
+  script:
+    - pnpm secure-run --upload-secrets
+  variables:
+    BWS_ACCESS_TOKEN: $BWS_ACCESS_TOKEN
+```
 
 ## Troubleshooting
 
-1. **Token Errors:**
+Common Issues:
 
-   - If you encounter errors like `permission denied` or `unexpected argument`, ensure:
-     - Your `BWS_ACCESS_TOKEN` is correct and loaded into the environment.
-     - Your token has the necessary permissions to create or update secrets.
+1. **404 Errors:**
 
-2. **File Not Processed:**
+   - Verify project ID
+   - Check token permissions
+   - Confirm project exists
 
-   - Verify that the file name matches the `.env.bws.<project-id>` pattern.
-   - Check that the file contains valid key-value pairs.
+2. **Rate Limiting:**
 
-3. **Environment Not Loaded:**
+   - Script handles automatically
+   - Adds delays between requests
+   - Shows warning messages
 
-   - Ensure `dotenv-cli` is installed and the `.env` file is located in the project root or a parent directory.
+3. **Permission Issues:**
 
-4. **Rate Limiting:**
-   - If you are processing many files or making frequent API requests, you may encounter rate limits. Reduce the number of requests or add delays between uploads.
+   - Check token access
+   - Verify file permissions
+   - Confirm CLI access
 
----
+4. **Empty Variables:**
+   - Check file contents
+   - Verify variable resolution
+   - Use debug mode
 
-## Contributing
+## Reference
 
-We welcome contributions to improve this project. Feel free to open issues or submit pull requests with enhancements or bug fixes.
+### BWS CLI Commands
 
-### Suggestions for Improvement
+List secrets:
 
-- Add parallel processing for faster uploads when handling many `.env.bws.*` files.
-- Include unit tests for the script to ensure reliability.
-- Extend support for additional configuration formats (e.g., YAML, JSON).
-- Add logging options for more detailed reports of successful and failed uploads.
+```bash
+bws secret list -o json <project-id>
+```
 
----
+Create secret:
 
-## License
+```bash
+bws secret create <key> <value> <project-id>
+```
 
-This project is licensed under the [MIT License](LICENSE).
+Delete secret:
+
+```bash
+bws secret delete <secret-id>
+```
+
+### Organization ID
+
+Default org ID (Last Rev):
+
+```
+22479128-f194-460a-884b-b24a015686c6
+```
+
+Override:
+
+```env
+BWS_ORG_ID=your-org-id
+```
+
+### File Structure
+
+```
+scripts/bws-secure/
+├── upload-to-bws/
+│   ├── upload-secrets.js     # Main script
+│   ├── readme.md            # This file
+│   └── .env                 # Local config
+├── secure-run.js            # Runner script
+└── README.md               # Parent docs
+```
+
+## Related Documentation
+
+- [Main BWS Secure Documentation](../README.md)
+- [Bitwarden Secrets Manager Docs](https://bitwarden.com/help/secrets-manager-overview/)
+- [BWS CLI Reference](https://bitwarden.com/help/secrets-manager-cli/)

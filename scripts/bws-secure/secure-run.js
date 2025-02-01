@@ -7,6 +7,7 @@ const path = require('path');
 const { execSync } = require('child_process');
 const readline = require('readline');
 const fsPromises = require('fs').promises;
+const dotenv = require('dotenv');
 
 // Load local .env so that BWS_ACCESS_TOKEN, ENCRYPTION_KEY, etc. become available
 require('dotenv').config();
@@ -17,9 +18,14 @@ const { validateDeployment } = require('./update-environments/utils.js');
 // Platform detection
 const isNetlify = process.env.NETLIFY === 'true';
 const isVercel = process.env.VERCEL === '1';
+const isDebug = process.env.DEBUG === 'true';
 
 // Add this near the top of the file with other imports
+const DEBUG = process.env.DEBUG === 'true';
+
 function log(level, message) {
+  if (level === 'debug' && !DEBUG) return;
+
   const colors = {
     info: '\x1b[36m', // Cyan
     debug: '\x1b[90m', // Gray
@@ -86,8 +92,43 @@ async function createRequiredVarsFile() {
   }
 }
 
-// Update the promptForProject function to remove platform information
+// Handle project selection - automatically use single project or prompt for selection
 async function promptForProject(projects) {
+  // If there's only one project, use it automatically
+  if (projects.length === 1) {
+    const selectedProject = projects[0];
+
+    // Set it in process.env immediately
+    process.env.BWS_PROJECT = selectedProject.projectName;
+
+    // Create content for .env file
+    let envContent = '\n\n# Added by bws-secure project selector\n';
+    envContent += `BWS_PROJECT=${selectedProject.projectName}\n\n`;
+
+    // Add environment options
+    envContent += '# Environment options (uncomment to switch):\n';
+    envContent += 'BWS_ENV=local\n'; // Default to local
+    envContent += '# BWS_ENV=dev     # For development/staging\n';
+    envContent += '# BWS_ENV=prod    # For production\n\n';
+
+    try {
+      const envPath = path.join(process.cwd(), '.env');
+      await fsPromises.appendFile(envPath, envContent);
+      log(
+        'info',
+        `Added BWS_PROJECT=${selectedProject.projectName} and environment options to your .env file`
+      );
+    } catch (err) {
+      log(
+        'warn',
+        'Could not update .env file. You may want to add BWS_PROJECT and BWS_ENV manually.'
+      );
+    }
+
+    return selectedProject;
+  }
+
+  // Original prompt logic for multiple projects...
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
@@ -109,8 +150,11 @@ async function promptForProject(projects) {
     if (selection >= 0 && selection < projects.length) {
       const selectedProject = projects[selection];
 
-      // Create content for .env file with all projects
-      let envContent = '\n# Added by bws-secure project selector\n';
+      // Set it in process.env immediately
+      process.env.BWS_PROJECT = selectedProject.projectName;
+
+      // Create content for .env file with all projects and environments
+      let envContent = '\n\n# Added by bws-secure project selector\n'; // Added extra \n
       envContent += '# Available projects (uncomment to switch):\n\n';
 
       // Add all projects as comments except the selected one
@@ -122,6 +166,12 @@ async function promptForProject(projects) {
         }
       });
 
+      // Add environment options
+      envContent += '\n# Environment options (uncomment to switch):\n';
+      envContent += 'BWS_ENV=local\n'; // Default to local
+      envContent += '# BWS_ENV=dev     # For development/staging\n';
+      envContent += '# BWS_ENV=prod    # For production\n';
+
       // Add a blank line at the end
       envContent += '\n';
 
@@ -130,10 +180,13 @@ async function promptForProject(projects) {
         await fsPromises.appendFile(envPath, envContent);
         log(
           'info',
-          `Added BWS_PROJECT=${selectedProject.projectName} to your .env file with commented alternatives`
+          `Added BWS_PROJECT=${selectedProject.projectName} and environment options to your .env file`
         );
       } catch (err) {
-        log('warn', 'Could not update .env file. You may want to add BWS_PROJECT manually.');
+        log(
+          'warn',
+          'Could not update .env file. You may want to add BWS_PROJECT and BWS_ENV manually.'
+        );
       }
 
       return selectedProject;
@@ -149,6 +202,26 @@ async function promptForProject(projects) {
 // Add helper to validate BWS token
 async function validateBwsToken() {
   if (!process.env.BWS_ACCESS_TOKEN) {
+    // prettier-ignore
+    {
+      console.warn('\x1b[33m╔════════════════════════════════════════════════════════╗\x1b[0m');
+      console.warn('\x1b[33m║                                                        ║\x1b[0m');
+      console.warn('\x1b[33m║             WARNING: BWS TOKEN MISSING                 ║\x1b[0m');
+      console.warn('\x1b[33m║                                                        ║\x1b[0m');
+      console.warn('\x1b[33m║ To use BWS features:                                   ║\x1b[0m');
+      console.warn('\x1b[33m║ 1. Log in to vault.bitwarden.com                       ║\x1b[0m');
+      console.warn('\x1b[33m║ 2. Go to Secrets Manager > Machine Accounts            ║\x1b[0m');
+      console.warn('\x1b[33m║ 3. Create or copy your machine access token            ║\x1b[0m');
+      console.warn('\x1b[33m║ 4. Add to .env: BWS_ACCESS_TOKEN=your_token            ║\x1b[0m');
+      console.warn('\x1b[33m║                                                        ║\x1b[0m');
+      console.warn('\x1b[33m║ For now, continuing with only .env values...           ║\x1b[0m');
+      console.warn('\x1b[33m║                                                        ║\x1b[0m');
+      console.warn('\x1b[33m╚════════════════════════════════════════════════════════╝\x1b[0m');
+      console.warn(
+        '\nVisit the link below to create your token: \n' +
+          '\nhttps://vault.bitwarden.com/#/sm/22479128-f194-460a-884b-b24a015686c6/machine-accounts\n'
+      );
+    }
     return false;
   }
 
@@ -160,6 +233,26 @@ async function validateBwsToken() {
     });
     return true;
   } catch (err) {
+    // prettier-ignore
+    {
+      console.error('\x1b[31m╔════════════════════════════════════════════════════════╗\x1b[0m');
+      console.error('\x1b[31m║                                                        ║\x1b[0m');
+      console.error('\x1b[31m║             CRITICAL BWS TOKEN ERROR                   ║\x1b[0m');
+      console.error('\x1b[31m║                                                        ║\x1b[0m');
+      console.error('\x1b[31m║ Your BWS_ACCESS_TOKEN appears to be invalid:           ║\x1b[0m');
+      console.error('\x1b[31m║ 1. Check if token has expired                          ║\x1b[0m');
+      console.error('\x1b[31m║ 2. Verify token permissions in vault.bitwarden.com     ║\x1b[0m');
+      console.error('\x1b[31m║ 3. Generate new token if needed                        ║\x1b[0m');
+      console.error('\x1b[31m║ 4. Ensure token has read access to required projects   ║\x1b[0m');
+      console.error('\x1b[31m║                                                        ║\x1b[0m');
+      console.error('\x1b[31m║ For now, continuing with only .env values...           ║\x1b[0m');
+      console.error('\x1b[31m║                                                        ║\x1b[0m');
+      console.error('\x1b[31m╚════════════════════════════════════════════════════════╝\x1b[0m');
+      console.error(
+        '\nVisit the link below to check or regenerate your token: \n' +
+          '\nhttps://vault.bitwarden.com/#/sm/22479128-f194-460a-884b-b24a015686c6/machine-accounts\n'
+      );
+    }
     return false;
   }
 }
@@ -190,19 +283,22 @@ function normalizeEnvironment(envName) {
     return 'prod';
   }
 
-  if (
-    [
-      'develop',
-      'development',
-      'preview',
-      'deploy-preview',
-      'branch-deploy',
-      'deploy/preview',
-      'branch',
-      'test',
-      'staging'
-    ].includes(env)
-  ) {
+  if (env === 'dev' || env === 'develop' || env === 'development') {
+    return 'dev';
+  }
+
+  // Check other development-like environments
+  const devEnvironments = [
+    'preview',
+    'deploy-preview',
+    'branch-deploy',
+    'deploy/preview',
+    'branch',
+    'test',
+    'staging'
+  ];
+
+  if (devEnvironments.includes(env)) {
     return 'dev';
   }
 
@@ -215,9 +311,92 @@ function normalizeEnvironment(envName) {
   return env;
 }
 
-// Also fix the setupEnvironment function to use the correct variable name
-async function setupEnvironment() {
-  log('info', 'Creating environment-specific secure files...');
+// Determine environment based on platform or defaults
+function determineEnvironment() {
+  // Platform-specific environment detection
+  if (process.env.NETLIFY === 'true') {
+    return normalizeEnvironment(process.env.CONTEXT || 'dev');
+  }
+
+  if (process.env.VERCEL === '1') {
+    return normalizeEnvironment(process.env.VERCEL_ENV || 'dev');
+  }
+
+  // Check explicit BWS_ENV setting
+  if (process.env.BWS_ENV) {
+    return normalizeEnvironment(process.env.BWS_ENV);
+  }
+
+  // Check NODE_ENV
+  if (process.env.NODE_ENV) {
+    return normalizeEnvironment(process.env.NODE_ENV);
+  }
+
+  // Default to local if nothing else matches
+  return 'local';
+}
+
+// Add this helper function for environment status display
+function printEnvironmentSummary() {
+  const env = process.env.BWS_ENV || 'local';
+  const project = process.env.BWS_PROJECT || 'none';
+  const testVar = process.env.BWS_SECRET_TEST_VAR || 'not set';
+  const projectId = process.env.BWS_PROJECT_ID || 'none';
+
+  // Adjust these values to control padding and width
+  const LABEL_WIDTH = 25; // Width for labels like "BWS_SECRET_TEST_VAR    :"
+  const MIN_BOX_WIDTH = 50;
+  const MAX_BOX_WIDTH = 80;
+  const EXTRA_PADDING = 10;
+
+  // Calculate the longest line to determine box width
+  const contentLength = Math.max(
+    project.length,
+    env.length,
+    projectId.length,
+    Math.min(testVar.length, 50)
+  );
+
+  // Add padding for labels and margins
+  const boxWidth = Math.min(contentLength + LABEL_WIDTH + EXTRA_PADDING, MAX_BOX_WIDTH);
+  const padWidth = boxWidth - 2; // -2 for the side borders
+  const contentPadding = padWidth - LABEL_WIDTH;
+
+  // Create formatted status box with environment info
+  const lines = [
+    `╔${'═'.repeat(padWidth + 1)}╗`,
+    `║${' Environment Summary'.padEnd(padWidth + 0)} ║`,
+    `╟${'─'.repeat(padWidth + 1)}╢`,
+    `║ Project${' '.repeat(13)}: ${project}${' '.repeat(contentPadding - project.length + 2)} ║`,
+    `║${' '.repeat(padWidth)} ║`, // Blank line after project
+    `║ BWS_ENV${' '.repeat(13)}: ${env}${' '.repeat(contentPadding - env.length + 2)} ║`,
+    `║${' '.repeat(padWidth)} ║`, // Blank line before project id
+    `║ BWS Project ID${' '.repeat(6)}: ${projectId}${' '.repeat(
+      contentPadding - projectId.length + 2
+    )} ║`,
+    `║${' '.repeat(padWidth)} ║`, // Blank line before test var
+    `║ BWS_SECRET_TEST_VAR${' '.repeat(1)}: ${testVar.substring(0, 50)}${' '.repeat(
+      contentPadding - Math.min(testVar.length, 50) + 2
+    )} ║`,
+    `╚${'═'.repeat(padWidth + 1)}╝`
+  ];
+
+  // Add a blank line before and after the box
+  log('info', '');
+  lines.forEach((line) => log('info', line));
+  log('info', '');
+}
+
+// At the start of execution, store ALL original environment variables
+const originalEnvironment = { ...process.env };
+
+// Keep original setupEnvironment but enhance with platform support
+async function setupEnvironment(options = { isPlatformBuild: false }) {
+  log('info', 'Creating project-specific secure files...');
+
+  if (options.isPlatformBuild) {
+    log('debug', 'Running platform-specific setup...');
+  }
 
   // Initialize tracking of created files
   process.env.BWS_CREATED_FILES = '[]';
@@ -233,116 +412,233 @@ async function setupEnvironment() {
       throw new Error('Invalid configuration file');
     }
 
-    // Get the correct project based on BWS_PROJECT or platform
-    let project = null;
-    log('debug', `Config loaded with ${config.projects.length} project(s)`);
-    log('debug', `Project platforms: ${config.projects.map((p) => p.platform).join(', ')}`);
-    if (process.env.BWS_PROJECT) {
-      project = config.projects.find((p) => p.projectName === process.env.BWS_PROJECT);
-    } else if (isNetlify) {
-      project = config.projects.find((p) => p.platform === 'netlify');
-    } else if (isVercel) {
-      project = config.projects.find((p) => p.platform === 'vercel');
-    } else {
-      // Not on a platform and no BWS_PROJECT set - either use single project or prompt
-      if (config.projects.length === 1) {
-        project = config.projects[0];
-        process.env.BWS_PROJECT = project.projectName;
-        log('info', `Using only available project: ${project.projectName}`);
-      } else {
-        try {
-          project = await promptForProject(config.projects);
-          process.env.BWS_PROJECT = project.projectName;
-        } catch (err) {
-          throw new Error(`Project selection required: ${err.message}`);
-        }
-      }
-    }
+    // Determine environment early
+    const env = determineEnvironment();
+    process.env.BWS_ENV = env;
+    log('debug', `Using environment: ${env}`);
 
-    if (!project) {
-      throw new Error('No suitable project found in bwsconfig.json');
-    }
+    // Get unique platforms from config
+    const platforms = new Set(config.projects.map((p) => p.platform.toLowerCase()));
 
-    // Always create all environment files
-    const environments = ['prod', 'dev', 'local'];
-    for (const env of environments) {
-      const projectId = project.bwsProjectIds[env];
-      if (!projectId) {
-        log('warn', `No project ID found for ${env} environment`);
-        continue;
-      }
-      await loadEnvironmentSecrets(env, projectId);
-    }
-
-    // Determine which environment to load into process.env
-    let activeEnvironment;
-    if (process.env.BWS_ENV) {
-      activeEnvironment = normalizeEnvironment(process.env.BWS_ENV);
-    } else if (isNetlify) {
-      activeEnvironment = normalizeEnvironment(process.env.CONTEXT || 'dev');
-    } else if (isVercel) {
-      activeEnvironment = normalizeEnvironment(process.env.VERCEL_ENV || 'dev');
-    } else {
-      activeEnvironment = 'local';
-      log('info', 'Local development detected, using local environment');
-    }
-
-    // Load the active environment's variables
-    console.log(`Loading environment variables from ${activeEnvironment} environment`);
-
-    const secureFile = `.env.secure.${activeEnvironment}`;
-    if (fs.existsSync(secureFile)) {
-      // Read and decrypt the secure file
-      const encryptedContent = fs.readFileSync(secureFile, 'utf-8');
-      const decryptedContent = decryptContent(encryptedContent, process.env.BWS_EPHEMERAL_KEY);
-
-      // Load decrypted variables into process.env
-      decryptedContent.split('\n').forEach((line) => {
-        const [key, ...valueParts] = line.split('=');
-        if (key && valueParts.length > 0) {
-          process.env[key.trim()] = valueParts.join('=').trim();
-        }
-      });
-      log('info', `Loaded variables from ${secureFile} into process.env`);
-    } else {
-      console.warn(`Environment file ${secureFile} not found`);
-    }
-
-    // If we're on a platform, also load auth tokens
-    if (isNetlify || isVercel) {
-      // Load global secrets (without project ID) to get auth tokens
-      process.env.BWS_PROJECT_ID = ''; // Clear project ID temporarily
-      const globalSecrets = loadBwsSecrets(process.env.BWS_EPHEMERAL_KEY);
-      if (globalSecrets) {
-        globalSecrets.split('\n').forEach((line) => {
-          const [key, ...valueParts] = line.split('=');
-          if (key && valueParts.length > 0) {
-            // Only set auth tokens
-            if (
-              (key.trim() === 'NETLIFY_AUTH_TOKEN' && isNetlify) ||
-              (key.trim() === 'VERCEL_AUTH_TOKEN' && isVercel)
-            ) {
-              process.env[key.trim()] = valueParts.join('=').trim();
-            }
+    // Create global .env.secure with platform tokens
+    if (process.env.BWS_ACCESS_TOKEN) {
+      try {
+        const result = spawnSync('bws', ['secret', 'list', '-t', process.env.BWS_ACCESS_TOKEN], {
+          encoding: 'utf8',
+          env: {
+            ...process.env,
+            NO_COLOR: '1',
+            FORCE_COLOR: '0',
+            TERM: 'dumb' // Add this to further discourage color output
           }
         });
+
+        if (result.status === 0) {
+          // Always clean the output, even without DEBUG
+          const cleanOutput = result.stdout.replace(/\u001b\[\d+m/g, '').trim();
+
+          try {
+            const secrets = JSON.parse(cleanOutput);
+            const platformTokens = {};
+            let platformsFound = [];
+
+            // Only load tokens for the platform we're on
+            if (isNetlify && platforms.has('netlify')) {
+              const netlifyToken = secrets.find((s) => s.key === 'NETLIFY_AUTH_TOKEN');
+              if (netlifyToken) {
+                platformTokens.NETLIFY_AUTH_TOKEN = netlifyToken.value;
+                platformsFound.push('Netlify');
+              }
+            }
+            if (isVercel && platforms.has('vercel')) {
+              const vercelToken = secrets.find((s) => s.key === 'VERCEL_AUTH_TOKEN');
+              if (vercelToken) {
+                platformTokens.VERCEL_AUTH_TOKEN = vercelToken.value;
+                platformsFound.push('Vercel');
+              }
+            }
+
+            // Only create .env.secure if we found tokens for our platform
+            if (Object.keys(platformTokens).length > 0) {
+              const content = Object.entries(platformTokens)
+                .map(([key, value]) => `${key}=${value}`)
+                .join('\n');
+              const cipherText = encryptContent(content, process.env.BWS_EPHEMERAL_KEY);
+              fs.writeFileSync('.env.secure', cipherText);
+              log('info', `✓ Successfully loaded auth tokens for: ${platformsFound.join(', ')}`);
+            }
+          } catch (error) {
+            log('warn', `Failed to parse secrets: ${error.message}`);
+          }
+        }
+      } catch (error) {
+        log('warn', `Failed to create global .env.secure: ${error.message}`);
       }
     }
 
-    // Add platform variable sync here
-    if (process.env.NETLIFY === 'true' || process.env.VERCEL === '1') {
-      log('info', 'Syncing platform variables...');
-      const updateResult = spawnSync(
-        'node',
-        [path.join(__dirname, 'update-environments', 'updateEnvVars.js')],
-        {
-          stdio: 'inherit',
-          env: process.env
-        }
-      );
+    // First, create all project ID based files
+    const projectIds = new Set();
+    config.projects.forEach((project) => {
+      Object.values(project.bwsProjectIds).forEach((id) => {
+        if (id) projectIds.add(id);
+      });
+    });
+
+    // Create project ID based files
+    for (const projectId of projectIds) {
+      await loadEnvironmentSecrets(projectId, projectId);
     }
+
+    // For platform builds, process each project
+    if (isNetlify || isVercel) {
+      // Save original environment values if they exist
+      const originalEnv = {
+        BWS_ENV: process.env.BWS_ENV,
+        BWS_PROJECT: process.env.BWS_PROJECT,
+        BWS_PROJECT_ID: process.env.BWS_PROJECT_ID,
+        BWS_ACCESS_TOKEN: process.env.BWS_ACCESS_TOKEN
+      };
+
+      for (const project of config.projects) {
+        log('info', `\n=== Processing ${project.projectName} ===`);
+
+        // Create the standard environment files for this project
+        const envMappings = {
+          prod: project.bwsProjectIds.prod,
+          dev: project.bwsProjectIds.dev,
+          local: project.bwsProjectIds.local
+        };
+
+        // Create environment files for this project
+        for (const [env, projectId] of Object.entries(envMappings)) {
+          const sourceFile = `.env.secure.${projectId}`;
+          const targetFile = `.env.secure.${env}`;
+          if (fs.existsSync(sourceFile)) {
+            fs.copyFileSync(sourceFile, targetFile);
+            log('debug', `Created ${targetFile} from ${sourceFile}`);
+          }
+        }
+
+        // Set current project in environment
+        process.env.BWS_PROJECT = project.projectName;
+
+        // Enhanced platform operations
+        log('info', `Syncing platform variables for ${project.projectName}...`);
+        const updateResult = spawnSync(
+          'node',
+          [path.join(__dirname, 'update-environments', 'updateEnvVars.js')],
+          {
+            stdio: 'inherit',
+            env: process.env
+          }
+        );
+
+        // Clean up the standard environment files after processing this project
+        if (!process.env.DEBUG) {
+          ['prod', 'dev', 'local'].forEach((env) => {
+            const file = `.env.secure.${env}`;
+            if (fs.existsSync(file)) {
+              fs.unlinkSync(file);
+              log('debug', `Cleaned up ${file}`);
+            }
+          });
+        }
+      }
+
+      // After all platform operations, restore original values if they existed
+      if (
+        originalEnv.BWS_ENV ||
+        originalEnv.BWS_PROJECT ||
+        originalEnv.BWS_PROJECT_ID ||
+        originalEnv.BWS_ACCESS_TOKEN
+      ) {
+        if (originalEnv.BWS_ENV) process.env.BWS_ENV = originalEnv.BWS_ENV;
+        if (originalEnv.BWS_PROJECT) process.env.BWS_PROJECT = originalEnv.BWS_PROJECT;
+        if (originalEnv.BWS_PROJECT_ID) process.env.BWS_PROJECT_ID = originalEnv.BWS_PROJECT_ID;
+        if (originalEnv.BWS_ACCESS_TOKEN)
+          process.env.BWS_ACCESS_TOKEN = originalEnv.BWS_ACCESS_TOKEN;
+
+        // Load the environment based on restored values
+        if (originalEnv.BWS_PROJECT && originalEnv.BWS_ENV) {
+          const project = config.projects.find((p) => p.projectName === originalEnv.BWS_PROJECT);
+          if (project) {
+            const projectId = project.bwsProjectIds[originalEnv.BWS_ENV];
+            if (projectId) {
+              process.env.BWS_PROJECT_ID = projectId;
+              const sourceFile = `.env.secure.${projectId}`;
+              if (fs.existsSync(sourceFile)) {
+                const content = fs.readFileSync(sourceFile, 'utf8');
+                const decrypted = decryptContent(content, process.env.BWS_EPHEMERAL_KEY);
+                Object.assign(process.env, dotenv.parse(decrypted));
+                log(
+                  'info',
+                  `Restored environment from ${sourceFile} for ${originalEnv.BWS_ENV} environment`
+                );
+              }
+            }
+          }
+        }
+      }
+
+      // Print final environment state
+      printEnvironmentSummary();
+    } else {
+      // For local development, handle single project
+      // First validate BWS token before prompting
+      const isValidToken = await validateBwsToken();
+
+      if (!isValidToken) {
+        log('info', 'No valid BWS_ACCESS_TOKEN found, continuing with .env values only');
+        return;
+      }
+
+      if (!process.env.BWS_PROJECT) {
+        await promptForProject(config.projects);
+      }
+
+      const projectName = process.env.BWS_PROJECT;
+      const project = config.projects.find((p) => p.projectName === projectName);
+      if (!project) {
+        throw new Error(`Project ${projectName} not found in config`);
+      }
+
+      const env = process.env.BWS_ENV || 'local';
+      const projectId = project.bwsProjectIds[env];
+      if (!projectId) {
+        throw new Error(`No project ID found for environment ${env}`);
+      }
+
+      // Set the project ID in process.env
+      process.env.BWS_PROJECT_ID = projectId;
+
+      // Load project-specific variables
+      const sourceFile = `.env.secure.${projectId}`;
+      if (fs.existsSync(sourceFile)) {
+        const content = fs.readFileSync(sourceFile, 'utf8');
+        const decrypted = decryptContent(content, process.env.BWS_EPHEMERAL_KEY);
+
+        // Parse decrypted content but don't override existing env vars
+        const decryptedVars = dotenv.parse(decrypted);
+        Object.keys(decryptedVars).forEach((key) => {
+          // Only set if not already defined in process.env
+          if (!(key in process.env)) {
+            process.env[key] = decryptedVars[key];
+          }
+        });
+
+        log('info', `Loaded environment from ${sourceFile} for local development`);
+
+        // Add environment summary
+        printEnvironmentSummary();
+      }
+    }
+
+    // After all BWS and platform operations, restore original environment variables
+    Object.entries(originalEnvironment).forEach(([key, value]) => {
+      process.env[key] = value;
+    });
   } catch (error) {
-    throw new Error(`Failed to setup environment: ${error.message}`);
+    log('error', `Failed to setup environment: ${error.message}`);
   }
 }
 
@@ -379,19 +675,18 @@ function encryptContent(content, encryptionKey) {
 // New function to handle environment-specific secrets
 async function loadEnvironmentSecrets(env, projectId) {
   if (!projectId || !env) {
-    console.warn(
-      `\x1b[33mSkipping invalid environment config - missing projectId or environment name\x1b[0m`
-    );
+    log('warn', 'Skipping invalid environment config - missing projectId or environment name');
     return false;
   }
 
   if (!process.env.BWS_ACCESS_TOKEN) {
-    console.warn(`\x1b[33mSkipping ${env} environment - BWS_ACCESS_TOKEN not set\x1b[0m`);
+    log('warn', 'Skipping environment - BWS_ACCESS_TOKEN not set');
     return false;
   }
 
   try {
-    console.log(`Loading secrets for ${env} environment (${projectId})...`);
+    // More concise logging
+    log('debug', `Loading secrets for ${projectId}...`);
 
     const output = execSync(
       `./node_modules/.bin/bws secret list -t ${process.env.BWS_ACCESS_TOKEN} ${projectId} --output json`,
@@ -401,52 +696,38 @@ async function loadEnvironmentSecrets(env, projectId) {
       }
     );
 
-    // Handle empty or invalid JSON response
     let bwsSecrets;
     try {
       bwsSecrets = JSON.parse(output || '[]');
     } catch (parseError) {
-      console.warn(`\x1b[33mWarning: No valid secrets found for ${env} environment\x1b[0m`);
+      log('warn', `No valid secrets found for ${env}`);
       return false;
     }
 
-    // If this is dev or prod environment, always load VERCEL_AUTH_TOKEN into memory
-    if ((env === 'dev' || env === 'prod') && process.env.VERCEL === '1') {
-      const vercelToken = bwsSecrets.find((s) => s.key === 'VERCEL_AUTH_TOKEN')?.value;
-      if (vercelToken) {
-        process.env.VERCEL_AUTH_TOKEN = vercelToken;
-      }
-    }
-
-    // Continue with normal environment file creation...
+    // Create the secure file
     const envContent = bwsSecrets.map(({ key, value }) => `${key}=${value}`).join('\n');
-
     if (process.env.BWS_EPHEMERAL_KEY && envContent) {
       const cipherText = encryptContent(envContent, process.env.BWS_EPHEMERAL_KEY);
-      fs.writeFileSync(`.env.secure.${env}`, cipherText, {
-        encoding: 'utf-8'
-      });
-      console.log(
-        `Created .env.secure.${env} file for ${env} environment with ${bwsSecrets.length} secrets`
-      );
+      fs.writeFileSync(`.env.secure.${projectId}`, cipherText, { encoding: 'utf-8' });
+
+      // Only show detailed counts in debug mode
+      if (process.env.DEBUG === 'true') {
+        log('debug', `Created .env.secure.${projectId} with ${bwsSecrets.length} secrets`);
+      }
       return true;
     }
     return false;
   } catch (error) {
-    // Handle 404 errors more gracefully
     if (error?.message?.includes('404 Not Found')) {
-      console.warn(
-        `\x1b[33mWarning: Project ${projectId} (${env}) no secrets found, does not exist, or no access\x1b[0m`
-      );
+      log('warn', `Project ${projectId} (${env}): no secrets found or no access`);
       return false;
     }
 
-    // Add more detailed error logging for other errors
-    console.warn(`\x1b[33mWarning: Failed to load secrets for ${env}:\x1b[0m`);
+    log('warn', `Failed to load secrets for ${env}`);
     if (process.env.DEBUG === 'true') {
-      if (error?.stdout) console.warn('stdout:', error.stdout.toString());
-      if (error?.stderr) console.warn('stderr:', error.stderr.toString());
-      console.warn('Error:', error?.message || 'Unknown error');
+      if (error?.stdout) log('debug', 'stdout:', error.stdout.toString());
+      if (error?.stderr) log('debug', 'stderr:', error.stderr.toString());
+      log('debug', 'Error:', error?.message || 'Unknown error');
     }
     return false;
   }
@@ -476,10 +757,10 @@ function loadSecureEnv(env) {
 // Move cleanup function to top level
 function cleanupSecureFiles() {
   try {
-    // Clean up all .env.secure.* files
+    // Clean up all .env.secure.* files and .env.secure
     const files = fs.readdirSync(process.cwd());
     files.forEach((file) => {
-      if (file.startsWith('.env.secure.')) {
+      if (file === '.env.secure' || file.startsWith('.env.secure.')) {
         fs.unlinkSync(path.join(process.cwd(), file));
         if (process.env.DEBUG) {
           log('debug', `Cleaned up ${file}`);
@@ -491,23 +772,46 @@ function cleanupSecureFiles() {
   }
 }
 
+// Add near the top with other helper functions
+async function handleUploadCommand() {
+  // Check if --clearvars was passed
+  const clearVars = process.argv.includes('--clearvars');
+
+  // Run the upload-secrets script with clearvars if specified
+  const uploadScript = path.join(__dirname, 'upload-to-bws', 'upload-secrets.js');
+  const args = clearVars ? ['--clearvars'] : [];
+
+  const result = spawnSync('node', [uploadScript, ...args], {
+    stdio: 'inherit',
+    env: process.env
+  });
+
+  // Exit with the same status as the upload script
+  process.exit(result.status);
+}
+
 // Main execution
 (async () => {
   try {
-    // -----------------------------------------------------------------------
-    // ADD/CHANGE START
-    // -----------------------------------------------------------------------
+    // Check for upload command
+    const args = process.argv.slice(2);
+    if (args[0] === '--upload-secrets') {
+      await handleUploadCommand();
+      return;
+    }
+
+    // 1. Always load base .env first (but don't override original env vars)
+    dotenv.config({ override: false });
+    log('debug', 'Loaded base environment from .env');
+
+    // 2. Check if we need to scan for required vars
     const requiredVarsPath = path.join(__dirname, 'requiredVars.env');
     const isNetlify = process.env.NETLIFY === 'true';
     const isVercel = process.env.VERCEL === '1';
     const isDebug = process.env.DEBUG === 'true';
 
-    if (fs.existsSync(requiredVarsPath) && !isNetlify && !isVercel && !isDebug) {
-      log(
-        'info',
-        'Skipping environment scan because requiredVars.env exists and we are not on Netlify/Vercel/DEBUG'
-      );
-    } else {
+    // Only run environment scan for platform builds or debug mode
+    if (!fs.existsSync(requiredVarsPath) || isNetlify || isVercel || isDebug) {
       log('info', 'Scanning for required variables...');
       const scanResult = spawnSync(
         'node',
@@ -518,26 +822,56 @@ function cleanupSecureFiles() {
         throw new Error('Failed to scan for required variables');
       }
     }
-    // -----------------------------------------------------------------------
-    // ADD/CHANGE END
-    // -----------------------------------------------------------------------
 
-    // Now that the file is ready or skipped, do environment setup
-    await setupEnvironment();
+    // 3. Try BWS enhancement if possible
+    try {
+      const isValidToken = await validateBwsToken();
+      if (isValidToken) {
+        // Single setupEnvironment call that handles both cases
+        await setupEnvironment({
+          isPlatformBuild: isNetlify || isVercel
+        });
 
-    log('info', 'Running environment validation now that secrets are loaded...');
+        // Call map-env-files.js to show decrypted contents if requested
+        const mapResult = spawnSync(
+          'node',
+          [path.join(__dirname, 'update-environments', 'map-env-files.js')],
+          {
+            stdio: 'inherit',
+            env: process.env
+          }
+        );
+
+        // Restore original variables after mapping
+        Object.entries(originalEnvironment).forEach(([key, value]) => {
+          process.env[key] = value;
+        });
+      } else {
+        log('info', 'No valid BWS_ACCESS_TOKEN found, continuing with .env values only');
+      }
+    } catch (error) {
+      log('warn', `BWS enhancement failed: ${error.message}`);
+    }
+
+    // 4. Run environment validation regardless
+    log('info', 'Running environment validation...');
     const validator = spawnSync('node', [path.join(__dirname, 'env_validator.js')], {
       stdio: 'inherit',
       env: process.env
     });
 
+    // 5. IMPORTANT: Restore original environment variables to ensure CLI-provided vars take precedence
+    Object.entries(originalEnvironment).forEach(([key, value]) => {
+      process.env[key] = value;
+    });
+
+    // 6. Execute the command
     const command = process.argv.slice(2);
     if (command.length === 0) {
-      console.log('\x1b[33mWarning: No command provided to execute\x1b[0m');
+      log('warn', 'No command provided to execute');
       process.exit(0);
     }
 
-    // Execute the command but DON'T clean up after
     const result = spawnSync(command[0], command.slice(1), {
       stdio: 'inherit',
       env: process.env
@@ -545,12 +879,12 @@ function cleanupSecureFiles() {
 
     process.exit(result.status);
   } catch (error) {
-    console.error('\x1b[31mError during execution:', error.message, '\x1b[0m');
+    log('error', error.message);
     process.exit(1);
   }
 })();
 
-// Add cleanup ONLY on process exit events
+// Comment out cleanup registrations
 process.on('exit', () => {
   cleanupSecureFiles();
 });

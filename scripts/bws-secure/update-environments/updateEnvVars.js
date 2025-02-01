@@ -19,9 +19,11 @@
  */
 
 const path = require('path');
-const fs = require('fs').promises;
+const fs = require('fs'); // Regular fs for sync operations
+const fsPromises = require('fs').promises; // For async operations
 const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
+const dotenv = require('dotenv');
 require('dotenv').config();
 
 const {
@@ -31,7 +33,8 @@ const {
   validateValue,
   shouldPreserveVar,
   getBuildOrAuthToken,
-  validatePlatform
+  validatePlatform,
+  decryptContent
 } = require('./utils');
 const {
   readVars: readNetlifyVars,
@@ -65,7 +68,7 @@ async function readConfigFile() {
   try {
     // bwsconfig.json is expected to be located one level up, e.g.: scripts/bws-secure/bwsconfig.json
     const configPath = path.join(__dirname, '../../../bwsconfig.json');
-    const data = await fs.readFile(configPath, 'utf8');
+    const data = await fsPromises.readFile(configPath, 'utf8');
     return JSON.parse(data);
   } catch (error) {
     handleError(error, 'Failed to read configuration file');
@@ -222,9 +225,9 @@ async function updateProjects(projects, baseVars) {
       if (result && result.updated) {
         log(
           'info',
-          `Updated variables for project ${
-            project.siteSlug || project.projectName
-          }: ${Object.keys(result.updated).join(', ')}`
+          `Updated variables for project ${project.siteSlug || project.projectName}: ${Object.keys(
+            result.updated
+          ).join(', ')}`
         );
       }
     } catch (err) {
@@ -245,6 +248,35 @@ async function main() {
       process.exit(0);
     }
 
+    // Load platform tokens ONCE at the start
+    if (fs.existsSync('.env.secure')) {
+      try {
+        const content = fs.readFileSync('.env.secure', 'utf8');
+        const key = process.env.BWS_PLATFORM_KEY || process.env.BWS_EPHEMERAL_KEY;
+        log('debug', `Attempting to decrypt platform tokens with key: ${key.substring(0, 8)}...`);
+
+        const decrypted = decryptContent(content, key);
+        const platformTokens = dotenv.parse(decrypted);
+
+        // Set tokens in environment
+        Object.assign(process.env, platformTokens);
+
+        if (process.env.DEBUG === 'true') {
+          log('debug', 'Loaded platform tokens:');
+          log(
+            'debug',
+            `NETLIFY_AUTH_TOKEN: ${process.env.NETLIFY_AUTH_TOKEN ? '✓ Present' : '❌ Missing'}`
+          );
+          log(
+            'debug',
+            `VERCEL_AUTH_TOKEN: ${process.env.VERCEL_AUTH_TOKEN ? '✓ Present' : '❌ Missing'}`
+          );
+        }
+      } catch (error) {
+        log('warn', `Failed to load platform tokens: ${error.message}`);
+      }
+    }
+
     log('info', 'Starting platform variable sync...');
     const config = await readConfigFile();
 
@@ -252,59 +284,64 @@ async function main() {
     const currentPlatform =
       process.env.NETLIFY === 'true' ? 'netlify' : process.env.VERCEL === '1' ? 'vercel' : null;
 
-    const relevantProjects = config.projects.filter(
-      (project) => project.platform.toLowerCase() === currentPlatform
+    // Get current project from environment
+    const currentProjectName = process.env.BWS_PROJECT;
+    const currentProject = config.projects.find(
+      (project) =>
+        project.platform.toLowerCase() === currentPlatform &&
+        project.projectName === currentProjectName
     );
 
-    if (relevantProjects.length === 0) {
-      log('warn', `No projects found for platform: ${currentPlatform}`);
+    if (!currentProject) {
+      log('warn', `No matching project found for ${currentPlatform}/${currentProjectName}`);
       process.exit(0);
     }
 
-    for (const project of relevantProjects) {
-      log('info', `Syncing ${project.platform} variables for ${project.projectName}`);
+    // Visual separator for clarity
+    console.log('\n' + '='.repeat(80));
+    console.log(`Starting update for project: ${currentProject.projectName}`);
+    console.log('='.repeat(80) + '\n');
 
-      try {
-        if (project.platform === 'vercel' && process.env.VERCEL === '1') {
-          await updateVercelEnvVars(project);
-        } else if (project.platform === 'netlify' && process.env.NETLIFY === 'true') {
-          await updateNetlifyEnvVars(project);
+    try {
+      if (currentProject.platform === 'vercel' && process.env.VERCEL === '1') {
+        await updateVercelEnvVars(currentProject);
+      } else if (currentProject.platform === 'netlify' && process.env.NETLIFY === 'true') {
+        await updateNetlifyEnvVars(currentProject);
+      }
+    } catch (platformError) {
+      // Handle Vercel auth errors
+      if (
+        currentProject.platform === 'vercel' &&
+        (platformError.message.includes('Not authorized') ||
+          platformError.message.includes('forbidden'))
+      ) {
+        // prettier-ignore
+        {
+          console.warn('\x1b[33m╔════════════════════════════════════════════════════════╗\x1b[0m');
+          console.warn('\x1b[33m║                                                        ║\x1b[0m');
+          console.warn('\x1b[33m║           WARNING: VERCEL TOKEN INVALID                ║\x1b[0m');
+          console.warn('\x1b[33m║    Update VERCEL_AUTH_TOKEN in BWS for auto-sync       ║\x1b[0m');
+          console.warn('\x1b[33m║        Platform variables may be out of sync           ║\x1b[0m');
+          console.warn('\x1b[33m║                                                        ║\x1b[0m');
+          console.warn('\x1b[33m╚════════════════════════════════════════════════════════╝\x1b[0m');
         }
-      } catch (platformError) {
-        // Handle Vercel auth errors
-        if (
-          project.platform === 'vercel' &&
-          (platformError.message.includes('Not authorized') ||
-            platformError.message.includes('forbidden'))
-        ) {
-          // prettier-ignore
-          {
-            console.warn('\x1b[33m╔════════════════════════════════════════════════════════╗\x1b[0m');
-            console.warn('\x1b[33m║                                                        ║\x1b[0m');
-            console.warn('\x1b[33m║           WARNING: VERCEL TOKEN INVALID                ║\x1b[0m');
-            console.warn('\x1b[33m║    Update VERCEL_AUTH_TOKEN in BWS for auto-sync       ║\x1b[0m');
-            console.warn('\x1b[33m║        Platform variables may be out of sync           ║\x1b[0m');
-            console.warn('\x1b[33m║                                                        ║\x1b[0m');
-            console.warn('\x1b[33m╚════════════════════════════════════════════════════════╝\x1b[0m');
-          }
-          // Handle Netlify auth errors
-        } else if (
-          project.platform === 'netlify' &&
-          (platformError.message.includes('unauthorized') || platformError.message.includes('403'))
-        ) {
-          // prettier-ignore
-          {
-            console.warn('\x1b[33m╔════════════════════════════════════════════════════════╗\x1b[0m');
-            console.warn('\x1b[33m║                                                        ║\x1b[0m');
-            console.warn('\x1b[33m║           WARNING: NETLIFY TOKEN INVALID               ║\x1b[0m');
-            console.warn('\x1b[33m║    Update NETLIFY_AUTH_TOKEN in BWS for auto-sync      ║\x1b[0m');
-            console.warn('\x1b[33m║        Platform variables may be out of sync           ║\x1b[0m');
-            console.warn('\x1b[33m║                                                        ║\x1b[0m');
-            console.warn('\x1b[33m╚════════════════════════════════════════════════════════╝\x1b[0m');
-          }
-        } else {
-          log('warn', `Platform sync skipped: ${platformError.message}`);
+        // Handle Netlify auth errors
+      } else if (
+        currentProject.platform === 'netlify' &&
+        (platformError.message.includes('unauthorized') || platformError.message.includes('403'))
+      ) {
+        // prettier-ignore
+        {
+          console.warn('\x1b[33m╔════════════════════════════════════════════════════════╗\x1b[0m');
+          console.warn('\x1b[33m║                                                        ║\x1b[0m');
+          console.warn('\x1b[33m║           WARNING: NETLIFY TOKEN INVALID               ║\x1b[0m');
+          console.warn('\x1b[33m║    Update NETLIFY_AUTH_TOKEN in BWS for auto-sync      ║\x1b[0m');
+          console.warn('\x1b[33m║        Platform variables may be out of sync           ║\x1b[0m');
+          console.warn('\x1b[33m║                                                        ║\x1b[0m');
+          console.warn('\x1b[33m╚════════════════════════════════════════════════════════╝\x1b[0m');
         }
+      } else {
+        log('warn', `Platform sync skipped: ${platformError.message}`);
       }
     }
   } catch (error) {

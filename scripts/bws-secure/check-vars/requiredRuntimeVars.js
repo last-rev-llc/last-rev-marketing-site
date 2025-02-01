@@ -49,6 +49,7 @@ const defaultDirs = [
   // Default folders we always want to check, if not explicitly provided
   'functions',
   'api',
+  'apps/web/src',
   'packages'
 ];
 
@@ -82,7 +83,7 @@ defaultDirs.forEach((d) => {
  * This is used later to skip certain folders/files from scanning.
  */
 function getIgnorePatterns() {
-  const patterns = ['node_modules', 'dist', 'build', '.next', '.cache', 'coverage', '.git', '.turbo']; // Ignore common build/cache directories
+  const patterns = ['node_modules']; // Always ignore node_modules
   try {
     const gitignore = fs.readFileSync('.gitignore', 'utf-8');
     const additionalPatterns = gitignore
@@ -115,7 +116,17 @@ function shouldIgnorePath(filePath, ignorePatterns) {
  * List of file extensions we want to scan for environment variables.
  * These are typically files that could contain runtime code.
  */
-const VALID_EXTENSIONS = new Set(['.js', '.jsx', '.ts', '.tsx', '.vue', '.mjs', '.cjs', '.mts', '.cts']);
+const VALID_EXTENSIONS = new Set([
+  '.js',
+  '.jsx',
+  '.ts',
+  '.tsx',
+  '.vue',
+  '.mjs',
+  '.cjs',
+  '.mts',
+  '.cts'
+]);
 
 /**
  * Check if a file should be scanned based on its extension
@@ -137,15 +148,6 @@ async function getAllFiles(dir, ignorePatterns) {
     const entries = await fs.promises.readdir(dir, { withFileTypes: true });
     for (const entry of entries) {
       const fullPath = path.join(dir, entry.name);
-
-      // Add early exit for node_modules directories
-      if (entry.isDirectory() && entry.name === 'node_modules') {
-        if (VERBOSE) {
-          console.log(`VERBOSE: Skipping node_modules directory: ${fullPath}`);
-        }
-        continue;
-      }
-
       const relativePath = path.relative(process.cwd(), fullPath);
 
       // Skip if .gitignore says to ignore this path
@@ -215,22 +217,22 @@ async function findEnvVarsInFile(filePath) {
     multi: [['/*', '*/']]
   };
 
-  // Use a single regex to remove all comments at once
+  // Remove multi-line comments for this file type
   let noComments = content;
-  const multiLinePatterns = commentStyle.multi.map(
-    ([start, end]) => `${escapeRegExp(start)}[\\s\\S]*?${escapeRegExp(end)}`
-  );
-  const commentRegex = new RegExp(`(${multiLinePatterns.join('|')})|${escapeRegExp(commentStyle.single)}.*$`, 'gm');
-  noComments = noComments.replace(commentRegex, '');
+  commentStyle.multi.forEach(([start, end]) => {
+    const multiLineRegex = new RegExp(`${escapeRegExp(start)}[\\s\\S]*?${escapeRegExp(end)}`, 'g');
+    noComments = noComments.replace(multiLineRegex, '');
+  });
 
-  // Use a more efficient regex with capturing group
-  const envVarRegex = /process\.env\.([a-zA-Z0-9_]+)/g;
-  const matches = new Set();
-  let match;
-  while ((match = envVarRegex.exec(noComments)) !== null) {
-    matches.add(match[1]);
-  }
-  return Array.from(matches);
+  // Split into lines and filter out single-line comments
+  const activeLines = noComments
+    .split('\n')
+    .filter((line) => !line.trim().startsWith(commentStyle.single));
+
+  // Rejoin the lines and find env vars
+  const activeContent = activeLines.join('\n');
+  const matches = activeContent.match(/process\.env\.([a-zA-Z0-9_]+)/g) || [];
+  return matches.map((match) => match.replace('process.env.', ''));
 }
 
 // Helper function to escape special regex characters
@@ -441,6 +443,55 @@ const cleanupExistingReport = async () => {
 };
 
 /**
+ * Read turbo.json and extract environment variables if available
+ */
+function getTurboVars() {
+  try {
+    const turboConfigPath = path.join(repoRoot, 'turbo.json');
+
+    // If no turbo.json exists, return empty set silently
+    if (!fs.existsSync(turboConfigPath)) {
+      if (VERBOSE) {
+        console.log('VERBOSE: No turbo.json found - skipping turbo variable scanning');
+      }
+      return new Set();
+    }
+
+    let turboConfig;
+    try {
+      const rawConfig = fs.readFileSync(turboConfigPath, 'utf8');
+      turboConfig = JSON.parse(rawConfig);
+    } catch (parseError) {
+      console.log('\n⚠️  Warning: Found turbo.json but could not parse it:');
+      console.log(`   ${parseError.message}`);
+      console.log('   Continuing scan without turbo.json variables...\n');
+      return new Set();
+    }
+
+    // Safely access potentially undefined properties
+    const buildEnv = turboConfig?.tasks?.build?.env || [];
+    const globalEnv = turboConfig?.globalEnv || [];
+
+    const turboVars = new Set([...buildEnv, ...globalEnv]);
+
+    if (VERBOSE) {
+      if (turboVars.size > 0) {
+        console.log('VERBOSE: Found variables in turbo.json:', Array.from(turboVars));
+      } else {
+        console.log('VERBOSE: No variables found in turbo.json');
+      }
+    }
+
+    return turboVars;
+  } catch (error) {
+    console.log('\n⚠️  Warning: Error accessing turbo.json:');
+    console.log(`   ${error.message}`);
+    console.log('   Continuing scan without turbo.json variables...\n');
+    return new Set();
+  }
+}
+
+/**
  * Main execution function. Orchestrates all logic:
  *   1. Decide which folders to scan
  *   2. Collect environment vars
@@ -455,6 +506,9 @@ async function main() {
     }
   }
   console.log('Scanning for environment variables...');
+
+  // Get turbo.json variables before starting the scan
+  const turboVars = getTurboVars();
 
   // Gather the patterns to ignore based on .gitignore
   const ignorePatterns = getIgnorePatterns();
@@ -569,17 +623,12 @@ async function main() {
   const varOccurrences = new Map();
   let totalFileCount = 0;
 
-  let filesProcessed = 0;
-  const totalFiles = pathsToScan.length;
-
+  // ---------------------------------------------
+  // CHANGE #3: Optional verbose logging for files
+  // ---------------------------------------------
   for (const file of pathsToScan) {
-    filesProcessed++;
-    if (filesProcessed % 100 === 0 || filesProcessed === totalFiles) {
-      process.stdout.write(`\rProcessing files: ${filesProcessed}/${totalFiles}`);
-    }
-
     if (VERBOSE) {
-      console.log(`\nVERBOSE: Scanning file: ${path.relative(repoRoot, file)}`);
+      console.log(`VERBOSE: Scanning file: ${path.relative(repoRoot, file)}`);
     }
     const vars = await findEnvVarsInFile(file);
     if (vars.length) {
@@ -598,8 +647,6 @@ async function main() {
     }
   }
 
-  console.log('\n'); // New line after progress indicator
-
   // Count directory occurrences
   for (const vars of envVarsByDir.values()) {
     for (const v of vars) {
@@ -608,7 +655,10 @@ async function main() {
   }
 
   // Calculate total references (actual sum of all variable references)
-  const totalReferences = Array.from(varTotalReferences.values()).reduce((sum, count) => sum + count, 0);
+  const totalReferences = Array.from(varTotalReferences.values()).reduce(
+    (sum, count) => sum + count,
+    0
+  );
 
   // Get unique variables across all directories
   const allEnvVars = new Set();
@@ -637,12 +687,26 @@ async function main() {
     });
   }
 
+  // After scanning is complete, add turbo vars to allEnvVars
+  if (turboVars.size > 0) {
+    console.log('\nAdding variables from turbo.json:');
+    for (const v of turboVars) {
+      if (!allEnvVars.has(v)) {
+        console.log(`- ${v} (from turbo.json)`);
+        allEnvVars.add(v);
+      }
+    }
+  }
+
   // Build a human-readable report that we can write to disk
   const reportLines = [
     '# Environment Variables Required by Directory',
     `# Generated: ${new Date().toLocaleString()}`,
     '#',
     '# This file maps which environment variables are required in each directory.',
+    '#',
+    '# Variables from turbo.json:',
+    ...Array.from(turboVars).map((v) => `# - ${v}`),
     '#\n'
   ];
 
@@ -675,6 +739,20 @@ async function main() {
       reportLines.push('');
     }
     reportLines.push('');
+  }
+
+  // Add turbo vars at the end of the report if they weren't found in scanned files
+  const scannedVars = new Set();
+  for (const [, vars] of envVarsByDir) {
+    for (const v of vars) {
+      scannedVars.add(v);
+    }
+  }
+
+  const turboOnlyVars = Array.from(turboVars).filter((v) => !scannedVars.has(v));
+  if (turboOnlyVars.length > 0) {
+    reportLines.push('\n# Additional variables from turbo.json:');
+    turboOnlyVars.forEach((v) => reportLines.push(v));
   }
 
   // Write out the final formatted report to a single file in this directory (check-vars).

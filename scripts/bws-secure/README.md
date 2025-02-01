@@ -4,38 +4,37 @@ A secure environment variable manager for Vercel and Netlify deployments using B
 
 ## Table of Contents
 
-- [BWS Secure Environment Manager](#bws-secure-environment-manager)
-  - [Table of Contents](#table-of-contents)
-  - [Quick Start](#quick-start)
-    - [Installation](#installation)
-      - [Option 1: Using SSH (Recommended for Private Repositories)](#option-1-using-ssh-recommended-for-private-repositories)
-      - [Option 2: Using HTTPS (Universal)](#option-2-using-https-universal)
-      - [Option 3: Manual Installation](#option-3-manual-installation)
-    - [Basic Setup](#basic-setup)
-    - [Platform Setup](#platform-setup)
-      - [Vercel](#vercel)
-      - [Netlify](#netlify)
-  - [Configuration](#configuration)
-    - [bwsconfig.json](#bwsconfigjson)
-    - [Environment Variables](#environment-variables)
-    - [Platform-Specific Setup](#platform-specific-setup)
-      - [Vercel Configuration](#vercel-configuration)
-      - [Netlify Configuration](#netlify-configuration)
-  - [Usage](#usage)
-    - [Basic Commands](#basic-commands)
-    - [Development Workflow](#development-workflow)
-    - [CI/CD Integration](#cicd-integration)
-  - [Features](#features)
-  - [Advanced Usage](#advanced-usage)
-    - [Variable Scanning](#variable-scanning)
-    - [Environment Mapping](#environment-mapping)
-    - [Security Features](#security-features)
-  - [Troubleshooting](#troubleshooting)
-    - [Common Issues](#common-issues)
-  - [Support](#support)
-  - [Machine Account Tokens](#machine-account-tokens)
-  - [Directory Structure](#directory-structure)
-    - [Links to README and Scripts](#links-to-readme-and-scripts)
+- [Quick Start](#quick-start)
+  - [Installation](#installation)
+  - [Basic Setup](#basic-setup)
+  - [Platform Setup](#platform-setup)
+- [Multi-Platform & Environment Management](#multi-platform--environment-management)
+  - [Why Multiple Environments?](#why-multiple-environments)
+  - [Environment File Structure](#environment-file-structure)
+  - [Platform Requirements](#platform-requirements)
+- [Configuration](#configuration)
+  - [bwsconfig.json](#bwsconfigjson)
+  - [Environment Variables](#environment-variables)
+  - [Platform-Specific Setup](#platform-specific-setup)
+- [Usage](#usage)
+  - [Basic Commands](#basic-commands)
+  - [Development Workflow](#development-workflow)
+  - [CI/CD Integration](#cicd-integration)
+- [Debugging](#debugging)
+  - [Environment Variables for Debugging](#environment-variables-for-debugging)
+  - [Debug Output Explained](#debug-output-explained)
+  - [Examples](#examples)
+  - [Why Debugging Features?](#why-debugging-features)
+- [Advanced Usage](#advanced-usage)
+  - [Variable Scanning](#variable-scanning)
+  - [Environment Mapping](#environment-mapping)
+  - [Security Features](#security-features)
+- [Troubleshooting](#troubleshooting)
+- [Support](#support)
+- [Directory Structure](#directory-structure)
+  - [Links to README and Scripts](#links-to-readme-and-scripts)
+- [Secret Management](#secret-management)
+  - [Upload to BWS](#upload-to-bws)
 
 ## Quick Start
 
@@ -80,9 +79,9 @@ bash scripts/bws-secure/install.sh
    ```json
    {
      "scripts": {
-       "dev": "secure-run next dev",
-       "build": "secure-run next build",
-       "start": "secure-run next start"
+       "dev": "npm secure-run next dev",
+       "build": "npm secure-run next build",
+       "start": "npm secure-run next start"
      }
    }
    ```
@@ -320,7 +319,7 @@ To securely manage sensitive platform tokens (like `NETLIFY_AUTH_TOKEN` or `VERC
 2. Open your Machine Account's vault or project scope.
 3. If the secret (`NETLIFY_AUTH_TOKEN` or `VERCEL_AUTH_TOKEN`) does not already exist:
    - Create the secret using the appropriate token value for the specific Netlify or Vercel account/team.
-4. If the secret already exists and you’re confident it works for the intended Netlify/Vercel account/team:
+4. If the secret already exists and you're confident it works for the intended Netlify/Vercel account/team:
    - Apply the existing secret to the Machine Account.
    - This approach allows multiple repositories, clients, or projects to share the same credentials when the token scope is appropriately configured.
 5. During a build, `secure-run.js` will automatically fetch these tokens using your `BWS_ACCESS_TOKEN`, making them available for Netlify or Vercel commands.
@@ -382,3 +381,192 @@ Scripts:
 - [secure-run.js](scripts/bws-secure/secure-run.js)
 - [test-netlify-upload.js](scripts/bws-secure/test-netlify-upload.js)
 - [test-vercel-upload.js](scripts/bws-secure/test-vercel-upload.js)
+
+## Debugging
+
+### Environment Variables for Debugging
+
+The following environment variables can be used for debugging:
+
+```bash
+# Basic debugging
+DEBUG=true pnpm secure-run           # Shows debug logs
+VERBOSE=true pnpm secure-run         # Shows more detailed logs
+
+# View decrypted environment contents
+DEBUG=true SHOW_DECRYPTED=true pnpm secure-run
+
+# Debug specific project/environment
+DEBUG=true SHOW_DECRYPTED=true BWS_PROJECT=my-project BWS_ENV=dev pnpm secure-run
+
+# Common combinations
+# Local development debugging
+DEBUG=true SHOW_DECRYPTED=true BWS_ENV=local pnpm secure-run
+
+# Production environment check
+DEBUG=true SHOW_DECRYPTED=true BWS_ENV=prod pnpm secure-run
+
+# Development environment with specific project
+DEBUG=true SHOW_DECRYPTED=true BWS_PROJECT=my-project BWS_ENV=dev pnpm secure-run
+```
+
+### Debug Output Explained
+
+- `DEBUG=true`: Enables basic debug logging
+
+  - Shows environment variable status
+  - Shows file operations
+  - Shows project processing steps
+
+- `SHOW_DECRYPTED=true`: Shows decrypted contents of environment files
+
+  - Only works when `DEBUG=true` is also set
+  - Shows contents in a formatted box
+  - Only shows current environment's contents
+
+- `BWS_PROJECT`: Specifies which project to process
+
+  - Must match a project name in bwsconfig.json
+  - Defaults to first project if not specified
+
+- `BWS_ENV`: Specifies which environment to use
+  - Values: 'local', 'dev', 'prod'
+  - Defaults to 'local' if not specified
+
+### Examples
+
+1. Debug local development setup:
+
+```bash
+DEBUG=true SHOW_DECRYPTED=true pnpm secure-run next dev
+```
+
+2. Check production environment variables:
+
+```bash
+DEBUG=true SHOW_DECRYPTED=true BWS_ENV=prod pnpm secure-run
+```
+
+3. Debug specific project's development environment:
+
+```bash
+DEBUG=true SHOW_DECRYPTED=true BWS_PROJECT=my-project BWS_ENV=dev pnpm secure-run
+```
+
+4. Full debug output for platform builds:
+
+```bash
+DEBUG=true VERBOSE=true SHOW_DECRYPTED=true pnpm secure-run
+```
+
+## Multi-Platform & Environment Management
+
+### Why Multiple Environments?
+
+The system supports multiple platforms (Netlify/Vercel) and environments (prod/dev/local) because:
+
+1. **Development Workflow**
+
+   - Local development needs different variables than production
+   - Preview deployments may need specific configurations
+   - Production builds require strict security settings
+
+2. **Platform Requirements**
+
+   - Netlify and Vercel handle environments differently
+   - Each platform needs its own token management
+   - Build contexts vary between platforms
+
+3. **Project Isolation**
+   - Multiple projects can share the same BWS instance
+   - Each project gets its own secure environment files
+   - Variables are isolated between projects and environments
+
+### Why Debugging Features?
+
+The debugging capabilities (`DEBUG=true`, `SHOW_DECRYPTED=true`) are essential for:
+
+1. **Troubleshooting**
+
+   - Verify correct variables are loaded
+   - Check environment file mappings
+   - Validate platform detection
+
+2. **Development**
+
+   - See decrypted contents during local development
+   - Confirm environment switching works
+   - Debug platform-specific issues
+
+3. **Deployment**
+   - Validate production variables before deployment
+   - Check platform token availability
+   - Verify environment detection
+
+Example workflow:
+
+```bash
+# Local development
+DEBUG=true SHOW_DECRYPTED=true BWS_ENV=local pnpm secure-run next dev
+
+# Test production variables
+DEBUG=true SHOW_DECRYPTED=true BWS_ENV=prod pnpm secure-run
+
+# Debug platform deployment
+DEBUG=true SHOW_DECRYPTED=true NETLIFY=true CONTEXT=deploy-preview pnpm secure-run
+```
+
+### Environment File Structure
+
+The system creates several types of environment files:
+
+1. **Project ID Based**
+
+   ```
+   .env.secure.<project-id>
+   ```
+
+   - Direct from BWS
+   - Encrypted contents
+   - Used as source files
+
+2. **Named Environment Files**
+
+   ```
+   .env.secure.<project-name>.<environment>
+   ```
+
+   - Symlinked from project ID files
+   - Used by platform builds
+   - Environment specific (prod/dev/local)
+
+3. **Platform Files**
+   ```
+   .env.secure
+   ```
+   - Global platform tokens
+   - Shared across projects
+   - Platform-specific settings
+
+## Secret Management
+
+### Upload to BWS
+
+The `upload-to-bws` module provides a secure way to manage secrets across your BWS projects:
+
+```bash
+# Upload secrets
+pnpm secure-run --upload-secrets
+
+# Clear existing secrets first, then upload
+pnpm secure-run --upload-secrets --clearvars
+```
+
+Key features:
+- Manage multiple projects with `.env.bws.<project-id>` files
+- Clear and verify existing secrets
+- Secure token handling
+- Rate limit protection
+- CI/CD ready
+
+For detailed usage, see [Upload to BWS Documentation](./upload-to-bws/readme.md)

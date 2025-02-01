@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 // Required modules
 const fs = require('fs');
 const path = require('path');
@@ -23,6 +25,19 @@ if (fs.existsSync(localEnvPath)) {
 
 // Automatically determine the folder of the script
 const folderPath = path.dirname(__filename);
+
+// Add near the top with other constants
+const EXCLUDED_VARS = ['BWS_ACCESS_TOKEN'];
+const DEBUG = process.env.DEBUG === 'true';
+
+function debug(message, command = '') {
+  if (DEBUG) {
+    console.log('\x1b[36m[DEBUG]\x1b[0m', message);
+    if (command) {
+      console.log('\x1b[36m[CMD]\x1b[0m', command);
+    }
+  }
+}
 
 // Function to sanitize and escape environment variable values
 const sanitizeValue = (value) => {
@@ -64,39 +79,44 @@ function createErrorBox(lines) {
   createBox(lines, '\x1b[31m');
 }
 
-function createSuccessBox(lines) {
-  // We skip the border for lines that contain " Link:" or "https://"
-  // so we only measure max length among the "boxed" lines.
-  // 1) Find the lines that should be inside the box vs. "no-border" lines.
-  const noBorderCheck = (l) => l.includes(' Link:') || l.includes('https://');
-  const boxedLines = lines.filter((l) => !noBorderCheck(l));
+function createSuccessBox(successes, uploadResults) {
+  // Create header lines using the passed parameters
+  const headerLines = [
+    '',
+    `SUCCESS! ${successes.length} of ${uploadResults.length} file(s) uploaded correctly.`,
+    '',
+    'Successfully uploaded the below project ID(s).',
+    'Visit the management URLs below to verify the uploaded contents:',
+    ''
+  ];
 
-  // 2) Determine the max width among boxed lines only.
-  let maxLen = 0;
-  boxedLines.forEach((line) => {
-    if (line.length > maxLen) {
-      maxLen = line.length;
-    }
-  });
+  // Find max width for the box
+  const maxLen = Math.max(...headerLines.map((line) => line.length));
 
-  // 3) Build top/bottom borders
+  // Build box borders
   const top = '┌' + '─'.repeat(maxLen + 2) + '┐';
   const bottom = '└' + '─'.repeat(maxLen + 2) + '┘';
 
-  console.log('\x1b[92m' + top);
+  // Print header box
+  console.log('\x1b[92m'); // Start green color
+  console.log(top);
+  headerLines.forEach((line) => {
+    const paddedLine = line.padEnd(maxLen, ' ');
+    console.log(`│ ${paddedLine} │`);
+  });
+  console.log(bottom);
 
-  // 4) Print each line: if it's a "no-border" line, print directly; else pad and box it.
-  lines.forEach((line) => {
-    if (noBorderCheck(line)) {
-      // Print with no bounding "│" characters
-      console.log(line);
-    } else {
-      const paddedLine = line.padEnd(maxLen, ' ');
-      console.log(`│ ${paddedLine} │`);
-    }
+  // Print project IDs and URLs below
+  console.log(''); // Add spacing
+  successes.forEach((s) => {
+    console.log(`Project ID: ${s.projectId} (${s.count} secrets)`);
+    console.log(
+      `https://vault.bitwarden.com/#/sm/22479128-f194-460a-884b-b24a015686c6/projects/${s.projectId}/secrets`
+    );
+    console.log(''); // Add spacing between projects
   });
 
-  console.log(bottom + '\x1b[0m');
+  console.log('\x1b[0m'); // Reset color
 }
 
 /**
@@ -165,11 +185,15 @@ function isRateLimitError(errorText) {
 function uploadSecretWithRetry(key, sanitizedValue, projectId, maxRetries = 3) {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      const cmd = `dotenv -- npx bws secret create ${key} -- ${sanitizedValue} ${projectId}`;
-      execSync(cmd, { stdio: 'pipe' }); // Hide CLI output
-      return; // If successful, return immediately
+      const cmd = `./node_modules/.bin/bws secret create -t ${process.env.BWS_ACCESS_TOKEN} ${key} -- ${sanitizedValue} ${projectId}`;
+      debug(`Attempt ${attempt}: Creating secret ${key} with command:`, cmd);
+
+      execSync(cmd, { stdio: 'pipe' });
+      return;
     } catch (execError) {
       const rawErrorOutput = execError.stderr?.toString() || execError.stdout?.toString() || '';
+      debug(`Upload error on attempt ${attempt}:`, rawErrorOutput);
+
       const prettyError = parseBwsErrorMessage(rawErrorOutput);
 
       if (isRateLimitError(prettyError)) {
@@ -195,8 +219,125 @@ function uploadSecretWithRetry(key, sanitizedValue, projectId, maxRetries = 3) {
   }
 }
 
-// Function to process each .env.bws.* file
-const processEnvFiles = () => {
+// Add near the top with other helper functions
+function warnEmptyValue(key, value, file) {
+  console.log(
+    `\x1b[31mWarning: Empty or unresolved variable "${key}" in ${file}${
+      value ? `: '${value}'` : ''
+    }\x1b[0m`
+  );
+}
+
+// Transform function to process a single .env.bws.* file
+function transformEnvFile(filePath) {
+  try {
+    const fileContent = fs.readFileSync(filePath, 'utf8');
+    const parsed = dotenv.parse(fileContent);
+    const filename = path.basename(filePath);
+
+    return Object.fromEntries(
+      Object.entries(parsed)
+        .filter(([key]) => !EXCLUDED_VARS.includes(key))
+        .map(([key, value]) => {
+          // Check for empty values before interpolation
+          if (!value || value.trim() === '') {
+            warnEmptyValue(key, null, filename);
+            return [key, ''];
+          }
+
+          // Let dotenv handle the variable interpolation
+          const interpolated = value.replace(/\${([^}]+)}/g, (match, varName) => {
+            const resolvedValue = parsed[varName] || '';
+            if (!resolvedValue) {
+              warnEmptyValue(key, value, filename);
+            }
+            return resolvedValue || match;
+          });
+          return [key, interpolated];
+        })
+    );
+  } catch (error) {
+    console.error(`Failed to transform ${filePath}:`, error.message);
+    throw error;
+  }
+}
+
+// Add near the top with other functions
+async function clearProjectSecrets(projectId) {
+  try {
+    console.log(`\nClearing existing secrets for project: ${projectId}...`);
+
+    // Get existing secrets
+    const listCmd = `./node_modules/.bin/bws secret list -o json -t ${process.env.BWS_ACCESS_TOKEN} ${projectId}`;
+    debug('Listing secrets with command:', listCmd);
+
+    try {
+      const result = execSync(listCmd, { encoding: 'utf8' });
+      debug('List command result:', result);
+      const secrets = JSON.parse(result || '[]');
+      debug(`Found ${secrets.length} secrets to delete`);
+
+      if (secrets.length === 0) {
+        console.log('\x1b[36m'); // Cyan color
+        console.log('----------------------------------------');
+        console.log(`Project ID: ${projectId}`);
+        console.log('Status: No existing secrets to clear');
+        console.log('----------------------------------------');
+        console.log('\x1b[0m'); // Reset color
+        return;
+      }
+
+      // Delete each secret
+      for (const secret of secrets) {
+        const deleteCmd = `./node_modules/.bin/bws secret delete --output none -t ${process.env.BWS_ACCESS_TOKEN} ${secret.id}`;
+        debug(`Deleting secret ${secret.key} with command:`, deleteCmd);
+
+        try {
+          execSync(deleteCmd, { stdio: 'pipe' });
+          console.log(`Deleted secret: ${secret.key}`);
+        } catch (deleteError) {
+          debug('Delete command error:', deleteError.message);
+          throw deleteError;
+        }
+      }
+
+      console.log(`Cleared ${secrets.length} secrets from project ${projectId}`);
+    } catch (listError) {
+      // If we get a 404, it means no secrets exist - that's okay
+      if (listError.message.includes('404 Not Found')) {
+        console.log('\x1b[33m'); // Yellow color
+        console.log('=========================================================');
+        console.log('No secrets found for this project (404).');
+        console.log('This could mean:');
+        console.log('  • Project is empty');
+        console.log('  • Project was recently cleared');
+        console.log('  • Project ID might be incorrect');
+        console.log('');
+        console.log(`Verify the BWS ProjectID at the following URL: ${projectId}`);
+        console.log('');
+        console.log(
+          `https://vault.bitwarden.com/#/sm/22479128-f194-460a-884b-b24a015686c6/projects/${projectId}/secrets`
+        );
+        console.log('');
+        console.log('Will continue with upload in 10 seconds...');
+        console.log('Press Ctrl+C to cancel if something looks wrong.');
+        console.log('=========================================================');
+        console.log('\x1b[0m'); // Reset color
+
+        // Wait 10 seconds
+        await new Promise((resolve) => setTimeout(resolve, 10000));
+        return;
+      }
+      throw listError;
+    }
+  } catch (error) {
+    debug('Clear project secrets error:', error.message);
+    throw new Error(`Failed to clear secrets for project ${projectId}: ${error.message}`);
+  }
+}
+
+// Modify processEnvFiles to handle clear option
+const processEnvFiles = async (options = { clearFirst: false }) => {
   const files = fs.readdirSync(folderPath);
   const envFiles = files.filter((file) => file.startsWith('.env.bws.'));
 
@@ -207,64 +348,88 @@ const processEnvFiles = () => {
 
   const uploadResults = [];
 
-  envFiles.forEach((file, i) => {
+  for (const file of envFiles) {
     const envFilePath = path.join(folderPath, file);
-    const fileContent = fs.readFileSync(envFilePath, 'utf8');
-    const lines = fileContent.split(/\r?\n/);
     const projectId = file.split('.').pop();
 
     if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(projectId)) {
       showErrorAndExit(`
-[ERROR] The project ID "${projectId}" is invalid.
-It should be 36 characters, hyphenated like "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx".
-Please fix your BWS project ID.
+[ERROR] Invalid or inaccessible project ID: "${projectId}"
+
+Please check:
+1. Project ID format should be: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+   Current file: ${file}
+
+2. Verify BWS_ACCESS_TOKEN permissions:
+   • Token must have WRITE access to this project
+   • Check permissions at: https://vault.bitwarden.com/#/sm/access-policies
+
+3. Confirm project exists and is accessible:
+   • Visit: https://vault.bitwarden.com/#/sm/projects
+   • Ensure project ID matches exactly
+   • Verify you have proper access to this project
+
+4. File naming convention:
+   • File should be named: .env.bws.<project-id>
+   • Example: .env.bws.12345678-1234-1234-1234-123456789abc
+
+Need help? Visit: https://bitwarden.com/help/secrets-manager-overview/
 `);
     }
 
-    // Gather valid secrets from the file, last definition wins:
-    const mappingForFile = {};
-    lines.forEach((line) => {
-      const trimmed = line.trim();
-      if (!trimmed || trimmed.startsWith('#')) return;
-      const parts = trimmed.split('=');
-      if (parts.length < 2) return;
-      const key = parts.shift().trim();
-      const value = parts.join('=').trim();
-      mappingForFile[key] = value;
-    });
-
-    const secrets = Object.keys(mappingForFile).map((k) => ({
-      key: k,
-      value: mappingForFile[k]
-    }));
-
-    if (!secrets.length) {
-      console.log(`No valid secrets found in ${file}. Skipping upload.`);
-      uploadResults.push({ file, projectId, success: true, count: 0 });
-      return;
-    }
-
-    console.log(
-      `\nFound ${secrets.length} secrets in ${file}. Uploading to projectId: ${projectId}...`
-    );
-
     try {
-      secrets.forEach((secret, idx) => {
+      // Clear existing secrets if option is enabled
+      if (options.clearFirst) {
+        await clearProjectSecrets(projectId);
+
+        // Add pause after clearing secrets
+        console.log('\x1b[33m'); // Yellow color
+        console.log('=========================================================');
+        console.log('Secrets have been cleared. Pausing for verification...');
+        console.log('You can verify deletion by checking the Bitwarden vault.');
+        console.log(`Verify the BWS Project ID at the following URL: ${projectId}`);
+        console.log('');
+        console.log(
+          `https://vault.bitwarden.com/#/sm/22479128-f194-460a-884b-b24a015686c6/projects/${projectId}/secrets`
+        );
+        console.log('');
+        console.log('Will continue with upload in 10 seconds...');
+        console.log('Press Ctrl+C to cancel if something looks wrong.');
+        console.log('=========================================================');
+        console.log('\x1b[0m'); // Reset color
+
+        // Wait 10 seconds
+        await new Promise((resolve) => setTimeout(resolve, 10000));
+      }
+
+      // Transform the file contents first
+      const secrets = transformEnvFile(envFilePath);
+      const secretList = Object.entries(secrets).map(([key, value]) => ({ key, value }));
+
+      if (!secretList.length) {
+        console.log(`No valid secrets found in ${file}. Skipping upload.`);
+        uploadResults.push({ file, projectId, success: true, count: 0 });
+        return;
+      }
+
+      console.log(
+        `\nFound ${secretList.length} secrets in ${file}. Uploading to projectId: ${projectId}...`
+      );
+
+      // Then upload each secret
+      secretList.forEach((secret, idx) => {
         const { key, value } = secret;
         const sanitizedValue = sanitizeValue(value);
-
-        // Use our new retry-aware function
         uploadSecretWithRetry(key, sanitizedValue, projectId);
 
-        // Show the secret key plus a count of how many we've done so far
         const current = idx + 1;
-        console.log(`Uploaded secret "${key}" (${current}/${secrets.length})...`);
+        console.log(`Uploaded secret "${key}" (${current}/${secretList.length})...`);
       });
 
-      uploadResults.push({ file, projectId, success: true, count: secrets.length });
+      uploadResults.push({ file, projectId, success: true, count: secretList.length });
 
       // Only wait if there is more than one file total AND this isn't the last file
-      if (envFiles.length > 1 && i < envFiles.length - 1) {
+      if (envFiles.length > 1 && envFiles.indexOf(file) < envFiles.length - 1) {
         console.log('Upload complete for this file; waiting 10 seconds before the next file...');
         syncSleep(10000);
       } else {
@@ -274,7 +439,7 @@ Please fix your BWS project ID.
       const prettyError = parseBwsErrorMessage(error.message);
       uploadResults.push({ file, projectId, success: false, error: prettyError });
     }
-  });
+  }
 
   printFinalSummary(uploadResults);
 };
@@ -289,34 +454,7 @@ function printFinalSummary(uploadResults) {
   const failures = uploadResults.filter((r) => !r.success);
 
   if (successes.length > 0) {
-    let successLines = [];
-    successLines.push('');
-    successLines.push(
-      `SUCCESS! ${successes.length} of ${uploadResults.length} file(s) uploaded correctly.`
-    );
-    successLines.push('');
-    successLines.push('Successfully Uploaded Project IDs:');
-    successLines.push('');
-
-    successes.forEach((s) => {
-      successLines.push(`• Project ID: ${s.projectId} (${s.count} secrets)`);
-      successLines.push(
-        `  • Link: https://vault.bitwarden.com/#/sm/22479128-f194-460a-884b-b24a015686c6/projects/${s.projectId}/secrets`
-      );
-      successLines.push('');
-    });
-
-    // // Calculate dynamic separator width based on the longest line (excluding links)
-    // const maxLineLength = Math.max(
-    //   ...successLines.map((line) => (line.includes('Link:') ? 0 : line.length))
-    // );
-    // const separator = '='.repeat(maxLineLength);
-
-    // // Insert the separator dynamically
-    // successLines.unshift(separator);
-    // successLines.push(separator);
-
-    createSuccessBox(successLines);
+    createSuccessBox(successes, uploadResults);
   }
 
   if (failures.length > 0) {
@@ -331,7 +469,14 @@ function printFinalSummary(uploadResults) {
       errorLines.push(`File: ${f.file}`);
       errorLines.push(`Project ID: ${f.projectId}`);
       errorLines.push('Reason:');
-      errorLines.push(...f.error.split('\n').map((l) => `  ${l}`));
+      if (f.error.includes('Resource not found')) {
+        errorLines.push('  Project ID not found or no access. Please check:');
+        errorLines.push('  • BWS_ACCESS_TOKEN has WRITE access to this project');
+        errorLines.push('  • Project ID exists and is accessible');
+        errorLines.push('  • Visit: https://vault.bitwarden.com/#/sm/projects');
+      } else {
+        errorLines.push(...f.error.split('\n').map((l) => `  ${l}`));
+      }
       errorLines.push('');
     });
 
@@ -353,13 +498,97 @@ function printFinalSummary(uploadResults) {
   }
 }
 
-// Ensure BWS_ACCESS_TOKEN is set
+// Add a warning if BWS_ACCESS_TOKEN is found in any file
+function checkForSensitiveVars(fileContent, fileName) {
+  const lines = fileContent.split(/\r?\n/);
+  const sensitiveVars = [];
+
+  lines.forEach((line) => {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) return;
+    const key = trimmed.split('=')[0].trim();
+    if (EXCLUDED_VARS.includes(key)) {
+      sensitiveVars.push(key);
+    }
+  });
+
+  if (sensitiveVars.length > 0) {
+    createBox(
+      [
+        '',
+        '⚠️  WARNING: Sensitive variables found!',
+        '',
+        `Found in file: ${fileName}`,
+        '',
+        'The following variables will be skipped:',
+        ...sensitiveVars.map((v) => `  - ${v}`),
+        '',
+        'These variables should not be uploaded to BWS.',
+        ''
+      ],
+      '\x1b[33m'
+    ); // Yellow warning box
+  }
+}
+
+// For missing token
 if (!process.env.BWS_ACCESS_TOKEN) {
-  console.error(
-    'Error: BWS_ACCESS_TOKEN not found. Provide it via local/root .env or environment variables.'
-  );
+  // prettier-ignore
+  {
+    console.error('\x1b[33m╔════════════════════════════════════════════════════════╗\x1b[0m');
+    console.error('\x1b[33m║                                                        ║\x1b[0m');
+    console.error('\x1b[33m║             WARNING: BWS TOKEN MISSING                 ║\x1b[0m');
+    console.error('\x1b[33m║                                                        ║\x1b[0m');
+    console.error('\x1b[33m║ To use BWS features:                                   ║\x1b[0m');
+    console.error('\x1b[33m║ 1. Log in to vault.bitwarden.com                       ║\x1b[0m');
+    console.error('\x1b[33m║ 2. Go to Secrets Manager > Machine Accounts            ║\x1b[0m');
+    console.error('\x1b[33m║ 3. Create or copy your machine access token            ║\x1b[0m');
+    console.error('\x1b[33m║ 4. Add to .env: BWS_ACCESS_TOKEN=your_token            ║\x1b[0m');
+    console.error('\x1b[33m║                                                        ║\x1b[0m');
+    console.error('\x1b[33m║ For now, continuing with only .env values...           ║\x1b[0m');
+    console.error('\x1b[33m║                                                        ║\x1b[0m');
+    console.error('\x1b[33m╚════════════════════════════════════════════════════════╝\x1b[0m');
+    console.error(
+      '\nVisit the link below to create your token: \n' +
+        '\nhttps://vault.bitwarden.com/#/sm/22479128-f194-460a-884b-b24a015686c6/machine-accounts\n'
+    );
+  }
   process.exit(1);
 }
 
-// Start processing
-processEnvFiles();
+// Add this try/catch block for token validation
+try {
+  // Try a simple bws command to validate the token
+  execSync(`./node_modules/.bin/bws project list -t ${process.env.BWS_ACCESS_TOKEN}`, {
+    stdio: 'ignore',
+    env: { ...process.env, NO_COLOR: '1', FORCE_COLOR: '0' }
+  });
+} catch (err) {
+  // prettier-ignore
+  {
+    console.error('\x1b[31m╔════════════════════════════════════════════════════════╗\x1b[0m');
+    console.error('\x1b[31m║                                                        ║\x1b[0m');
+    console.error('\x1b[31m║             CRITICAL BWS TOKEN ERROR                   ║\x1b[0m');
+    console.error('\x1b[31m║                                                        ║\x1b[0m');
+    console.error('\x1b[31m║ Your BWS_ACCESS_TOKEN appears to be invalid:           ║\x1b[0m');
+    console.error('\x1b[31m║ 1. Check if token has expired                          ║\x1b[0m');
+    console.error('\x1b[31m║ 2. Verify token permissions in vault.bitwarden.com     ║\x1b[0m');
+    console.error('\x1b[31m║ 3. Generate new token if needed                        ║\x1b[0m');
+    console.error('\x1b[31m║ 4. Ensure token has read access to required projects   ║\x1b[0m');
+    console.error('\x1b[31m║                                                        ║\x1b[0m');
+    console.error('\x1b[31m║ For now, continuing with only .env values...           ║\x1b[0m');
+    console.error('\x1b[31m║                                                        ║\x1b[0m');
+    console.error('\x1b[31m╚════════════════════════════════════════════════════════╝\x1b[0m');
+    console.error(
+      '\nVisit the link below to check or regenerate your token: \n' +
+        '\nhttps://vault.bitwarden.com/#/sm/22479128-f194-460a-884b-b24a015686c6/machine-accounts\n'
+    );
+  }
+  process.exit(1);
+}
+
+// Check for --clearvars argument
+const shouldClearFirst = process.argv.includes('--clearvars');
+
+// Start processing with options
+processEnvFiles({ clearFirst: shouldClearFirst });

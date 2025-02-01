@@ -75,50 +75,29 @@ else
 {
   "projects": [
     {
-      "platform": "vercel",
-      "projectName": "your-project-name",
+      "platform": "vercel|netlify",
+      "projectName": "firstProjectName",
       "bwsProjectIds": {
-        "prod": "your-prod-project-id",
-        "dev": "your-dev-project-id",
-        "local": "your-local-project-id"
+        "prod": "yourBWSProdProjectID",
+        "dev": "yourBWSDevProjectID",
+        "local": "yourBWSLocalProjectID"
       },
       "preserveVars": ["BWS_ACCESS_TOKEN"],
       "excludeVars": [
-        "NODE_ENV",
-        "VERCEL_URL",
-        "VERCEL_ENV",
-        "VERCEL",
-        "CI",
-        "DEPLOY_URL",
-        "NEXT_PUBLIC_VERCEL_URL",
-        "NEXT_PUBLIC_VERCEL_ENV"
+        "VERCEL_URL"
       ]
     },
     {
-      "platform": "netlify",
-      "projectName": "your-project-name",
+      "platform": "vercel|netlify",
+      "projectName": "secondProjectName",
       "bwsProjectIds": {
-        "prod": "your-prod-project-id",
-        "dev": "your-dev-project-id",
-        "local": "your-local-project-id"
+        "prod": "yourBWSProdProjectID",
+        "dev": "yourBWSDevProjectID",
+        "local": "yourBWSLocalProjectID"
       },
       "preserveVars": ["BWS_ACCESS_TOKEN"],
       "excludeVars": [
-        "NODE_ENV",
-        "NETLIFY",
-        "NETLIFY_DEV",
-        "DEPLOY_URL",
-        "DEPLOY_PRIME_URL",
-        "DEPLOY_URL_OLD",
-        "URL",
-        "CONTEXT",
-        "BRANCH",
-        "HEAD",
-        "COMMIT_REF",
-        "REVIEW_ID",
-        "INCOMING_HOOK_TITLE",
-        "INCOMING_HOOK_URL",
-        "INCOMING_HOOK_BODY"
+        "DEPLOY_URL"
       ]
     }
   ]
@@ -133,6 +112,7 @@ rm -rf scripts/bws-secure/.git
 echo "Checking .gitignore configuration..."
 # Update .gitignore
 GITIGNORE_ENTRIES=(
+  " "
   "# BWS Secure"
   ".env"
   ".env.*"
@@ -273,4 +253,38 @@ For help or issues:
 1. Check the README.md in scripts/bws-secure/
 2. Enable debug mode: DEBUG=true $PM build
 3. Open an issue on GitHub
-" 
+"
+
+echo "Checking Prettier configuration..."
+# Create or update .prettierignore
+PRETTIER_ENTRIES=(
+  "# BWS Secure - Environment Files"
+  ".env"
+  ".env.*"
+  "*.env"
+  "scripts/bws-secure/.env*"
+  "scripts/bws-secure/**/.env*"
+  ".env.secure"
+  ".env.secure.*"
+)
+
+# Create .prettierignore if it doesn't exist
+if [ ! -f ".prettierignore" ]; then
+  touch .prettierignore
+  echo "Created new .prettierignore file"
+fi
+
+# Check if entries already exist in .prettierignore
+for entry in "${PRETTIER_ENTRIES[@]}"; do
+  if ! grep -Fxq "$entry" .prettierignore; then
+    echo "$entry" >> .prettierignore
+    echo "Added $entry to .prettierignore"
+  fi
+done
+
+# Add a blank line at the end if there isn't one
+if [ -s ".prettierignore" ] && [ "$(tail -c1 .prettierignore)" != "" ]; then
+  echo "" >> .prettierignore
+fi
+
+echo "Prettier ignore configuration updated successfully" 

@@ -286,9 +286,9 @@ async function getSiteIdFromSlug(projectName, token) {
       headers: { Authorization: token }
     });
 
-    const site = response.data.find((s) => s.name === projectName || s.url.includes(projectName));
+    const site = response.data.find((s) => s.name === projectName);
     if (!site) {
-      throw new Error(`Site not found with name: ${projectName}`);
+      throw new Error(`Site not found with exact name: ${projectName}`);
     }
 
     return site;
