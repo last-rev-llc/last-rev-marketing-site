@@ -7,7 +7,7 @@
   command = "yarn dev"
 
 [functions]
-  directory = "packages/web/src"
+  directory = "packages/functions/src"
   included_files = ["!node_modules/@swc/core-linux-x64-musl/*","!node_modules/@swc/core-linux-x64-gnu/*"]
   external_node_modules = ["express"]
   node_bundler = "esbuild"
