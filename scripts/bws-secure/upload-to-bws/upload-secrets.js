@@ -135,8 +135,15 @@ function showErrorAndExit(msg) {
 function parseBwsErrorMessage(rawErrorMessage) {
   let simplified = rawErrorMessage.trim();
 
-  // Try to find JSON in the error (e.g., {"message":"Resource not found.", ...})
-  const matchJSON = simplified.match(/\{.*\}/s);
+  // Use a non-greedy, more specific regex pattern to find JSON
+  // Limit the JSON search to reasonable size and complexity
+  const MAX_JSON_LENGTH = 1000; // Reasonable limit for error messages
+  const truncated = simplified.slice(0, MAX_JSON_LENGTH);
+
+  // Use a more specific pattern that won't cause catastrophic backtracking
+  // [\s\S] is used instead of . to match newlines, and +? makes it non-greedy
+  const matchJSON = truncated.match(/\{[\s\S]+?\}/);
+
   if (matchJSON) {
     try {
       const errorObj = JSON.parse(matchJSON[0]);
