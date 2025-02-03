@@ -588,5 +588,36 @@ try {
 const shouldClearFirst =
   process.argv.includes('--clearvars') || process.argv.includes('--clear-vars');
 
+// Add near the top, before processing starts
+function showInitialWarning() {
+  // prettier-ignore
+  {
+    console.log('\x1b[33m╔════════════════════════════════════════════════════════╗\x1b[0m');
+    console.log('\x1b[33m║                                                        ║\x1b[0m');
+    console.log('\x1b[33m║                   IMPORTANT NOTE                       ║\x1b[0m');
+    console.log('\x1b[33m║                                                        ║\x1b[0m');
+    console.log('\x1b[33m║ When uploading secrets:                                ║\x1b[0m');
+    console.log('\x1b[33m║                                                        ║\x1b[0m');
+    console.log('\x1b[33m║ 1. Use --clear-vars to remove existing secrets first   ║\x1b[0m');
+    console.log('\x1b[33m║    Example: pnpm secure-run --upload-secrets --clear-vars ║\x1b[0m');
+    console.log('\x1b[33m║                                                        ║\x1b[0m');
+    console.log('\x1b[33m║ 2. Or manually update values in Bitwarden if you       ║\x1b[0m');
+    console.log('\x1b[33m║    want to preserve other existing secrets             ║\x1b[0m');
+    console.log('\x1b[33m║                                                        ║\x1b[0m');
+    console.log('\x1b[33m║ Continuing in 5 seconds...                             ║\x1b[0m');
+    console.log('\x1b[33m║ Press Ctrl+C to cancel                                 ║\x1b[0m');
+    console.log('\x1b[33m║                                                        ║\x1b[0m');
+    console.log('\x1b[33m╚════════════════════════════════════════════════════════╝\x1b[0m');
+  }
+
+  // Give user time to read and potentially cancel
+  syncSleep(5000);
+}
+
+// Add to main execution flow
+if (!process.argv.includes('--clear-vars') && !process.argv.includes('--clearvars')) {
+  showInitialWarning();
+}
+
 // Start processing with options
 processEnvFiles({ clearFirst: shouldClearFirst });
