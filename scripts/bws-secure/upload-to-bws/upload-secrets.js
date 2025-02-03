@@ -47,40 +47,34 @@ const sanitizeValue = (value) => {
   return `"${unquotedValue.replace(/"/g, '\\"')}"`;
 };
 
-/**
- * Creates a colored ASCII box that fits any number of lines.
- * @param {string[]} lines   Lines of text to display inside the box
- * @param {string} colorCode ANSI color code (e.g., "\x1b[92m" for green, "\x1b[31m" for red)
- */
-function createBox(lines, colorCode) {
-  // Find the longest line to set box width
-  let maxLen = 0;
-  lines.forEach((line) => {
-    if (line.length > maxLen) {
-      maxLen = line.length;
-    }
-  });
-  // Build top/bottom borders
+// Extract common URL into a constant
+const BWS_BASE_URL = 'https://vault.bitwarden.com/#/sm/22479128-f194-460a-884b-b24a015686c6';
+
+// Extract common box drawing functions
+function drawBox(lines, color) {
+  const maxLen = Math.max(...lines.map((line) => line.length));
   const top = '┌' + '─'.repeat(maxLen + 2) + '┐';
   const bottom = '└' + '─'.repeat(maxLen + 2) + '┘';
 
-  // Print the box in the specified color
-  console.log(colorCode + top);
+  console.log(color);
+  console.log(top);
   lines.forEach((line) => {
-    // Pad each line so they are all the same width
     const paddedLine = line.padEnd(maxLen, ' ');
     console.log(`│ ${paddedLine} │`);
   });
-  console.log(bottom + '\x1b[0m'); // reset color at the end
+  console.log(bottom + '\x1b[0m'); // Reset color
+}
+
+// Simplify box creation functions to use common drawBox
+function createBox(lines, colorCode) {
+  drawBox(lines, colorCode);
 }
 
 function createErrorBox(lines) {
-  // Red color
-  createBox(lines, '\x1b[31m');
+  drawBox(lines, '\x1b[31m'); // Red
 }
 
 function createSuccessBox(successes, uploadResults) {
-  // Create header lines using the passed parameters
   const headerLines = [
     '',
     `SUCCESS! ${successes.length} of ${uploadResults.length} file(s) uploaded correctly.`,
@@ -90,33 +84,20 @@ function createSuccessBox(successes, uploadResults) {
     ''
   ];
 
-  // Find max width for the box
-  const maxLen = Math.max(...headerLines.map((line) => line.length));
+  drawBox(headerLines, '\x1b[92m'); // Green
 
-  // Build box borders
-  const top = '┌' + '─'.repeat(maxLen + 2) + '┐';
-  const bottom = '└' + '─'.repeat(maxLen + 2) + '┘';
-
-  // Print header box
-  console.log('\x1b[92m'); // Start green color
-  console.log(top);
-  headerLines.forEach((line) => {
-    const paddedLine = line.padEnd(maxLen, ' ');
-    console.log(`│ ${paddedLine} │`);
-  });
-  console.log(bottom);
-
-  // Print project IDs and URLs below
-  console.log(''); // Add spacing
+  // Print project details
+  console.log('');
   successes.forEach((s) => {
     console.log(`Project ID: ${s.projectId} (${s.count} secrets)`);
-    console.log(
-      `https://vault.bitwarden.com/#/sm/22479128-f194-460a-884b-b24a015686c6/projects/${s.projectId}/secrets`
-    );
-    console.log(''); // Add spacing between projects
+    console.log(`${BWS_BASE_URL}/projects/${s.projectId}/secrets`);
+    console.log('');
   });
+}
 
-  console.log('\x1b[0m'); // Reset color
+// Extract common project URL generation
+function getProjectUrl(projectId) {
+  return `${BWS_BASE_URL}/projects/${projectId}/secrets`;
 }
 
 /**
@@ -320,25 +301,26 @@ async function clearProjectSecrets(projectId) {
       // If we get a 404, it means no secrets exist - that's okay
       if (listError.message.includes('404 Not Found')) {
         console.log('\x1b[33m'); // Yellow color
-        console.log('=========================================================');
-        console.log('No secrets found for this project (404).');
-        console.log('This could mean:');
-        console.log('  • Project is empty');
-        console.log('  • Project was recently cleared');
-        console.log('  • Project ID might be incorrect');
-        console.log('');
-        console.log(`Verify the BWS ProjectID at the following URL: ${projectId}`);
-        console.log('');
-        console.log(
-          `https://vault.bitwarden.com/#/sm/22479128-f194-460a-884b-b24a015686c6/projects/${projectId}/secrets`
+        drawBox(
+          [
+            '=========================================================',
+            'No secrets found for this project (404).',
+            'This could mean:',
+            '  • Project is empty',
+            '  • Project was recently cleared',
+            '  • Project ID might be incorrect',
+            '',
+            `Verify the BWS ProjectID at the following URL: ${projectId}`,
+            '',
+            getProjectUrl(projectId),
+            '',
+            'Will continue with upload in 10 seconds...',
+            'Press Ctrl+C to cancel if something looks wrong.',
+            '========================================================='
+          ],
+          '\x1b[33m'
         );
-        console.log('');
-        console.log('Will continue with upload in 10 seconds...');
-        console.log('Press Ctrl+C to cancel if something looks wrong.');
-        console.log('=========================================================');
-        console.log('\x1b[0m'); // Reset color
 
-        // Wait 10 seconds
         await new Promise((resolve) => setTimeout(resolve, 10000));
         return;
       }
