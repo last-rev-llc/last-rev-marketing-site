@@ -27,18 +27,20 @@ function ensureBwsInstalled() {
 }
 
 function encryptContent(plaintext, encryptionKey) {
-  const iv = crypto.randomBytes(16);
-  const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(encryptionKey, 'hex'), iv);
+  const nonce = crypto.randomBytes(12); // 12 bytes is optimal for GCM
+  const cipher = crypto.createCipheriv('aes-256-gcm', Buffer.from(encryptionKey, 'hex'), nonce);
   let encrypted = cipher.update(plaintext, 'utf8', 'base64');
   encrypted += cipher.final('base64');
-  const ivBase64 = iv.toString('base64');
-  return `${ivBase64}:${encrypted}`;
+  const authTag = cipher.getAuthTag();
+  return `${nonce.toString('base64')}:${authTag.toString('base64')}:${encrypted}`;
 }
 
 function decryptContent(encrypted, encryptionKey) {
-  const [ivBase64, data] = encrypted.split(':');
-  const iv = Buffer.from(ivBase64, 'base64');
-  const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(encryptionKey, 'hex'), iv);
+  const [nonceBase64, authTagBase64, data] = encrypted.split(':');
+  const nonce = Buffer.from(nonceBase64, 'base64');
+  const authTag = Buffer.from(authTagBase64, 'base64');
+  const decipher = crypto.createDecipheriv('aes-256-gcm', Buffer.from(encryptionKey, 'hex'), nonce);
+  decipher.setAuthTag(authTag);
   let decrypted = decipher.update(data, 'base64', 'utf8');
   decrypted += decipher.final('utf8');
   return decrypted;

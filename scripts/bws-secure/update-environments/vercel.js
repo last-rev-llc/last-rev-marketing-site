@@ -172,17 +172,14 @@ async function getCurrentVercelEnvVars(projectId, token) {
  * Encrypt a value using a project-specific key
  */
 function encryptValue(value, projectId) {
-  // Use a combination of project ID and a fixed salt as encryption key
   const keyBase = `${projectId}_bws_secure_salt`;
   const key = crypto.createHash('sha256').update(keyBase).digest();
-  const iv = crypto.randomBytes(16);
-
-  const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
+  const nonce = crypto.randomBytes(12); // 12 bytes is optimal for GCM
+  const cipher = crypto.createCipheriv('aes-256-gcm', key, nonce);
   let encrypted = cipher.update(value, 'utf8', 'base64');
   encrypted += cipher.final('base64');
-
-  // Prefix with IV so we can decrypt later
-  return `BWS_ENC_${iv.toString('base64')}:${encrypted}`;
+  const authTag = cipher.getAuthTag();
+  return `BWS_ENC_${nonce.toString('base64')}:${authTag.toString('base64')}:${encrypted}`;
 }
 
 /**
@@ -317,25 +314,24 @@ async function createVercelEnvVar(projectId, key, value, token, target) {
  */
 function decryptEnvVar(encryptedValue, projectId) {
   if (!encryptedValue.startsWith('BWS_ENC_')) {
-    return encryptedValue; // Not encrypted
+    return encryptedValue;
   }
-
   try {
-    const [ivBase64, encrypted] = encryptedValue.replace('BWS_ENC_', '').split(':');
-    const iv = Buffer.from(ivBase64, 'base64');
-
-    // Recreate the key using project ID
+    const [nonceBase64, authTagBase64, encrypted] = encryptedValue
+      .replace('BWS_ENC_', '')
+      .split(':');
+    const nonce = Buffer.from(nonceBase64, 'base64');
+    const authTag = Buffer.from(authTagBase64, 'base64');
     const keyBase = `${projectId}_bws_secure_salt`;
     const key = crypto.createHash('sha256').update(keyBase).digest();
-
-    const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
+    const decipher = crypto.createDecipheriv('aes-256-gcm', key, nonce);
+    decipher.setAuthTag(authTag);
     let decrypted = decipher.update(encrypted, 'base64', 'utf8');
     decrypted += decipher.final('utf8');
-
     return decrypted;
   } catch (error) {
     log('error', `Failed to decrypt value: ${error.message}`);
-    return encryptedValue; // Return original value if decryption fails
+    return encryptedValue;
   }
 }
 

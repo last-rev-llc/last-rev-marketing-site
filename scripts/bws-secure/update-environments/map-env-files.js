@@ -14,9 +14,11 @@ if (process.env.DEBUG === 'true') {
 }
 
 function decryptContent(encrypted, encryptionKey) {
-  const [ivBase64, data] = encrypted.split(':');
+  const [ivBase64, authTagBase64, data] = encrypted.split(':');
   const iv = Buffer.from(ivBase64, 'base64');
-  const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(encryptionKey, 'hex'), iv);
+  const authTag = Buffer.from(authTagBase64, 'base64');
+  const decipher = crypto.createDecipheriv('aes-256-gcm', Buffer.from(encryptionKey, 'hex'), iv);
+  decipher.setAuthTag(authTag);
   let decrypted = decipher.update(data, 'base64', 'utf8');
   decrypted += decipher.final('utf8');
   return decrypted;

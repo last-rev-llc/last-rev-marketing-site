@@ -644,9 +644,11 @@ async function setupEnvironment(options = { isPlatformBuild: false }) {
 
 // 4) If you also want to demonstrate decrypting from .env.secure, do it now in memory:
 function decryptContent(encrypted, encryptionKey) {
-  const [ivBase64, data] = encrypted.split(':');
-  const iv = Buffer.from(ivBase64, 'base64');
-  const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(encryptionKey, 'hex'), iv);
+  const [nonceBase64, authTagBase64, data] = encrypted.split(':');
+  const nonce = Buffer.from(nonceBase64, 'base64');
+  const authTag = Buffer.from(authTagBase64, 'base64');
+  const decipher = crypto.createDecipheriv('aes-256-gcm', Buffer.from(encryptionKey, 'hex'), nonce);
+  decipher.setAuthTag(authTag);
   let decrypted = decipher.update(data, 'base64', 'utf8');
   decrypted += decipher.final('utf8');
   return decrypted;
@@ -665,11 +667,12 @@ if (fs.existsSync('.env.secure') && process.env.BWS_ACCESS_TOKEN && process.env.
 
 // Add this function near the other crypto functions
 function encryptContent(content, encryptionKey) {
-  const iv = crypto.randomBytes(16);
-  const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(encryptionKey, 'hex'), iv);
+  const nonce = crypto.randomBytes(12); // 12 bytes is optimal for GCM
+  const cipher = crypto.createCipheriv('aes-256-gcm', Buffer.from(encryptionKey, 'hex'), nonce);
   let encrypted = cipher.update(content, 'utf8', 'base64');
   encrypted += cipher.final('base64');
-  return `${iv.toString('base64')}:${encrypted}`;
+  const authTag = cipher.getAuthTag();
+  return `${nonce.toString('base64')}:${authTag.toString('base64')}:${encrypted}`;
 }
 
 // New function to handle environment-specific secrets

@@ -331,11 +331,12 @@ function decryptContent(encrypted, encryptionKey) {
     // Only show first 20 chars of encrypted data, not the full value
     log('debug', `Raw encrypted start: ${encrypted.substring(0, 20)}...`);
 
-    const [ivBase64, data] = encrypted.split(':');
+    const [ivBase64, authTagBase64, data] = encrypted.split(':');
     log('debug', `IV (base64) length: ${ivBase64?.length}`);
+    log('debug', `Auth tag length: ${authTagBase64?.length}`);
     log('debug', `Data (base64) length: ${data?.length}`);
 
-    if (!ivBase64 || !data) {
+    if (!ivBase64 || !authTagBase64 || !data) {
       throw new Error(
         `Invalid encrypted content format - IV: ${Boolean(ivBase64)}, Data: ${Boolean(data)}`
       );
@@ -355,18 +356,15 @@ function decryptContent(encrypted, encryptionKey) {
       isValidHex: /^[0-9a-f]+$/i.test(encryptionKey)
     });
 
-    try {
-      const decipher = crypto.createDecipheriv('aes-256-cbc', keyBuffer, iv);
-      let decrypted = decipher.update(data, 'base64', 'utf8');
-      decrypted += decipher.final('utf8');
+    const authTag = Buffer.from(authTagBase64, 'base64');
+    const decipher = crypto.createDecipheriv('aes-256-gcm', keyBuffer, iv);
+    decipher.setAuthTag(authTag);
+    let decrypted = decipher.update(data, 'base64', 'utf8');
+    decrypted += decipher.final('utf8');
 
-      log('debug', 'Decryption successful!');
-      log('debug', `Decrypted length: ${decrypted.length}`);
-      return decrypted;
-    } catch (cryptoError) {
-      log('error', `Crypto operation failed: ${cryptoError.message}`);
-      throw cryptoError;
-    }
+    log('debug', 'Decryption successful!');
+    log('debug', `Decrypted length: ${decrypted.length}`);
+    return decrypted;
   } catch (error) {
     log('error', `Decryption failed: ${error.message}`);
     throw error;
