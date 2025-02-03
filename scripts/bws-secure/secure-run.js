@@ -343,42 +343,30 @@ function printEnvironmentSummary() {
   const testVar = process.env.BWS_SECRET_TEST_VAR || 'not set';
   const projectId = process.env.BWS_PROJECT_ID || 'none';
 
-  // Adjust these values to control padding and width
-  const LABEL_WIDTH = 25; // Width for labels like "BWS_SECRET_TEST_VAR    :"
-  const MIN_BOX_WIDTH = 50;
-  const MAX_BOX_WIDTH = 80;
-  const EXTRA_PADDING = 10;
+  // Increased BOX_WIDTH by 10 characters (from 80 to 90)
+  const BOX_WIDTH = 90;
+  const CONTENT_START = 25; // Position where values start
 
-  // Calculate the longest line to determine box width
-  const contentLength = Math.max(
-    project.length,
-    env.length,
-    projectId.length,
-    Math.min(testVar.length, 50)
-  );
+  // Helper to pad content
+  const padContent = (label, value) => {
+    const padding = ' '.repeat(CONTENT_START - label.length);
+    const available = BOX_WIDTH - CONTENT_START - 4; // -4 for borders and spacing
+    const truncated = value.substring(0, available);
+    return `║ ${label}${padding}: ${truncated}${' '.repeat(available - truncated.length)} ║`;
+  };
 
-  // Add padding for labels and margins
-  const boxWidth = Math.min(contentLength + LABEL_WIDTH + EXTRA_PADDING, MAX_BOX_WIDTH);
-  const padWidth = boxWidth - 2; // -2 for the side borders
-  const contentPadding = padWidth - LABEL_WIDTH;
-
-  // Create formatted status box with environment info
   const lines = [
-    `╔${'═'.repeat(padWidth + 1)}╗`,
-    `║${' Environment Summary'.padEnd(padWidth + 0)} ║`,
-    `╟${'─'.repeat(padWidth + 1)}╢`,
-    `║ Project${' '.repeat(13)}: ${project}${' '.repeat(contentPadding - project.length + 2)} ║`,
-    `║${' '.repeat(padWidth)} ║`, // Blank line after project
-    `║ BWS_ENV${' '.repeat(13)}: ${env}${' '.repeat(contentPadding - env.length + 2)} ║`,
-    `║${' '.repeat(padWidth)} ║`, // Blank line before project id
-    `║ BWS Project ID${' '.repeat(6)}: ${projectId}${' '.repeat(
-      contentPadding - projectId.length + 2
-    )} ║`,
-    `║${' '.repeat(padWidth)} ║`, // Blank line before test var
-    `║ BWS_SECRET_TEST_VAR${' '.repeat(1)}: ${testVar.substring(0, 50)}${' '.repeat(
-      contentPadding - Math.min(testVar.length, 50) + 2
-    )} ║`,
-    `╚${'═'.repeat(padWidth + 1)}╝`
+    `╔${'═'.repeat(BOX_WIDTH - 0)}╗`,
+    `║${' Environment Summary'.padEnd(BOX_WIDTH - 1)} ║`,
+    `╟${'─'.repeat(BOX_WIDTH - 0)}╢`,
+    padContent('Project', project),
+    `║${' '.repeat(BOX_WIDTH - 0)}║`,
+    padContent('BWS_ENV', env),
+    `║${' '.repeat(BOX_WIDTH - 0)}║`,
+    padContent('BWS Project ID', projectId),
+    `║${' '.repeat(BOX_WIDTH - 0)}║`,
+    padContent('BWS_SECRET_TEST_VAR', testVar),
+    `╚${'═'.repeat(BOX_WIDTH - 0)}╝`
   ];
 
   // Add a blank line before and after the box
