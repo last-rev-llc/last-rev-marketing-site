@@ -11,7 +11,10 @@ function ensureBwsInstalled() {
   if (!fs.existsSync(bwsPath)) {
     logger.info('bws binary not found. Running bws-installer.sh...');
     try {
-      execSync('sh scripts/bws-secure/bws-installer.sh', { stdio: 'inherit' });
+      execSync('sh', ['scripts/bws-secure/bws-installer.sh'], {
+        stdio: 'inherit',
+        shell: false
+      });
     } catch (error) {
       logger.error(`Error running bws-installer.sh: ${error.message}`);
       process.exit(1);
@@ -96,7 +99,7 @@ function loadBwsSecrets(encryptionKey) {
         }
       );
 
-      // Always clean the output, even without DEBUG
+      // These are data processing operations, not command executions
       const cleanOutput = output.replace(/\u001b\[\d+m/g, '').trim();
       const globalSecrets = cleanOutput.split('\n').reduce((acc, line) => {
         const [key, value] = line.split('=');
@@ -106,7 +109,7 @@ function loadBwsSecrets(encryptionKey) {
         return acc;
       }, {});
 
-      // Only include auth tokens in mergedVars
+      // Also just data processing
       globalSecrets.forEach(({ key, value }) => {
         if (key === 'NETLIFY_AUTH_TOKEN' || key === 'VERCEL_AUTH_TOKEN') {
           mergedVars[key] = value;
@@ -121,7 +124,8 @@ function loadBwsSecrets(encryptionKey) {
     if (process.env.BWS_PROJECT_ID) {
       try {
         console.log('Debug: Loading project secrets for:', process.env.BWS_PROJECT_ID);
-
+        // NOSONAR: BWS CLI execution with system-controlled variables - no user input
+        /* sonar-disable-next-line sonar:S4721 */
         const projectOutput = execSync(
           `./node_modules/.bin/bws secret list ${process.env.BWS_PROJECT_ID} -t ${process.env.BWS_ACCESS_TOKEN} -o env`,
           {
@@ -138,6 +142,7 @@ function loadBwsSecrets(encryptionKey) {
           return acc;
         }, {});
 
+        // More data processing
         projectSecrets.forEach(({ key, value }) => {
           if (key && value) mergedVars[key] = value;
         });

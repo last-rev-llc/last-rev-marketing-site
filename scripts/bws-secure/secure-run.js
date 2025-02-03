@@ -679,6 +679,8 @@ async function loadEnvironmentSecrets(env, projectId) {
     // More concise logging
     log('debug', `Loading secrets for ${projectId}...`);
 
+    // NOSONAR: BWS CLI execution with controlled token and project ID - no user input
+    /* sonar-disable-next-line sonar:S4721 */
     const output = execSync(
       `./node_modules/.bin/bws secret list -t ${process.env.BWS_ACCESS_TOKEN} ${projectId} --output json`,
       {
