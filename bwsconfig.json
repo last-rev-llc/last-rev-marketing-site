@@ -1,0 +1,24 @@
+{
+  "projects": [
+    {
+      "platform": "netlify",
+      "projectName": "last-rev-marketing-site-prod",
+      "bwsProjectIds": {
+        "prod": "713fd3cf-d0fc-4111-b68d-b2740186d218",
+        "dev": "713fd3cf-d0fc-4111-b68d-b2740186d218",
+        "local": "467a446c-bd75-46bd-9a35-b2740186e3a1"
+      },
+      "preserveVars": ["BWS_ACCESS_TOKEN", "DEBUG"]
+    },
+    {
+      "platform": "netlify",
+      "projectName": "last-rev-marketing-site-dev",
+      "bwsProjectIds": {
+        "prod": "2565761f-26bb-479b-b565-b2740186da6f",
+        "dev": "2565761f-26bb-479b-b565-b2740186da6f",
+        "local": "467a446c-bd75-46bd-9a35-b2740186e3a1"
+      },
+      "preserveVars": ["BWS_ACCESS_TOKEN", "DEBUG"]
+    }
+  ]
+}

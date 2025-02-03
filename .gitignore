@@ -24,8 +24,10 @@ lerna-debug.log
 create-app.json
 
 daisy/preview
-
-# .envkey will be ignored everywhere except for the root directory
-**/.envkey
-!/.envkey
-/scripts/removeEnvFirstRun
+ 
+# BWS Secure
+.env
+.env.*
+.env.secure.*
+requiredVars.env
+.env-debug.html

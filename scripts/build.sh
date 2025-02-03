@@ -16,7 +16,6 @@ function cleanup() {
 trap "cleanup" EXIT
 
 echo "Preparing environment..."
-yarn propagate:envkey
 
 bash "$PWD/scripts/pre_build.sh"
 
