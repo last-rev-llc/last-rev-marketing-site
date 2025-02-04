@@ -9,8 +9,9 @@ const readline = require('readline');
 const fsPromises = require('fs').promises;
 const dotenv = require('dotenv');
 
-// Load local .env so that BWS_ACCESS_TOKEN, ENCRYPTION_KEY, etc. become available
-require('dotenv').config();
+// 1) Explicitly load .env from the repo root (../../.env) in case we're running from a subdirectory
+const dotenvPath = path.join(__dirname, '../../.env');
+dotenv.config({ path: dotenvPath });
 
 const { loadBwsSecrets } = require('./bws-dotenv.js');
 const { validateDeployment } = require('./update-environments/utils.js');
@@ -92,43 +93,112 @@ async function createRequiredVarsFile() {
   }
 }
 
-// Handle project selection - automatically use single project or prompt for selection
-async function promptForProject(projects) {
-  // If there's only one project, use it automatically
-  if (projects.length === 1) {
-    const selectedProject = projects[0];
+// Add this simpler helper function to update BWS section in .env
+async function updateEnvBwsSection(project, environment) {
+  const envPath = path.join(process.cwd(), '.env');
 
-    // Set it in process.env immediately
-    process.env.BWS_PROJECT = selectedProject.projectName;
-
-    // Create content for .env file
-    let envContent = '\n\n# Added by bws-secure project selector\n';
-    envContent += `BWS_PROJECT=${selectedProject.projectName}\n\n`;
-
-    // Add environment options
-    envContent += '# Environment options (uncomment to switch):\n';
-    envContent += 'BWS_ENV=local\n'; // Default to local
-    envContent += '# BWS_ENV=dev     # For development/staging\n';
-    envContent += '# BWS_ENV=prod    # For production\n\n';
-
-    try {
-      const envPath = path.join(process.cwd(), '.env');
-      await fsPromises.appendFile(envPath, envContent);
-      log(
-        'info',
-        `Added BWS_PROJECT=${selectedProject.projectName} and environment options to your .env file`
-      );
-    } catch (err) {
-      log(
-        'warn',
-        'Could not update .env file. You may want to add BWS_PROJECT and BWS_ENV manually.'
-      );
+  try {
+    // Read current .env content
+    let content = '';
+    if (fs.existsSync(envPath)) {
+      content = await fsPromises.readFile(envPath, 'utf-8');
     }
 
+    // Split into lines and find BWS section
+    let lines = content.split('\n').map((line) => line.trimEnd());
+    const startIndex = lines.findIndex((line) =>
+      line.includes('Added by bws-secure project selector')
+    );
+
+    // If BWS section exists, remove it
+    if (startIndex !== -1) {
+      // Find the end of the BWS section (next double newline or EOF)
+      let endIndex = lines
+        .slice(startIndex)
+        .findIndex((line, i, arr) => line.trim() === '' && (arr[i + 1] || '').trim() === '');
+      endIndex = endIndex === -1 ? lines.length : startIndex + endIndex;
+
+      // Remove the old section
+      lines.splice(startIndex, endIndex - startIndex);
+    }
+
+    // Get all projects from config
+    const config = await readConfigFile();
+
+    // Create BWS section with all available projects
+    const bwsSection = [];
+
+    // Add a single newline before BWS section if there's content and no newline
+    if (lines.length > 0 && lines[lines.length - 1] !== '') {
+      bwsSection.push('');
+    }
+
+    bwsSection.push('# Added by bws-secure project selector');
+
+    // Add all projects (active one uncommented, others commented)
+    config.projects.forEach((p) => {
+      if (p.projectName === project.projectName) {
+        bwsSection.push(`BWS_PROJECT=${p.projectName}`);
+      } else {
+        bwsSection.push(`# BWS_PROJECT=${p.projectName}`);
+      }
+    });
+
+    bwsSection.push(
+      '',
+      '# Environment options (uncomment to switch):',
+      `BWS_ENV=${environment}     # For local development`,
+      '# BWS_ENV=dev     # For development/staging',
+      '# BWS_ENV=prod     # For production',
+      ''
+    );
+
+    // If no BWS section existed, add to end, otherwise insert where old section was
+    if (startIndex === -1) {
+      lines.push(...bwsSection);
+    } else {
+      lines.splice(startIndex, 0, ...bwsSection);
+    }
+
+    // Remove multiple consecutive empty lines
+    for (let i = lines.length - 1; i > 0; i--) {
+      if (lines[i] === '' && lines[i - 1] === '') {
+        lines.splice(i, 1);
+      }
+    }
+
+    // Ensure single newline at end of file
+    if (lines[lines.length - 1] !== '') {
+      lines.push('');
+    }
+
+    // Write back to file
+    await fsPromises.writeFile(envPath, lines.join('\n'));
+  } catch (error) {
+    log('warn', `Failed to update BWS section in .env: ${error.message}`);
+  }
+}
+
+// Simplify promptForProject to only prompt if needed
+async function promptForProject(projects) {
+  // If BWS_PROJECT is already set and valid, just use it
+  if (process.env.BWS_PROJECT) {
+    const existingProject = projects.find((p) => p.projectName === process.env.BWS_PROJECT);
+    if (existingProject) {
+      await updateEnvBwsSection(existingProject, process.env.BWS_ENV || 'local');
+      return existingProject;
+    }
+  }
+
+  // If single project, use it automatically
+  if (projects.length === 1) {
+    const selectedProject = projects[0];
+    process.env.BWS_PROJECT = selectedProject.projectName;
+    await updateEnvBwsSection(selectedProject, process.env.BWS_ENV || 'local');
     return selectedProject;
   }
 
-  // Original prompt logic for multiple projects...
+  // Multiple projects - need to prompt
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
@@ -149,46 +219,8 @@ async function promptForProject(projects) {
 
     if (selection >= 0 && selection < projects.length) {
       const selectedProject = projects[selection];
-
-      // Set it in process.env immediately
       process.env.BWS_PROJECT = selectedProject.projectName;
-
-      // Create content for .env file with all projects and environments
-      let envContent = '\n\n# Added by bws-secure project selector\n'; // Added extra \n
-      envContent += '# Available projects (uncomment to switch):\n\n';
-
-      // Add all projects as comments except the selected one
-      projects.forEach((p) => {
-        if (p.projectName === selectedProject.projectName) {
-          envContent += `BWS_PROJECT=${p.projectName}\n`;
-        } else {
-          envContent += `# BWS_PROJECT=${p.projectName}\n`;
-        }
-      });
-
-      // Add environment options
-      envContent += '\n# Environment options (uncomment to switch):\n';
-      envContent += 'BWS_ENV=local\n'; // Default to local
-      envContent += '# BWS_ENV=dev     # For development/staging\n';
-      envContent += '# BWS_ENV=prod    # For production\n';
-
-      // Add a blank line at the end
-      envContent += '\n';
-
-      try {
-        const envPath = path.join(process.cwd(), '.env');
-        await fsPromises.appendFile(envPath, envContent);
-        log(
-          'info',
-          `Added BWS_PROJECT=${selectedProject.projectName} and environment options to your .env file`
-        );
-      } catch (err) {
-        log(
-          'warn',
-          'Could not update .env file. You may want to add BWS_PROJECT and BWS_ENV manually.'
-        );
-      }
-
+      await updateEnvBwsSection(selectedProject, process.env.BWS_ENV || 'local');
       return selectedProject;
     }
 
@@ -197,6 +229,19 @@ async function promptForProject(projects) {
     rl.close();
     throw new Error('Project selection failed');
   }
+}
+
+// 1) Add this helper function *before* any place you call spawnSync or execSync with "bws"
+function getBwsCommand() {
+  const binDir = path.join(process.cwd(), 'node_modules', '.bin');
+  const exePath = path.join(binDir, 'bws.exe');
+
+  if (process.platform === 'win32' && fs.existsSync(exePath)) {
+    return exePath; // Use bws.exe on Windows
+  }
+
+  // Otherwise fallback to the script name "bws" for non-Windows
+  return path.join(binDir, 'bws');
 }
 
 // Add helper to validate BWS token
@@ -226,8 +271,8 @@ async function validateBwsToken() {
   }
 
   try {
-    // Try a simple bws command to validate the token
-    execSync(`./node_modules/.bin/bws project list -t ${process.env.BWS_ACCESS_TOKEN}`, {
+    // 2) Replace "./node_modules/.bin/bws" with the helper function
+    execSync(`${getBwsCommand()} project list -t ${process.env.BWS_ACCESS_TOKEN}`, {
       stdio: 'ignore',
       env: { ...process.env, NO_COLOR: '1', FORCE_COLOR: '0' }
     });
@@ -324,7 +369,16 @@ function determineEnvironment() {
 
   // Check explicit BWS_ENV setting
   if (process.env.BWS_ENV) {
-    return normalizeEnvironment(process.env.BWS_ENV);
+    const env = normalizeEnvironment(process.env.BWS_ENV);
+    // Update BWS section if project is set
+    if (process.env.BWS_PROJECT) {
+      const config = require('../../bwsconfig.json');
+      const project = config.projects.find((p) => p.projectName === process.env.BWS_PROJECT);
+      if (project) {
+        updateEnvBwsSection(project, env).catch(console.error);
+      }
+    }
+    return env;
   }
 
   // Check NODE_ENV
@@ -405,21 +459,43 @@ async function setupEnvironment(options = { isPlatformBuild: false }) {
     process.env.BWS_ENV = env;
     log('debug', `Using environment: ${env}`);
 
+    // Update BWS section in .env if we have a project set
+    if (process.env.BWS_PROJECT) {
+      const project = config.projects.find((p) => p.projectName === process.env.BWS_PROJECT);
+      if (project) {
+        await updateEnvBwsSection(project, env);
+      } else {
+        // If current project not found in config, prompt for new selection
+        const selectedProject = await promptForProject(config.projects);
+        process.env.BWS_PROJECT = selectedProject.projectName;
+        await updateEnvBwsSection(selectedProject, env);
+      }
+    } else {
+      // No project set, prompt for selection
+      const selectedProject = await promptForProject(config.projects);
+      process.env.BWS_PROJECT = selectedProject.projectName;
+      await updateEnvBwsSection(selectedProject, env);
+    }
+
     // Get unique platforms from config
     const platforms = new Set(config.projects.map((p) => p.platform.toLowerCase()));
 
     // Create global .env.secure with platform tokens
     if (process.env.BWS_ACCESS_TOKEN) {
       try {
-        const result = spawnSync('bws', ['secret', 'list', '-t', process.env.BWS_ACCESS_TOKEN], {
-          encoding: 'utf8',
-          env: {
-            ...process.env,
-            NO_COLOR: '1',
-            FORCE_COLOR: '0',
-            TERM: 'dumb' // Add this to further discourage color output
+        const result = spawnSync(
+          getBwsCommand(),
+          ['secret', 'list', '-t', process.env.BWS_ACCESS_TOKEN],
+          {
+            encoding: 'utf8',
+            env: {
+              ...process.env,
+              NO_COLOR: '1',
+              FORCE_COLOR: '0',
+              TERM: 'dumb' // Add this to further discourage color output
+            }
           }
-        });
+        );
 
         if (result.status === 0) {
           // Always clean the output, even without DEBUG
@@ -679,10 +755,9 @@ async function loadEnvironmentSecrets(env, projectId) {
     // More concise logging
     log('debug', `Loading secrets for ${projectId}...`);
 
-    // NOSONAR: BWS CLI execution with controlled token and project ID - no user input
-    /* sonar-disable-next-line sonar:S4721 */
+    // 3) Replace "./node_modules/.bin/bws" with getBwsCommand()
     const output = execSync(
-      `./node_modules/.bin/bws secret list -t ${process.env.BWS_ACCESS_TOKEN} ${projectId} --output json`,
+      `${getBwsCommand()} secret list -t ${process.env.BWS_ACCESS_TOKEN} ${projectId} --output json`,
       {
         encoding: 'utf-8',
         env: { ...process.env, NO_COLOR: '1', FORCE_COLOR: '0' }

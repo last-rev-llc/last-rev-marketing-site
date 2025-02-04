@@ -160,9 +160,20 @@ try {
   // Add our core scripts
   packageJson.scripts['secure-run'] = 'node ./scripts/bws-secure/secure-run.js';
   packageJson.scripts['list-projects'] = 'node ./scripts/bws-secure/list-projects.js';
-  packageJson.scripts['bws-deps'] = '[ -d node_modules/dotenv ] && [ -d node_modules/dotenv-cli ] && [ -f node_modules/.bin/bws ] || $PM install';
-  // Add postinstall to run bws-installer.sh
-  packageJson.scripts['postinstall'] = 'bash ./scripts/bws-secure/bws-installer.sh';
+  packageJson.scripts['bws-deps'] = '[ -d node_modules/dotenv ] && [ -d node_modules/dotenv-cli ] && [ -f node_modules/.bin/bws ] || npm install';
+
+  // Handle postinstall script intelligently
+  const bwsInstallCommand = 'bash ./scripts/bws-secure/bws-installer.sh';
+  if (packageJson.scripts.postinstall) {
+    // Check if bws-installer is already in the postinstall script
+    if (!packageJson.scripts.postinstall.includes(bwsInstallCommand)) {
+      // Append our command to existing postinstall
+      packageJson.scripts.postinstall = \`\${packageJson.scripts.postinstall} && \${bwsInstallCommand}\`;
+    }
+  } else {
+    // No existing postinstall, add ours
+    packageJson.scripts.postinstall = bwsInstallCommand;
+  }
 
   // Add dependencies if they don't exist
   packageJson.dependencies = packageJson.dependencies || {};
@@ -258,6 +269,7 @@ For help or issues:
 echo "Checking Prettier configuration..."
 # Create or update .prettierignore
 PRETTIER_ENTRIES=(
+  " "
   "# BWS Secure - Environment Files"
   ".env"
   ".env.*"
@@ -274,6 +286,21 @@ if [ ! -f ".prettierignore" ]; then
   echo "Created new .prettierignore file"
 fi
 
+# Add a blank line if file exists and doesn't end with one
+if [ -s ".prettierignore" ]; then
+  if [ "$(tail -c1 .prettierignore | wc -l)" -eq 0 ]; then
+    echo "" >> .prettierignore
+  fi
+fi
+
+# Check if BWS Secure section header exists
+if ! grep -q "# BWS Secure - Environment Files" .prettierignore; then
+  # Add a blank line before our section if file is not empty
+  if [ -s ".prettierignore" ]; then
+    echo "" >> .prettierignore
+  fi
+fi
+
 # Check if entries already exist in .prettierignore
 for entry in "${PRETTIER_ENTRIES[@]}"; do
   if ! grep -Fxq "$entry" .prettierignore; then
@@ -282,8 +309,8 @@ for entry in "${PRETTIER_ENTRIES[@]}"; do
   fi
 done
 
-# Add a blank line at the end if there isn't one
-if [ -s ".prettierignore" ] && [ "$(tail -c1 .prettierignore)" != "" ]; then
+# Ensure file ends with a newline
+if [ -s ".prettierignore" ] && [ "$(tail -c1 .prettierignore | wc -l)" -eq 0 ]; then
   echo "" >> .prettierignore
 fi
 
