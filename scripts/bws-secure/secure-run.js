@@ -179,9 +179,9 @@ async function updateEnvBwsSection(project, environment) {
   }
 }
 
-// Simplify promptForProject to only prompt if needed
+// Replace the existing promptForProject function with this updated version
 async function promptForProject(projects) {
-  // If BWS_PROJECT is already set and valid, just use it
+  // If BWS_PROJECT is already set and valid, use it
   if (process.env.BWS_PROJECT) {
     const existingProject = projects.find((p) => p.projectName === process.env.BWS_PROJECT);
     if (existingProject) {
@@ -198,7 +198,17 @@ async function promptForProject(projects) {
     return selectedProject;
   }
 
-  // Multiple projects - need to prompt
+  // For platform builds, use first project as default
+  const isNetlify = process.env.NETLIFY === 'true';
+  const isVercel = process.env.VERCEL === '1';
+  if (isNetlify || isVercel) {
+    const selectedProject = projects[0];
+    process.env.BWS_PROJECT = selectedProject.projectName;
+    await updateEnvBwsSection(selectedProject, process.env.BWS_ENV || 'local');
+    return selectedProject;
+  }
+
+  // Multiple projects in local development - need to prompt
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
@@ -206,7 +216,7 @@ async function promptForProject(projects) {
 
   console.log('\nAvailable projects:');
   projects.forEach((p, i) => {
-    console.log(`${i + 1}. ${p.projectName}`);
+    console.log(`${i + 1}. ${p.projectName} (${p.platform})`);
   });
 
   try {
@@ -227,7 +237,7 @@ async function promptForProject(projects) {
     throw new Error('Invalid selection');
   } catch (err) {
     rl.close();
-    throw new Error('Project selection failed');
+    throw new Error('Project selection failed: ' + err.message);
   }
 }
 
@@ -886,7 +896,9 @@ async function handleUploadCommand() {
       const scanResult = spawnSync(
         'node',
         [path.join(__dirname, 'check-vars', 'requiredRuntimeVars.js')],
-        { stdio: 'inherit' }
+        {
+          stdio: 'inherit'
+        }
       );
       if (scanResult.status !== 0) {
         throw new Error('Failed to scan for required variables');
