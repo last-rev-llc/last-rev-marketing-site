@@ -942,37 +942,12 @@ async function handleUploadCommand() {
       process.exit(0);
     }
 
-    // Handle environment variables in command for Windows compatibility
-    const isWindowsEnvVar = command[0].includes('=');
-    if (process.platform === 'win32' && isWindowsEnvVar) {
-      // Parse environment variables from the command
-      const envVars = {};
-      let cmdIndex = 0;
+    const result = spawnSync(command[0], command.slice(1), {
+      stdio: 'inherit',
+      env: process.env
+    });
 
-      while (cmdIndex < command.length && command[cmdIndex].includes('=')) {
-        const [key, value] = command[cmdIndex].split('=');
-        envVars[key] = value;
-        cmdIndex++;
-      }
-
-      // Execute command with environment variables
-      const result = spawnSync(command[cmdIndex], command.slice(cmdIndex + 1), {
-        stdio: 'inherit',
-        env: { ...process.env, ...envVars },
-        shell: true,
-        windowsVerbatimArguments: true
-      });
-      process.exit(result.status);
-    } else {
-      // Normal command execution
-      const result = spawnSync(command[0], command.slice(1), {
-        stdio: 'inherit',
-        env: process.env,
-        shell: true,
-        windowsVerbatimArguments: true
-      });
-      process.exit(result.status);
-    }
+    process.exit(result.status);
   } catch (error) {
     log('error', error.message);
     process.exit(1);
