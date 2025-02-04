@@ -757,7 +757,9 @@ async function loadEnvironmentSecrets(env, projectId) {
 
     // 3) Replace "./node_modules/.bin/bws" with getBwsCommand()
     const output = execSync(
-      `${getBwsCommand()} secret list -t ${process.env.BWS_ACCESS_TOKEN} ${projectId} --output json`,
+      `${getBwsCommand()} secret list -t ${
+        process.env.BWS_ACCESS_TOKEN
+      } ${projectId} --output json`,
       {
         encoding: 'utf-8',
         env: { ...process.env, NO_COLOR: '1', FORCE_COLOR: '0' }
@@ -940,12 +942,37 @@ async function handleUploadCommand() {
       process.exit(0);
     }
 
-    const result = spawnSync(command[0], command.slice(1), {
-      stdio: 'inherit',
-      env: process.env
-    });
+    // Handle environment variables in command for Windows compatibility
+    const isWindowsEnvVar = command[0].includes('=');
+    if (process.platform === 'win32' && isWindowsEnvVar) {
+      // Parse environment variables from the command
+      const envVars = {};
+      let cmdIndex = 0;
 
-    process.exit(result.status);
+      while (cmdIndex < command.length && command[cmdIndex].includes('=')) {
+        const [key, value] = command[cmdIndex].split('=');
+        envVars[key] = value;
+        cmdIndex++;
+      }
+
+      // Execute command with environment variables
+      const result = spawnSync(command[cmdIndex], command.slice(cmdIndex + 1), {
+        stdio: 'inherit',
+        env: { ...process.env, ...envVars },
+        shell: true,
+        windowsVerbatimArguments: true
+      });
+      process.exit(result.status);
+    } else {
+      // Normal command execution
+      const result = spawnSync(command[0], command.slice(1), {
+        stdio: 'inherit',
+        env: process.env,
+        shell: true,
+        windowsVerbatimArguments: true
+      });
+      process.exit(result.status);
+    }
   } catch (error) {
     log('error', error.message);
     process.exit(1);
