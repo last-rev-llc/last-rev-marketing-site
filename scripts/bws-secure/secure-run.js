@@ -955,11 +955,42 @@ async function handleUploadCommand() {
       process.exit(0);
     }
 
-    const result = spawnSync(args.join(' '), [], {
-      stdio: 'inherit',
-      env: process.env,
-      shell: true
-    });
+    let result;
+
+    // If on Windows and the first arg ends with ".sh", run with "bash"
+    if (process.platform === 'win32' && command[0].match(/\.sh$/)) {
+      console.log('[secure-run] Detected Windows + .sh script. Attempting to call via "bash".');
+      result = spawnSync(
+        'bash',
+        command,
+        {
+          stdio: 'inherit',
+          env: process.env
+        }
+      );
+    // If the command is a direct .js file, execute via node
+    } else if (command[0].match(/\.js$/)) {
+      console.log('[secure-run] Detected .js script. Attempting to call via "node".');
+      result = spawnSync(
+        'node',
+        command,  // e.g. ["scripts/foo.js", "--arg"]
+        {
+          stdio: 'inherit',
+          env: process.env
+        }
+      );
+    } else {
+      // Otherwise, just do the normal spawnSync with shell: true
+      result = spawnSync(
+        command.join(' '),
+        [],
+        {
+          stdio: 'inherit',
+          env: process.env,
+          shell: true
+        }
+      );
+    }
 
     process.exit(result.status);
   } catch (error) {
