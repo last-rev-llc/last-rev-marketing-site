@@ -41,7 +41,7 @@
     "combine:reports": "node scripts/combineCoverage.js",
     "secure-run": "node ./scripts/bws-secure/secure-run.js",
     "list-projects": "node ./scripts/bws-secure/list-projects.js",
-    "bws-deps": "[ -d node_modules/dotenv ] && [ -d node_modules/dotenv-cli ] && [ -f node_modules/.bin/bws ] || yarn install"
+    "bws-deps": "[ -d node_modules/dotenv ] && [ -d node_modules/dotenv-cli ] && [ -f node_modules/.bin/bws ] || npm install"
   },
   "private": true,
   "resolutions": {

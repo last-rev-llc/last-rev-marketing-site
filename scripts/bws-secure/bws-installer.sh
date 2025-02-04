@@ -48,6 +48,8 @@ platform_detect() {
     PLATFORM="unknown-linux-gnu"
   elif [ "$(uname -s)" = "Darwin" ]; then
     PLATFORM="apple-darwin"
+  elif [ "$(expr substr "$(uname -s)" 1 10)" = "MINGW32_NT" ] || [ "$(expr substr "$(uname -s)" 1 10)" = "MINGW64_NT" ]; then
+    PLATFORM="pc-windows-msvc"
   else
     error "Unsupported platform: $(uname -s)"
   fi
@@ -111,30 +113,35 @@ validate_checksum() {
 install_bws() {
   echo "Installing bws into node_modules/.bin directory..."
   extract "$tmp_dir/bws.zip" "$(pwd)/node_modules/.bin"
-  chmod +x "$(pwd)/node_modules/.bin/bws"
-  
-  # Add installation to NVM binary directory
-  NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
-  if [ -d "$NVM_DIR" ]; then
-    NODE_VERSION=$(node -v)
-    NVM_BIN_DIR="$NVM_DIR/versions/node/$NODE_VERSION/bin"
-    
-    if [ -d "$NVM_BIN_DIR" ]; then
-      echo "Installing bws into NVM binary directory..."
-      cp "$(pwd)/node_modules/.bin/bws" "$NVM_BIN_DIR/bws"
-      chmod +x "$NVM_BIN_DIR/bws"
-      echo "bws installed globally to $NVM_BIN_DIR/bws"
+
+  # Skip chmod for Windows
+  if [ "$PLATFORM" != "pc-windows-msvc" ]; then
+    chmod +x "$(pwd)/node_modules/.bin/bws"
+  fi
+
+  # Add installation to NVM binary directory only if not Windows
+  if [ "$PLATFORM" != "pc-windows-msvc" ]; then
+    NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+    if [ -d "$NVM_DIR" ]; then
+      NODE_VERSION=$(node -v)
+      NVM_BIN_DIR="$NVM_DIR/versions/node/$NODE_VERSION/bin"
+      if [ -d "$NVM_BIN_DIR" ]; then
+        echo "Installing bws into NVM binary directory..."
+        cp "$(pwd)/node_modules/.bin/bws" "$NVM_BIN_DIR/bws"
+        chmod +x "$NVM_BIN_DIR/bws"
+        echo "bws installed globally to $NVM_BIN_DIR/bws"
+      else
+        echo "Warning: NVM binary directory not found at $NVM_BIN_DIR"
+      fi
     else
-      echo "Warning: NVM binary directory not found at $NVM_BIN_DIR"
+      echo "Warning: NVM directory not found at $NVM_DIR"
     fi
-  else
-    echo "Warning: NVM directory not found at $NVM_DIR"
   fi
 
   echo "bws installed to node_modules/.bin/bws"
   echo "To use bws, run either:"
-  echo "  npx bws <command>"
-  echo "  bws <command> (if using NVM installation)"
+  echo "  ./node_modules/.bin/bws <command>"
+  echo "  bws <command> (if it is on your PATH)"
 }
 
 uninstall_bws() {
