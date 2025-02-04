@@ -35,7 +35,7 @@ const {
   getBuildOrAuthToken,
   validatePlatform,
   decryptContent
-} = require('./utils.js');
+} = require('./utils');
 const {
   readVars: readNetlifyVars,
   updateVars: updateNetlifyVars,
@@ -43,7 +43,7 @@ const {
   getCurrentNetlifyEnvVars,
   testNetlifyEnvVars,
   updateNetlifyEnvVars
-} = require('./netlify.js');
+} = require('./netlify');
 const {
   readVars: readVercelVars,
   updateVars: updateVercelVars,

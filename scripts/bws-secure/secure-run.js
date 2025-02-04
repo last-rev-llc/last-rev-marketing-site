@@ -179,9 +179,22 @@ async function updateEnvBwsSection(project, environment) {
   }
 }
 
-// Replace the existing promptForProject function with this updated version
+// Simplify promptForProject to only prompt if needed
 async function promptForProject(projects) {
-  // If BWS_PROJECT is already set and valid, use it
+  // Skip prompting on Netlify/Vercel platforms
+  if (isNetlify || isVercel) {
+    // If BWS_PROJECT is set, validate and use it
+    if (process.env.BWS_PROJECT) {
+      const existingProject = projects.find((p) => p.projectName === process.env.BWS_PROJECT);
+      if (existingProject) {
+        return existingProject;
+      }
+    }
+    // For platform builds without BWS_PROJECT set, use first project as default
+    return projects[0];
+  }
+
+  // Existing logic for local development
   if (process.env.BWS_PROJECT) {
     const existingProject = projects.find((p) => p.projectName === process.env.BWS_PROJECT);
     if (existingProject) {
@@ -198,17 +211,7 @@ async function promptForProject(projects) {
     return selectedProject;
   }
 
-  // For platform builds, use first project as default
-  const isNetlify = process.env.NETLIFY === 'true';
-  const isVercel = process.env.VERCEL === '1';
-  if (isNetlify || isVercel) {
-    const selectedProject = projects[0];
-    process.env.BWS_PROJECT = selectedProject.projectName;
-    await updateEnvBwsSection(selectedProject, process.env.BWS_ENV || 'local');
-    return selectedProject;
-  }
-
-  // Multiple projects in local development - need to prompt
+  // Multiple projects - need to prompt (only for local development)
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
@@ -216,7 +219,7 @@ async function promptForProject(projects) {
 
   console.log('\nAvailable projects:');
   projects.forEach((p, i) => {
-    console.log(`${i + 1}. ${p.projectName} (${p.platform})`);
+    console.log(`${i + 1}. ${p.projectName}`);
   });
 
   try {
@@ -237,7 +240,7 @@ async function promptForProject(projects) {
     throw new Error('Invalid selection');
   } catch (err) {
     rl.close();
-    throw new Error('Project selection failed: ' + err.message);
+    throw new Error('Project selection failed');
   }
 }
 
@@ -896,9 +899,7 @@ async function handleUploadCommand() {
       const scanResult = spawnSync(
         'node',
         [path.join(__dirname, 'check-vars', 'requiredRuntimeVars.js')],
-        {
-          stdio: 'inherit'
-        }
+        { stdio: 'inherit' }
       );
       if (scanResult.status !== 0) {
         throw new Error('Failed to scan for required variables');
@@ -954,9 +955,10 @@ async function handleUploadCommand() {
       process.exit(0);
     }
 
-    const result = spawnSync(command[0], command.slice(1), {
+    const result = spawnSync(args.join(' '), [], {
       stdio: 'inherit',
-      env: process.env
+      env: process.env,
+      shell: true
     });
 
     process.exit(result.status);
