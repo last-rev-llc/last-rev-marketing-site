@@ -179,22 +179,9 @@ async function updateEnvBwsSection(project, environment) {
   }
 }
 
-// Simplify promptForProject to only prompt if needed
+// Replace the existing promptForProject function with this updated version
 async function promptForProject(projects) {
-  // Skip prompting on Netlify/Vercel platforms
-  if (isNetlify || isVercel) {
-    // If BWS_PROJECT is set, validate and use it
-    if (process.env.BWS_PROJECT) {
-      const existingProject = projects.find((p) => p.projectName === process.env.BWS_PROJECT);
-      if (existingProject) {
-        return existingProject;
-      }
-    }
-    // For platform builds without BWS_PROJECT set, use first project as default
-    return projects[0];
-  }
-
-  // Existing logic for local development
+  // If BWS_PROJECT is already set and valid, use it
   if (process.env.BWS_PROJECT) {
     const existingProject = projects.find((p) => p.projectName === process.env.BWS_PROJECT);
     if (existingProject) {
@@ -211,7 +198,17 @@ async function promptForProject(projects) {
     return selectedProject;
   }
 
-  // Multiple projects - need to prompt (only for local development)
+  // For platform builds, use first project as default
+  const isNetlify = process.env.NETLIFY === 'true';
+  const isVercel = process.env.VERCEL === '1';
+  if (isNetlify || isVercel) {
+    const selectedProject = projects[0];
+    process.env.BWS_PROJECT = selectedProject.projectName;
+    await updateEnvBwsSection(selectedProject, process.env.BWS_ENV || 'local');
+    return selectedProject;
+  }
+
+  // Multiple projects in local development - need to prompt
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
@@ -219,7 +216,7 @@ async function promptForProject(projects) {
 
   console.log('\nAvailable projects:');
   projects.forEach((p, i) => {
-    console.log(`${i + 1}. ${p.projectName}`);
+    console.log(`${i + 1}. ${p.projectName} (${p.platform})`);
   });
 
   try {
@@ -240,7 +237,7 @@ async function promptForProject(projects) {
     throw new Error('Invalid selection');
   } catch (err) {
     rl.close();
-    throw new Error('Project selection failed');
+    throw new Error('Project selection failed: ' + err.message);
   }
 }
 
@@ -770,9 +767,7 @@ async function loadEnvironmentSecrets(env, projectId) {
 
     // 3) Replace "./node_modules/.bin/bws" with getBwsCommand()
     const output = execSync(
-      `${getBwsCommand()} secret list -t ${
-        process.env.BWS_ACCESS_TOKEN
-      } ${projectId} --output json`,
+      `${getBwsCommand()} secret list -t ${process.env.BWS_ACCESS_TOKEN} ${projectId} --output json`,
       {
         encoding: 'utf-8',
         env: { ...process.env, NO_COLOR: '1', FORCE_COLOR: '0' }
@@ -899,7 +894,9 @@ async function handleUploadCommand() {
       const scanResult = spawnSync(
         'node',
         [path.join(__dirname, 'check-vars', 'requiredRuntimeVars.js')],
-        { stdio: 'inherit' }
+        {
+          stdio: 'inherit'
+        }
       );
       if (scanResult.status !== 0) {
         throw new Error('Failed to scan for required variables');
@@ -955,42 +952,11 @@ async function handleUploadCommand() {
       process.exit(0);
     }
 
-    let result;
-
-    // If on Windows and the first arg ends with ".sh", run with "bash"
-    if (process.platform === 'win32' && command[0].match(/\.sh$/)) {
-      console.log('[secure-run] Detected Windows + .sh script. Attempting to call via "bash".');
-      result = spawnSync(
-        'bash',
-        command,
-        {
-          stdio: 'inherit',
-          env: process.env
-        }
-      );
-    // If the command is a direct .js file, execute via node
-    } else if (command[0].match(/\.js$/)) {
-      console.log('[secure-run] Detected .js script. Attempting to call via "node".');
-      result = spawnSync(
-        'node',
-        command,  // e.g. ["scripts/foo.js", "--arg"]
-        {
-          stdio: 'inherit',
-          env: process.env
-        }
-      );
-    } else {
-      // Otherwise, just do the normal spawnSync with shell: true
-      result = spawnSync(
-        command.join(' '),
-        [],
-        {
-          stdio: 'inherit',
-          env: process.env,
-          shell: true
-        }
-      );
-    }
+    const result = spawnSync(args.join(' '), [], {
+      stdio: 'inherit',
+      env: process.env,
+      shell: true
+    });
 
     process.exit(result.status);
   } catch (error) {
