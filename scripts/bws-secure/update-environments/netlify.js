@@ -282,18 +282,54 @@ async function updateSingleKey(
  */
 async function getSiteIdFromSlug(projectName, token) {
   try {
+    // Ensure token has "Bearer " prefix
+    const authToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+
+    // Add debug logging
+    log('debug', `Looking up site with name: ${projectName}`);
+
     const response = await axios.get('https://api.netlify.com/api/v1/sites', {
-      headers: { Authorization: token }
+      headers: { Authorization: authToken },
+      params: { filter: 'all' }
     });
 
-    const site = response.data.find((s) => s.name === projectName);
-    if (!site) {
-      throw new Error(`Site not found with exact name: ${projectName}`);
+    // Log found sites for debugging
+    if (process.env.DEBUG === 'true') {
+      // log('debug', `Found sites: ${response.data.map((s) => s.name).join(', ')}`);
     }
 
+    // Try matching by name first
+    let site = response.data.find((s) => s.name === projectName);
+
+    // If no match by name, try matching by site_id or custom_domain
+    if (!site) {
+      site = response.data.find(
+        (s) =>
+          s.site_id === projectName ||
+          s.custom_domain === projectName ||
+          s.url.includes(projectName)
+      );
+    }
+
+    if (!site) {
+      throw new Error(
+        `Site not found with name/id: ${projectName}.\n` +
+          `Available sites: ${response.data.map((s) => `\n- ${s.name} (${s.url})`).join('')}`
+      );
+    }
+
+    log('debug', `Found site ID ${site.id} for ${projectName} (${site.url})`);
     return site;
   } catch (error) {
-    throw new Error(`Failed to get Netlify site ID: ${error.message}`);
+    // Add more detailed error logging
+    if (error.response?.status === 401) {
+      throw new Error('Invalid or expired Netlify token');
+    } else if (error.response?.status === 403) {
+      throw new Error('Token does not have permission to list sites');
+    } else if (error.response?.data) {
+      throw new Error(`Netlify API error: ${JSON.stringify(error.response.data)}`);
+    }
+    throw error;
   }
 }
 
@@ -344,7 +380,7 @@ async function deleteNetlifyEnvVar(site, token, key) {
     }
 
     await axios.delete(url, config);
-    log('debug', `Deleted Netlify env var: ${key}`);
+    log('debug', `Deleted Netlify env var: ${key} (cleanup)`);
   } catch (error) {
     if (error.response?.status === 404) {
       return;

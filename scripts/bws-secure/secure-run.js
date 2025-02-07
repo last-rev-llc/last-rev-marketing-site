@@ -93,8 +93,8 @@ async function createRequiredVarsFile() {
   }
 }
 
-// Add this simpler helper function to update BWS section in .env
-async function updateEnvBwsSection(project, environment) {
+// Update the updateEnvBwsSection function to handle both cases
+async function updateEnvBwsSection(project, environment, onlyToggleEnv = false) {
   const envPath = path.join(process.cwd(), '.env');
 
   try {
@@ -104,76 +104,112 @@ async function updateEnvBwsSection(project, environment) {
       content = await fsPromises.readFile(envPath, 'utf-8');
     }
 
-    // Split into lines and find BWS section
     let lines = content.split('\n').map((line) => line.trimEnd());
-    const startIndex = lines.findIndex((line) =>
-      line.includes('Added by bws-secure project selector')
-    );
 
-    // If BWS section exists, remove it
-    if (startIndex !== -1) {
-      // Find the end of the BWS section (next double newline or EOF)
-      let endIndex = lines
-        .slice(startIndex)
-        .findIndex((line, i, arr) => line.trim() === '' && (arr[i + 1] || '').trim() === '');
-      endIndex = endIndex === -1 ? lines.length : startIndex + endIndex;
+    if (onlyToggleEnv) {
+      // Just toggle environment comments when BWS_ENV is explicitly set
+      const envSectionStart = lines.findIndex((line) =>
+        line.includes('Environment options (uncomment to switch)')
+      );
 
-      // Remove the old section
-      lines.splice(startIndex, endIndex - startIndex);
-    }
+      if (envSectionStart !== -1) {
+        for (let i = envSectionStart + 1; i < lines.length; i++) {
+          const line = lines[i];
+          if (!line.includes('BWS_ENV=')) continue;
+          if (
+            line === '' ||
+            (line.trim() !== '' && !line.includes('#') && !line.includes('BWS_ENV='))
+          )
+            break;
 
-    // Get all projects from config
-    const config = await readConfigFile();
-
-    // Create BWS section with all available projects
-    const bwsSection = [];
-
-    // Add a single newline before BWS section if there's content and no newline
-    if (lines.length > 0 && lines[lines.length - 1] !== '') {
-      bwsSection.push('');
-    }
-
-    bwsSection.push('# Added by bws-secure project selector');
-
-    // Add all projects (active one uncommented, others commented)
-    config.projects.forEach((p) => {
-      if (p.projectName === project.projectName) {
-        bwsSection.push(`BWS_PROJECT=${p.projectName}`);
-      } else {
-        bwsSection.push(`# BWS_PROJECT=${p.projectName}`);
+          if (line.includes('BWS_ENV=')) {
+            if (line.includes(`BWS_ENV=${environment}`)) {
+              lines[i] = line.replace(/^#\s*/, '');
+            } else if (!line.startsWith('#')) {
+              lines[i] = `# ${line}`;
+            }
+          }
+        }
       }
-    });
-
-    bwsSection.push(
-      '',
-      '# Environment options (uncomment to switch):',
-      `BWS_ENV=${environment}     # For local development`,
-      '# BWS_ENV=dev     # For development/staging',
-      '# BWS_ENV=prod     # For production',
-      ''
-    );
-
-    // If no BWS section existed, add to end, otherwise insert where old section was
-    if (startIndex === -1) {
-      lines.push(...bwsSection);
     } else {
-      lines.splice(startIndex, 0, ...bwsSection);
-    }
+      // Full rewrite of BWS section to sync with bwsconfig.json
+      const startIndex = lines.findIndex((line) =>
+        line.includes('Added by bws-secure project selector')
+      );
 
-    // Remove multiple consecutive empty lines
-    for (let i = lines.length - 1; i > 0; i--) {
-      if (lines[i] === '' && lines[i - 1] === '') {
-        lines.splice(i, 1);
+      if (startIndex !== -1) {
+        let endIndex = lines
+          .slice(startIndex)
+          .findIndex((line, i, arr) => line.trim() === '' && (arr[i + 1] || '').trim() === '');
+        endIndex = endIndex === -1 ? lines.length : startIndex + endIndex;
+        lines.splice(startIndex, endIndex - startIndex);
+      }
+
+      const config = await readConfigFile();
+      const bwsSection = [];
+
+      if (lines.length > 0 && lines[lines.length - 1] !== '') {
+        bwsSection.push('');
+      }
+
+      bwsSection.push('# Added by bws-secure project selector');
+
+      config.projects.forEach((p) => {
+        if (p.projectName === project.projectName) {
+          bwsSection.push(`BWS_PROJECT=${p.projectName}`);
+        } else {
+          bwsSection.push(`# BWS_PROJECT=${p.projectName}`);
+        }
+      });
+
+      bwsSection.push('', '# Environment options (uncomment to switch):');
+
+      // Add standard environments first
+      const standardEnvs = {
+        local: 'For local development',
+        dev: 'For development/staging',
+        prod: 'For production'
+      };
+
+      // Add current environment if it's not standard
+      if (!standardEnvs.hasOwnProperty(environment)) {
+        bwsSection.push(`BWS_ENV=${environment}     # Custom environment`);
+      }
+
+      // Add standard environments (commented unless they match current)
+      Object.entries(standardEnvs).forEach(([env, comment]) => {
+        const line = `BWS_ENV=${env}     # ${comment}`;
+        bwsSection.push(env === environment ? line : `# ${line}`);
+      });
+
+      bwsSection.push('');
+
+      // Then immediately after this, uncomment the current environment
+      const envIndex = bwsSection.findIndex((line) => line.includes(`BWS_ENV=${environment}`));
+      if (envIndex !== -1) {
+        bwsSection[envIndex] = bwsSection[envIndex].replace(/^#\s*/, '');
+      }
+
+      if (startIndex === -1) {
+        lines.push(...bwsSection);
+      } else {
+        lines.splice(startIndex, 0, ...bwsSection);
+      }
+
+      // Clean up consecutive empty lines
+      for (let i = lines.length - 1; i > 0; i--) {
+        if (lines[i] === '' && lines[i - 1] === '') {
+          lines.splice(i, 1);
+        }
+      }
+
+      if (lines[lines.length - 1] !== '') {
+        lines.push('');
       }
     }
 
-    // Ensure single newline at end of file
-    if (lines[lines.length - 1] !== '') {
-      lines.push('');
-    }
-
-    // Write back to file
     await fsPromises.writeFile(envPath, lines.join('\n'));
+    log('debug', `Updated BWS section in .env file`);
   } catch (error) {
     log('warn', `Failed to update BWS section in .env: ${error.message}`);
   }
@@ -185,7 +221,9 @@ async function promptForProject(projects) {
   if (process.env.BWS_PROJECT) {
     const existingProject = projects.find((p) => p.projectName === process.env.BWS_PROJECT);
     if (existingProject) {
-      await updateEnvBwsSection(existingProject, process.env.BWS_ENV || 'local');
+      // If BWS_ENV was explicitly set, only toggle comments
+      const onlyToggleEnv = process.env.BWS_ENV !== undefined;
+      await updateEnvBwsSection(existingProject, process.env.BWS_ENV || 'local', onlyToggleEnv);
       return existingProject;
     }
   }
@@ -767,7 +805,9 @@ async function loadEnvironmentSecrets(env, projectId) {
 
     // 3) Replace "./node_modules/.bin/bws" with getBwsCommand()
     const output = execSync(
-      `${getBwsCommand()} secret list -t ${process.env.BWS_ACCESS_TOKEN} ${projectId} --output json`,
+      `${getBwsCommand()} secret list -t ${
+        process.env.BWS_ACCESS_TOKEN
+      } ${projectId} --output json`,
       {
         encoding: 'utf-8',
         env: { ...process.env, NO_COLOR: '1', FORCE_COLOR: '0' }

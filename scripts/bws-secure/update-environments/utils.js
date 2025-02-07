@@ -274,10 +274,10 @@ function loadEnvironmentVariables(filePath, encryptionKey) {
     const envType = filePath.includes('.prod')
       ? 'prod'
       : filePath.includes('.dev')
-      ? 'dev'
-      : filePath.includes('.local')
-      ? 'local'
-      : 'unknown';
+        ? 'dev'
+        : filePath.includes('.local')
+          ? 'local'
+          : 'unknown';
 
     log('debug', `Loading ${envType} environment from: ${filePath}`);
 
