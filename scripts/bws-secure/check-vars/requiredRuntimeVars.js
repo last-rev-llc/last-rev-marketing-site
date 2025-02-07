@@ -25,12 +25,10 @@ const path = require('path');
 
 /**
  * ---------------------------------------------
- * CHANGE #1: Optional verbose logging
- *        Set VAR_SCANNER_VERBOSE=true in your
- *        environment to see extra console info
+ * CHANGE: Use DEBUG=true instead of VAR_SCANNER_VERBOSE
  * ---------------------------------------------
  */
-const VERBOSE = process.env.VAR_SCANNER_VERBOSE === 'true';
+const VERBOSE = process.env.DEBUG === 'true';
 
 /**
  * The root of the repository is determined by going up two levels ("../../..")
@@ -91,7 +89,7 @@ function getIgnorePatterns() {
       .map((line) => line.trim())
       .filter((line) => line && !line.startsWith('#'));
     patterns.push(...additionalPatterns);
-  } catch {
+  } catch (error) {
     console.warn('No .gitignore found, using default exclusions');
   }
   return patterns;
@@ -105,11 +103,80 @@ function shouldIgnorePath(filePath, ignorePatterns) {
   // Normalize Windows backslashes to forward slashes
   const normalizedPath = filePath.replace(/\\/g, '/');
 
-  return ignorePatterns.some((pattern) => {
-    // Convert pattern (e.g. "*.test.js") to a simple regex that checks the entire path
-    const regexPattern = pattern.replace(/\./g, '\\.').replace(/\*/g, '.*').replace(/\?/g, '.');
-    return new RegExp(regexPattern).test(normalizedPath);
-  });
+  // Always ignore these patterns (more specific than before)
+  const defaultIgnores = [
+    'node_modules/',
+    '.git/',
+    'dist/',
+    'build/',
+    '.next/',
+    '.cache/',
+    'coverage/',
+    '.turbo/',
+    '.env',
+    '.env.*',
+    '*.min.js',
+    '*.bundle.js'
+  ];
+
+  const allPatterns = [...new Set([...defaultIgnores, ...ignorePatterns])];
+
+  if (VERBOSE) {
+    console.log(`DEBUG: Checking path against ignore patterns: ${normalizedPath}`);
+  }
+
+  // Add a timeout to prevent infinite loops
+  const startTime = Date.now();
+  const TIMEOUT = 5000; // 5 seconds
+
+  for (const pattern of allPatterns) {
+    // Check for timeout
+    if (Date.now() - startTime > TIMEOUT) {
+      console.warn('WARNING: Pattern matching timeout - skipping remaining patterns');
+      return true;
+    }
+
+    try {
+      // Handle directory patterns that end with /
+      if (pattern.endsWith('/')) {
+        if (normalizedPath.includes(`/${pattern}`) || normalizedPath.startsWith(pattern)) {
+          if (VERBOSE) {
+            console.log(`DEBUG: Path ${normalizedPath} matched directory pattern ${pattern}`);
+          }
+          return true;
+        }
+        continue;
+      }
+
+      // Handle exact matches first
+      if (normalizedPath === pattern || normalizedPath.endsWith(`/${pattern}`)) {
+        if (VERBOSE) {
+          console.log(`DEBUG: Path ${normalizedPath} matched exact pattern ${pattern}`);
+        }
+        return true;
+      }
+
+      // Handle glob patterns
+      if (pattern.includes('*') || pattern.includes('?')) {
+        const regexPattern = pattern
+          .replace(/\./g, '\\.')
+          .replace(/\*/g, '[^/]*')
+          .replace(/\?/g, '[^/]')
+          .replace(/\//g, '\\/');
+        const regex = new RegExp(`^${regexPattern}$|/${regexPattern}$`);
+        if (regex.test(normalizedPath)) {
+          if (VERBOSE) {
+            console.log(`DEBUG: Path ${normalizedPath} matched glob pattern ${pattern}`);
+          }
+          return true;
+        }
+      }
+    } catch (error) {
+      console.warn(`WARNING: Error matching pattern ${pattern}:`, error.message);
+    }
+  }
+
+  return false;
 }
 
 /**
@@ -153,7 +220,7 @@ async function getAllFiles(dir, ignorePatterns) {
       // Skip if .gitignore says to ignore this path
       if (shouldIgnorePath(relativePath, ignorePatterns)) {
         if (VERBOSE) {
-          console.log(`VERBOSE: Ignoring path (matched .gitignore): ${relativePath}`);
+          console.log(`DEBUG: Ignoring path (matched .gitignore): ${relativePath}`);
         }
         continue;
       }
@@ -165,7 +232,7 @@ async function getAllFiles(dir, ignorePatterns) {
         // Only add files with valid extensions
         files.push(fullPath);
       } else if (VERBOSE) {
-        console.log(`VERBOSE: Skipping file (invalid extension): ${relativePath}`);
+        console.log(`DEBUG: Skipping file (invalid extension): ${relativePath}`);
       }
     }
     return files;
@@ -349,7 +416,7 @@ async function findAllNamedDirs(dir, targetDirName, ignorePatterns) {
 
     if (shouldIgnorePath(relativePath, ignorePatterns)) {
       if (VERBOSE) {
-        console.log(`VERBOSE: Skipping directory (matched .gitignore): ${relativePath}`);
+        console.log(`DEBUG: Skipping directory (matched .gitignore): ${relativePath}`);
       }
       continue;
     }
@@ -432,7 +499,7 @@ const cleanupExistingReport = async () => {
   try {
     await fs.promises.unlink(reportPath);
     if (VERBOSE) {
-      console.log(`VERBOSE: Removed old report file at ${reportPath}`);
+      console.log(`DEBUG: Removed old report file at ${reportPath}`);
     }
   } catch (error) {
     // Ignore if file doesn't exist
@@ -452,7 +519,7 @@ function getTurboVars() {
     // If no turbo.json exists, return empty set silently
     if (!fs.existsSync(turboConfigPath)) {
       if (VERBOSE) {
-        console.log('VERBOSE: No turbo.json found - skipping turbo variable scanning');
+        console.log('DEBUG: No turbo.json found - skipping turbo variable scanning');
       }
       return new Set();
     }
@@ -476,9 +543,9 @@ function getTurboVars() {
 
     if (VERBOSE) {
       if (turboVars.size > 0) {
-        console.log('VERBOSE: Found variables in turbo.json:', Array.from(turboVars));
+        console.log('DEBUG: Found variables in turbo.json:', Array.from(turboVars));
       } else {
-        console.log('VERBOSE: No variables found in turbo.json');
+        console.log('DEBUG: No variables found in turbo.json');
       }
     }
 
@@ -614,6 +681,10 @@ async function main() {
     process.exit(0);
   }
 
+  console.log(`\nScanning ${pathsToScan.length} files...`);
+  let processedFiles = 0;
+  const startTime = Date.now();
+
   /**
    * We'll create a Map keyed by directory, with a Set of environment variable names
    * that we found in that directory's files.
@@ -623,12 +694,15 @@ async function main() {
   const varOccurrences = new Map();
   let totalFileCount = 0;
 
-  // ---------------------------------------------
-  // CHANGE #3: Optional verbose logging for files
-  // ---------------------------------------------
   for (const file of pathsToScan) {
+    processedFiles++;
+    if (processedFiles % 100 === 0 || VERBOSE) {
+      const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+      console.log(`Progress: ${processedFiles}/${pathsToScan.length} files (${elapsed}s)`);
+    }
+
     if (VERBOSE) {
-      console.log(`VERBOSE: Scanning file: ${path.relative(repoRoot, file)}`);
+      console.log(`DEBUG: Scanning file: ${path.relative(repoRoot, file)}`);
     }
     const vars = await findEnvVarsInFile(file);
     if (vars.length) {

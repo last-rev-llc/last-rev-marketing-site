@@ -132,28 +132,49 @@ async function updateEnvBwsSection(project, environment, onlyToggleEnv = false) 
         }
       }
     } else {
-      // Full rewrite of BWS section to sync with bwsconfig.json
+      // Find BWS section boundaries
       const startIndex = lines.findIndex((line) =>
         line.includes('Added by bws-secure project selector')
       );
 
+      // Find the end of the BWS section
+      let endIndex = -1;
       if (startIndex !== -1) {
-        let endIndex = lines
-          .slice(startIndex)
-          .findIndex((line, i, arr) => line.trim() === '' && (arr[i + 1] || '').trim() === '');
-        endIndex = endIndex === -1 ? lines.length : startIndex + endIndex;
-        lines.splice(startIndex, endIndex - startIndex);
+        // Look for the first empty line after the environment options
+        for (let i = startIndex; i < lines.length; i++) {
+          if (lines[i].includes('Environment options (uncomment to switch)')) {
+            // Find the next empty line after environment options
+            for (let j = i + 1; j < lines.length; j++) {
+              if (lines[j].trim() === '') {
+                endIndex = j;
+                break;
+              }
+              // Also stop if we hit a line that doesn't look like an environment option
+              if (!lines[j].includes('BWS_ENV=') && !lines[j].startsWith('#')) {
+                endIndex = j;
+                break;
+              }
+            }
+            break;
+          }
+        }
+        // If we didn't find a clear end, use the next empty line
+        if (endIndex === -1) {
+          endIndex = lines.findIndex((line, idx) => idx > startIndex && line.trim() === '');
+        }
       }
 
-      const config = await readConfigFile();
+      // Prepare BWS section content
       const bwsSection = [];
 
-      if (lines.length > 0 && lines[lines.length - 1] !== '') {
+      // Add an empty line before BWS section if we're not at the start of the file
+      if (startIndex > 0) {
         bwsSection.push('');
       }
 
       bwsSection.push('# Added by bws-secure project selector');
 
+      const config = await readConfigFile();
       config.projects.forEach((p) => {
         if (p.projectName === project.projectName) {
           bwsSection.push(`BWS_PROJECT=${p.projectName}`);
@@ -164,7 +185,7 @@ async function updateEnvBwsSection(project, environment, onlyToggleEnv = false) 
 
       bwsSection.push('', '# Environment options (uncomment to switch):');
 
-      // Add standard environments first
+      // Add standard environments
       const standardEnvs = {
         local: 'For local development',
         dev: 'For development/staging',
@@ -182,30 +203,52 @@ async function updateEnvBwsSection(project, environment, onlyToggleEnv = false) 
         bwsSection.push(env === environment ? line : `# ${line}`);
       });
 
+      // Add an empty line after the BWS section
       bwsSection.push('');
 
-      // Then immediately after this, uncomment the current environment
-      const envIndex = bwsSection.findIndex((line) => line.includes(`BWS_ENV=${environment}`));
-      if (envIndex !== -1) {
-        bwsSection[envIndex] = bwsSection[envIndex].replace(/^#\s*/, '');
-      }
-
+      // Update the file content
       if (startIndex === -1) {
-        lines.push(...bwsSection);
-      } else {
-        lines.splice(startIndex, 0, ...bwsSection);
-      }
+        // If no existing BWS section, try to find the best place to insert it
+        const accessTokenIndex = lines.findIndex((line) => line.includes('BWS_ACCESS_TOKEN='));
 
-      // Clean up consecutive empty lines
-      for (let i = lines.length - 1; i > 0; i--) {
-        if (lines[i] === '' && lines[i - 1] === '') {
-          lines.splice(i, 1);
+        // Insert after access token if found, otherwise after first line
+        const insertIndex = accessTokenIndex !== -1 ? accessTokenIndex + 1 : 1;
+
+        // Ensure there's an empty line before insertion if we're not at the start
+        if (insertIndex > 0 && lines[insertIndex - 1].trim() !== '') {
+          lines.splice(insertIndex, 0, '');
         }
-      }
 
-      if (lines[lines.length - 1] !== '') {
-        lines.push('');
+        lines.splice(insertIndex, 0, ...bwsSection);
+      } else {
+        // Replace existing BWS section while preserving content before and after
+        const beforeSection = lines.slice(0, startIndex);
+        const afterSection = endIndex !== -1 ? lines.slice(endIndex) : [];
+
+        // Filter out any trailing empty lines from beforeSection
+        while (beforeSection.length > 0 && beforeSection[beforeSection.length - 1].trim() === '') {
+          beforeSection.pop();
+        }
+
+        // Filter out any leading empty lines from afterSection
+        while (afterSection.length > 0 && afterSection[0].trim() === '') {
+          afterSection.shift();
+        }
+
+        lines = [...beforeSection, ...bwsSection, ...afterSection];
       }
+    }
+
+    // Clean up consecutive empty lines
+    for (let i = lines.length - 1; i > 0; i--) {
+      if (lines[i] === '' && lines[i - 1] === '') {
+        lines.splice(i, 1);
+      }
+    }
+
+    // Ensure file ends with a newline
+    if (lines[lines.length - 1] !== '') {
+      lines.push('');
     }
 
     await fsPromises.writeFile(envPath, lines.join('\n'));
@@ -805,9 +848,7 @@ async function loadEnvironmentSecrets(env, projectId) {
 
     // 3) Replace "./node_modules/.bin/bws" with getBwsCommand()
     const output = execSync(
-      `${getBwsCommand()} secret list -t ${
-        process.env.BWS_ACCESS_TOKEN
-      } ${projectId} --output json`,
+      `${getBwsCommand()} secret list -t ${process.env.BWS_ACCESS_TOKEN} ${projectId} --output json`,
       {
         encoding: 'utf-8',
         env: { ...process.env, NO_COLOR: '1', FORCE_COLOR: '0' }

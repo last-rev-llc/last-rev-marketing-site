@@ -30,6 +30,14 @@ const folderPath = path.dirname(__filename);
 const EXCLUDED_VARS = ['BWS_ACCESS_TOKEN'];
 const DEBUG = process.env.DEBUG === 'true';
 
+// Update the rate limit handling constants
+const RATE_LIMIT_DELAYS = {
+  FIRST: 65_000, // 65 seconds (in milliseconds)
+  BETWEEN_FILES: 30_000, // 30 seconds between files
+  BETWEEN_OPERATIONS: 15_000, // 15 seconds between delete/upload operations
+  BETWEEN_DELETES: 500 // Reduce from 2000ms to 500ms - still safe but much faster
+};
+
 function debug(message, command = '') {
   if (DEBUG) {
     console.log('\x1b[36m[DEBUG]\x1b[0m', message);
@@ -188,98 +196,57 @@ function isRateLimitError(errorText) {
 }
 
 /**
- * Upload one secret with up to maxRetries.  If we detect rate-limit errors,
- * we sleep, increment timesRateLimited, then retry.
+ * Generic rate limit handler that can be used for both delete and upload operations
  */
-function uploadSecretWithRetry(key, sanitizedValue, projectId, maxRetries = 3) {
+async function handleRateLimit(operation = 'operation') {
+  console.log(`\x1b[33mRate-limit detected during ${operation}; sleeping 65 seconds...\x1b[0m`);
+
+  const waitTime = RATE_LIMIT_DELAYS.FIRST;
+  const startTime = Date.now();
+  const endTime = startTime + waitTime;
+
+  while (Date.now() < endTime) {
+    const remainingSeconds = Math.ceil((endTime - Date.now()) / 1000);
+    process.stdout.write(`\r\x1b[33mWaiting... ${remainingSeconds} seconds remaining\x1b[0m`);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
+  process.stdout.write('\n');
+}
+
+/**
+ * Delete a single secret with retry logic
+ */
+async function deleteSecretWithRetry(secret, projectId, maxRetries = 3) {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      // NOSONAR: BWS CLI execution with controlled token and sanitized values - no user input
-      /* sonar-disable-next-line sonar:S4721 */
-      const cmd = `./node_modules/.bin/bws secret create -t ${process.env.BWS_ACCESS_TOKEN} ${key} -- ${sanitizedValue} ${projectId}`;
-      debug(`Attempt ${attempt}: Creating secret ${key} with command:`, cmd);
+      const deleteCmd = `./node_modules/.bin/bws secret delete --output none -t ${process.env.BWS_ACCESS_TOKEN} ${secret.id}`;
+      debug(`Deleting secret ${secret.key} with command:`, deleteCmd);
 
-      execSync(cmd, { stdio: 'pipe' });
-      return;
-    } catch (execError) {
-      const rawErrorOutput = execError.stderr?.toString() || execError.stdout?.toString() || '';
-      debug(`Upload error on attempt ${attempt}:`, rawErrorOutput);
+      execSync(deleteCmd, { stdio: 'pipe' });
+      console.log(`Deleted secret: ${secret.key}`);
 
-      const prettyError = parseBwsErrorMessage(rawErrorOutput);
-
-      if (isRateLimitError(prettyError)) {
-        // If we got a rate-limit, wait before retrying
-        if (timesRateLimited === 0) {
-          console.log('\x1b[33mRate-limit detected; sleeping 10s...\x1b[0m');
-          syncSleep(10_000);
-        } else {
-          console.log(`\x1b[33mRate-limit again; sleeping 0.5s...\x1b[0m`);
-          syncSleep(500);
-        }
-        timesRateLimited++;
-
-        // Then continue (i.e. retry) if we haven't exceeded maxRetries
-        if (attempt < maxRetries) {
-          continue; // move on to next attempt
-        }
+      // Only add small delay if there are more secrets to delete
+      if (attempt === maxRetries) {
+        await new Promise((resolve) => setTimeout(resolve, RATE_LIMIT_DELAYS.BETWEEN_DELETES));
       }
+      return;
+    } catch (deleteError) {
+      const prettyError = parseBwsErrorMessage(deleteError.message);
 
-      // If it's not a rate-limit error (or we ran out of attempts), throw a real error
-      throw new Error(`Failed to upload secret "${key}". BWS CLI said:\n${prettyError}`);
+      if (isRateLimitError(prettyError) && attempt < maxRetries) {
+        await handleRateLimit('delete');
+        continue;
+      }
+      throw deleteError;
     }
   }
 }
 
-// Add near the top with other helper functions
-function warnEmptyValue(key, value, file) {
-  console.log(
-    `\x1b[31mWarning: Empty or unresolved variable "${key}" in ${file}${
-      value ? `: '${value}'` : ''
-    }\x1b[0m`
-  );
-}
-
-// Transform function to process a single .env.bws.* file
-function transformEnvFile(filePath) {
-  try {
-    const fileContent = fs.readFileSync(filePath, 'utf8');
-    const parsed = dotenv.parse(fileContent);
-    const filename = path.basename(filePath);
-
-    return Object.fromEntries(
-      Object.entries(parsed)
-        .filter(([key]) => !EXCLUDED_VARS.includes(key))
-        .map(([key, value]) => {
-          // Check for empty values before interpolation
-          if (!value || value.trim() === '') {
-            warnEmptyValue(key, null, filename);
-            return [key, ''];
-          }
-
-          // Let dotenv handle the variable interpolation
-          const interpolated = value.replace(/\${([^}]+)}/g, (match, varName) => {
-            const resolvedValue = parsed[varName] || '';
-            if (!resolvedValue) {
-              warnEmptyValue(key, value, filename);
-            }
-            return resolvedValue || match;
-          });
-          return [key, interpolated];
-        })
-    );
-  } catch (error) {
-    console.error(`Failed to transform ${filePath}:`, error.message);
-    throw error;
-  }
-}
-
-// Add near the top with other functions
+// Update the clearProjectSecrets function
 async function clearProjectSecrets(projectId) {
   try {
     console.log(`\nClearing existing secrets for project: ${projectId}...`);
 
-    // NOSONAR: BWS CLI execution with controlled token and project ID - no user input
-    /* sonar-disable-next-line sonar:S4721 */
     const listCmd = `./node_modules/.bin/bws secret list -o json -t ${process.env.BWS_ACCESS_TOKEN} ${projectId}`;
     debug('Listing secrets with command:', listCmd);
 
@@ -299,23 +266,18 @@ async function clearProjectSecrets(projectId) {
         return;
       }
 
-      // Delete each secret
+      // Delete each secret with retry logic
       for (const secret of secrets) {
-        // NOSONAR: BWS CLI execution with controlled token and secret ID - no user input
-        /* sonar-disable-next-line sonar:S4721 */
-        const deleteCmd = `./node_modules/.bin/bws secret delete --output none -t ${process.env.BWS_ACCESS_TOKEN} ${secret.id}`;
-        debug(`Deleting secret ${secret.key} with command:`, deleteCmd);
-
-        try {
-          execSync(deleteCmd, { stdio: 'pipe' });
-          console.log(`Deleted secret: ${secret.key}`);
-        } catch (deleteError) {
-          debug('Delete command error:', deleteError.message);
-          throw deleteError;
-        }
+        await deleteSecretWithRetry(secret, projectId);
       }
 
       console.log(`Cleared ${secrets.length} secrets from project ${projectId}`);
+
+      // Add delay after clearing before starting uploads
+      console.log(
+        `Waiting ${RATE_LIMIT_DELAYS.BETWEEN_OPERATIONS / 1000} seconds before starting uploads...`
+      );
+      await new Promise((resolve) => setTimeout(resolve, RATE_LIMIT_DELAYS.BETWEEN_OPERATIONS));
     } catch (listError) {
       // If we get a 404, it means no secrets exist - that's okay
       if (listError.message.includes('404 Not Found')) {
@@ -350,7 +312,83 @@ async function clearProjectSecrets(projectId) {
   }
 }
 
-// Modify processEnvFiles to handle clear option
+// Move these functions to before they're used
+function warnEmptyValue(key, value, file) {
+  console.log(
+    `\x1b[31mWarning: Empty or unresolved variable "${key}" in ${file}${value ? `: '${value}'` : ''}\x1b[0m`
+  );
+}
+
+function transformEnvFile(filePath) {
+  try {
+    const fileContent = fs.readFileSync(filePath, 'utf8');
+    const parsed = dotenv.parse(fileContent);
+    const filename = path.basename(filePath);
+
+    return Object.fromEntries(
+      Object.entries(parsed)
+        .filter(([key]) => !EXCLUDED_VARS.includes(key))
+        .map(([key, value]) => {
+          // Check for empty values before interpolation
+          if (!value || value.trim() === '') {
+            warnEmptyValue(key, null, filename);
+            return [key, ''];
+          }
+
+          // Let dotenv handle the variable interpolation
+          const interpolated = value.replace(/\${([^}]+)}/g, (match, varName) => {
+            const resolvedValue = parsed[varName] || '';
+            if (!resolvedValue) {
+              warnEmptyValue(key, value, filename);
+            }
+            return resolvedValue || match;
+          });
+          return [key, interpolated];
+        })
+    );
+  } catch (error) {
+    console.error(`Failed to transform ${filePath}:`, error.message);
+    throw error;
+  }
+}
+
+function uploadSecretWithRetry(key, sanitizedValue, projectId, maxRetries = 3) {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      // NOSONAR: BWS CLI execution with controlled token and sanitized values - no user input
+      /* sonar-disable-next-line sonar:S4721 */
+      const cmd = `./node_modules/.bin/bws secret create -t ${process.env.BWS_ACCESS_TOKEN} ${key} -- ${sanitizedValue} ${projectId}`;
+      debug(`Attempt ${attempt}: Creating secret ${key} with command:`, cmd);
+
+      execSync(cmd, { stdio: 'pipe' });
+      return;
+    } catch (execError) {
+      const rawErrorOutput = execError.stderr?.toString() || execError.stdout?.toString() || '';
+      debug(`Upload error on attempt ${attempt}:`, rawErrorOutput);
+
+      const prettyError = parseBwsErrorMessage(rawErrorOutput);
+
+      if (isRateLimitError(prettyError)) {
+        // Always use the 65 second delay for rate limits
+        console.log(`\x1b[33mRate-limit detected; sleeping 65 seconds...\x1b[0m`);
+        syncSleep(RATE_LIMIT_DELAYS.FIRST);
+        timesRateLimited++;
+
+        // Then continue (i.e. retry) if we haven't exceeded maxRetries
+        if (attempt < maxRetries) {
+          continue; // move on to next attempt
+        }
+      }
+
+      // If it's not a rate-limit error (or we ran out of attempts), throw a real error
+      throw new Error(`Failed to upload secret "${key}". BWS CLI said:\n${prettyError}`);
+    }
+  }
+}
+
+/**
+ * Main function to process all .env.bws.* files in the directory
+ */
 const processEnvFiles = async (options = { clearFirst: false }) => {
   const files = fs.readdirSync(folderPath);
   const envFiles = files.filter((file) => file.startsWith('.env.bws.'));
@@ -442,10 +480,14 @@ Need help? Visit: https://bitwarden.com/help/secrets-manager-overview/
 
       uploadResults.push({ file, projectId, success: true, count: secretList.length });
 
-      // Only wait if there is more than one file total AND this isn't the last file
+      // Add longer delay between files
       if (envFiles.length > 1 && envFiles.indexOf(file) < envFiles.length - 1) {
-        console.log('Upload complete for this file; waiting 10 seconds before the next file...');
-        syncSleep(10000);
+        console.log(
+          `Upload complete for this file; waiting ${
+            RATE_LIMIT_DELAYS.BETWEEN_FILES / 1000
+          } seconds before the next file...`
+        );
+        await new Promise((resolve) => setTimeout(resolve, RATE_LIMIT_DELAYS.BETWEEN_FILES));
       } else {
         console.log('Upload complete for this file; no further wait needed.');
       }
@@ -606,22 +648,22 @@ try {
 function showInitialWarning() {
   // prettier-ignore
   {
-    console.log('\x1b[33m╔════════════════════════════════════════════════════════╗\x1b[0m');
-    console.log('\x1b[33m║                                                        ║\x1b[0m');
-    console.log('\x1b[33m║                   IMPORTANT NOTE                       ║\x1b[0m');
-    console.log('\x1b[33m║                                                        ║\x1b[0m');
-    console.log('\x1b[33m║ When uploading secrets:                                ║\x1b[0m');
-    console.log('\x1b[33m║                                                        ║\x1b[0m');
-    console.log('\x1b[33m║ 1. Use --clear-vars to remove existing secrets first   ║\x1b[0m');
-    console.log('\x1b[33m║    Example: pnpm secure-run --upload-secrets --clear-vars ║\x1b[0m');
-    console.log('\x1b[33m║                                                        ║\x1b[0m');
-    console.log('\x1b[33m║ 2. Or manually update values in Bitwarden if you       ║\x1b[0m');
-    console.log('\x1b[33m║    want to preserve other existing secrets             ║\x1b[0m');
-    console.log('\x1b[33m║                                                        ║\x1b[0m');
-    console.log('\x1b[33m║ Continuing in 5 seconds...                             ║\x1b[0m');
-    console.log('\x1b[33m║ Press Ctrl+C to cancel                                 ║\x1b[0m');
-    console.log('\x1b[33m║                                                        ║\x1b[0m');
-    console.log('\x1b[33m╚════════════════════════════════════════════════════════╝\x1b[0m');
+    console.log('\x1b[33m╔══════════════════════════════════════════════════════════════════╗\x1b[0m');
+    console.log('\x1b[33m║                                                                  ║\x1b[0m');
+    console.log('\x1b[33m║                   IMPORTANT NOTE                                 ║\x1b[0m');
+    console.log('\x1b[33m║                                                                  ║\x1b[0m');
+    console.log('\x1b[33m║ When uploading secrets:                                          ║\x1b[0m');
+    console.log('\x1b[33m║                                                                  ║\x1b[0m');
+    console.log('\x1b[33m║ 1. Use --clear-vars to remove existing secrets first             ║\x1b[0m');
+    console.log('\x1b[33m║    Example: pnpm secure-run --upload-secrets --clear-vars        ║\x1b[0m');
+    console.log('\x1b[33m║                                                                  ║\x1b[0m');
+    console.log('\x1b[33m║ 2. Or manually update values in Bitwarden if you                 ║\x1b[0m');
+    console.log('\x1b[33m║    want to preserve other existing secrets                       ║\x1b[0m');
+    console.log('\x1b[33m║                                                                  ║\x1b[0m');
+    console.log('\x1b[33m║ Continuing in 5 seconds...                                       ║\x1b[0m');
+    console.log('\x1b[33m║ Press Ctrl+C to cancel                                           ║\x1b[0m');
+    console.log('\x1b[33m║                                                                  ║\x1b[0m');
+    console.log('\x1b[33m╚══════════════════════════════════════════════════════════════════╝\x1b[0m');
   }
 
   // Give user time to read and potentially cancel
