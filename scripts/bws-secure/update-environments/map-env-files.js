@@ -29,10 +29,26 @@ function createSymlink(source, target) {
     if (fs.existsSync(target)) {
       fs.unlinkSync(target);
     }
-    fs.symlinkSync(source, target);
-    log('info', `Created symlink: ${target} -> ${source}`);
+
+    if (process.platform !== 'win32') {
+      // On non-Windows, create a normal symlink
+      fs.symlinkSync(source, target);
+      log('info', `Created symlink: ${target} -> ${source}`);
+      return;
+    }
+
+    // On Windows, try to create a file symlink
+    try {
+      fs.symlinkSync(source, target, 'file');
+      log('info', `Created Windows symlink: ${target} -> ${source}`);
+    } catch (error) {
+      // If we fail (EPERM, no dev mode, etc.), fallback to copying
+      log('warn', `Could not create symlink on Windows. Fallback to copy: ${error.message}`);
+      fs.copyFileSync(source, target);
+      log('info', `Copied file instead: ${target} <- ${source}`);
+    }
   } catch (error) {
-    log('error', `Failed to create symlink ${target}: ${error.message}`);
+    log('error', `Failed to create or copy for ${target}: ${error.message}`);
   }
 }
 

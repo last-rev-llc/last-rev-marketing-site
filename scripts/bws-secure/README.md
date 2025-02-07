@@ -11,6 +11,7 @@ A secure environment variable manager for Vercel and Netlify deployments using B
       - [Option 1: Using SSH (Recommended for Private Repositories)](#option-1-using-ssh-recommended-for-private-repositories)
       - [Option 2: Using HTTPS (Universal)](#option-2-using-https-universal)
       - [Option 3: Manual Installation](#option-3-manual-installation)
+      - [Option 4: Update/Replace Existing Installation](#option-4-updatereplace-existing-installation)
     - [Basic Setup](#basic-setup)
     - [Platform Setup](#platform-setup)
       - [Vercel](#vercel)
@@ -69,6 +70,14 @@ git clone https://github.com/last-rev-llc/bws-secure.git scripts/bws-secure && r
 git clone https://github.com/last-rev-llc/bws-secure.git scripts/bws-secure
 rm -rf scripts/bws-secure/.git
 bash scripts/bws-secure/install.sh
+```
+
+#### Option 4: Update/Replace Existing Installation
+
+To update an existing installation to the latest version:
+
+```bash
+rm -rf scripts/bws-secure && git clone git@github.com:last-rev-llc/bws-secure.git scripts/bws-secure && rm -rf scripts/bws-secure/.git && bash scripts/bws-secure/install.sh
 ```
 
 ### Basic Setup

@@ -629,7 +629,8 @@ function showInitialWarning() {
 }
 
 // Change the check for clearvars to accept both formats
-const shouldClearFirst = process.argv.includes('--clearvars') || process.argv.includes('--clear-vars');
+const shouldClearFirst =
+  process.argv.includes('--clearvars') || process.argv.includes('--clear-vars');
 
 // Add initial warning if not using clear-vars
 if (!shouldClearFirst) {
