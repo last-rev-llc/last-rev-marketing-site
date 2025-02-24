@@ -1,4 +1,10 @@
-import { ComponentsOverrides, ComponentsVariants, Theme, ThemeOptions, alpha } from '@mui/material/styles';
+import {
+  ComponentsOverrides,
+  ComponentsVariants,
+  Theme,
+  ThemeOptions,
+  alpha
+} from '@mui/material/styles';
 
 // https://mui.com/customization/theme-components/#default-props
 export const defaultProps = {};
@@ -8,7 +14,8 @@ export const styleOverrides: ComponentsOverrides<Theme>['Form'] = {
   root: ({ theme, ownerState }) => ({
     'width': '100%',
 
-    ...((ownerState?.variant === 'hubspotFormDefault' || ownerState?.variant === 'hubspotFormDefaultThin') && {
+    ...((ownerState?.variant === 'hubspotFormDefault' ||
+      ownerState?.variant === 'hubspotFormDefaultThin') && {
       padding: theme.spacing(2),
 
       [theme.breakpoints.up('md')]: {
@@ -311,7 +318,10 @@ export const styleOverrides: ComponentsOverrides<Theme>['Form'] = {
           ...theme.typography.body3,
           display: 'block !important',
           padding: theme.spacing(0.25, 0, 0),
-          color: ownerState?.variant === 'hubspotFormChecks' ? theme.palette.white : theme.palette.error.main,
+          color:
+            ownerState?.variant === 'hubspotFormChecks'
+              ? theme.palette.white
+              : theme.palette.error.main,
           textAlign: 'left'
         }
       }
@@ -330,7 +340,8 @@ export const styleOverrides: ComponentsOverrides<Theme>['Form'] = {
   }),
 
   formOuterContainer: ({ theme, ownerState }) => ({
-    ...((ownerState?.variant === 'hubspotFormDefault' || ownerState?.variant === 'hubspotFormDefaultThin') && {
+    ...((ownerState?.variant === 'hubspotFormDefault' ||
+      ownerState?.variant === 'hubspotFormDefaultThin') && {
       padding: theme.spacing(4, 3),
       backgroundColor: theme.palette.grey[100],
       border: `solid 2px ${theme.palette.grey[200]}`,
@@ -436,7 +447,7 @@ export const styleOverrides: ComponentsOverrides<Theme>['Form'] = {
     'margin': theme.spacing(3.5, 0),
 
     '*': {
-      color: theme.palette.grey[300]
+      color: 'inherit'
     }
   })
 };
