@@ -59,7 +59,7 @@
   ],
   "devDependencies": {
     "@netlify/plugin-nextjs": "4.41.3",
-    "bws-secure": "^0.1.5-beta.12"
+    "bws-secure": "^0.1.5"
   },
   "dependencies": {
     "@last-rev/app-config": "^0.5.1",

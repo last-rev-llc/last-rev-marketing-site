@@ -13256,10 +13256,10 @@ busboy@^1.6.0:
   dependencies:
     streamsearch "^1.1.0"
 
-bws-secure@^0.1.5-beta.12:
-  version "0.1.5-beta.12"
-  resolved "https://registry.yarnpkg.com/bws-secure/-/bws-secure-0.1.5-beta.12.tgz#8e293ba8b6bdc0bdd81fa6cbfb526e91989948fa"
-  integrity sha512-rKtW4OdJPl1pNrR5kDIvsYvKyn82sGljvysL3ThHzrwQEsr4qWd7psChKbVqNK+vteVxDDAOw1RQW2LA+c+LFA==
+bws-secure@^0.1.5:
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/bws-secure/-/bws-secure-0.1.5.tgz#c384d0411ff9e43257548fa9dad0009b94e81bde"
+  integrity sha512-V245ACIuAYVEX3FZC9+je5WqsPhSjF6oy0NG7yxIILevFdbY1IzUTob3NKn8JZDZbTseGoRdszIEFz8vFB9Kmw==
   dependencies:
     axios "^1.7.9"
     dotenv "^16.4.7"
