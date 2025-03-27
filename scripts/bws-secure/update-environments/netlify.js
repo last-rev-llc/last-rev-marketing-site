@@ -2,189 +2,251 @@
  * netlify.js
  *
  * This module contains all Netlify-specific operations for reading and updating
- * environment variables. We do a single multi-context update for each variable key:
+ * environment variables. It provides the following functions:
  *
- *   - If a key has a production value from .env.secure.prod, that goes to context: "production"
- *   - If a key has a dev value from .env.secure.dev, that goes to contexts: "branch-deploy" & "deploy-preview"
- *   - We only delete old Netlify variables that are not in requiredVars and not excluded/preserved.
+ *   readVars(project, token) -> { found: {}, missing: [], excluded: [] }
+ *   updateVars(project, token, vars) -> { updated: {} }
+ *
+ * The code interacts with Netlify via the REST API and requires an API token.
  */
 
-const path = require('path');
-const fs = require('fs');
-const axios = require('axios');
-const { exec } = require('child_process');
-const util = require('util');
-const execPromise = util.promisify(exec);
-
-const {
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import axios from 'axios';
+import {
   log,
   handleError,
-  getBuildOrAuthToken,
   loadEnvironmentVariables,
-  validateDeployment
-} = require('./utils');
+  validateDeployment,
+  shouldPreserveVar as shouldPreserveVariable,
+  getBuildOrAuthToken
+} from './utils.js';
 
-// Local in-memory cache for Netlify environment variables
-const netlifyEnvCache = new Map();
+// Get the directory name in ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Local in-memory cache for Netlify environment variables (if needed for caching)
+const netlifyEnvironmentCache = new Map();
 
 /**
- * Main function to update Netlify environment variables
+ * Helper function to handle API rate limiting with exponential backoff
+ *
+ * @param {Function} apiCall - The function that makes the API call
+ * @param {Number} maxRetries - Maximum number of retries (default: 3)
+ * @param {Number} initialDelay - Initial delay in ms (default: 1000)
  */
-async function updateNetlifyEnvVars(project) {
-  // Validate
+async function withRateLimitRetry(apiCall, maxRetries = 3, initialDelay = 1000) {
+  let retries = 0;
+  let delay = initialDelay;
+
+  while (true) {
+    try {
+      return await apiCall();
+    } catch (error) {
+      // Check if the error is a rate limit (429)
+      if (error.response?.status === 429 && retries < maxRetries) {
+        // Get retry delay from header if available, otherwise use exponential backoff
+        const retryAfter = error.response.headers['retry-after'];
+        const waitTime = retryAfter ? parseInt(retryAfter, 10) * 1000 : delay;
+
+        retries++;
+        log(
+          'warn',
+          `Rate limit exceeded (429). Retrying in ${waitTime / 1000}s (Attempt ${retries}/${maxRetries})`
+        );
+
+        // Wait before retrying
+        await new Promise((resolve) => setTimeout(resolve, waitTime));
+
+        // Increase delay for next potential retry (exponential backoff)
+        delay *= 2;
+      } else {
+        // Not a rate limit error or we've run out of retries
+        throw error;
+      }
+    }
+  }
+}
+
+/**
+ * Main function to update Netlify environment variables in batch.
+ */
+async function updateNetlifyEnvironmentVariables(project) {
+  // 1) Validate deployment
   const validation = validateDeployment(project);
   if (!validation.isValid) {
     throw new Error(validation.error);
   }
 
   try {
-    // 1) Load .env.secure.prod
-    const prodVarsAll =
+    // 2) Load environment variables from .env.secure.prod and .env.secure.dev
+    const productionVariablesAll =
       loadEnvironmentVariables('.env.secure.prod', process.env.BWS_EPHEMERAL_KEY) || {};
-
-    // 2) Load .env.secure.dev
-    const devVarsAll =
+    const developmentVariablesAll =
       loadEnvironmentVariables('.env.secure.dev', process.env.BWS_EPHEMERAL_KEY) || {};
 
     log(
       'debug',
-      `Loaded ${Object.keys(prodVarsAll).length} prod vars, ${
-        Object.keys(devVarsAll).length
+      `Loaded ${Object.keys(productionVariablesAll).length} prod vars, ${
+        Object.keys(developmentVariablesAll).length
       } dev vars`
     );
 
-    // 3) Load requiredVars
-    const requiredVarsPath = path.join(__dirname, '..', 'requiredVars.env');
-    const requiredVarsContent = await fs.promises.readFile(requiredVarsPath, 'utf8');
-    const requiredVars = new Set(
-      requiredVarsContent
+    // 3) Load requiredVars from file and ensure BWS_PROJECT and BWS_ENV are always included
+    const requiredVariablesPath = path.join(__dirname, '..', 'requiredVars.env');
+    const requiredVariablesContent = await fs.promises.readFile(requiredVariablesPath, 'utf8');
+    const requiredVariables = new Set(
+      requiredVariablesContent
         .split('\n')
         .filter((line) => line.trim() && !line.startsWith('#'))
         .map((line) => line.trim())
     );
+    requiredVariables.add('BWS_PROJECT');
+    requiredVariables.add('BWS_ENV');
 
-    // Ensure BWS_PROJECT and BWS_ENV are always included
-    requiredVars.add('BWS_PROJECT');
-    requiredVars.add('BWS_ENV');
-
-    // 4) Gather all unique keys
+    // 4) Gather all unique keys from prod and dev files, plus the forced ones
     const allKeys = new Set([
-      ...Object.keys(prodVarsAll),
-      ...Object.keys(devVarsAll),
+      ...Object.keys(productionVariablesAll),
+      ...Object.keys(developmentVariablesAll),
       'BWS_PROJECT',
       'BWS_ENV'
     ]);
 
-    // 5) Netlify site + token + existing envs
+    // 5) Get Netlify site info and the list of currently set environment variable keys
     const netlifyToken = getBuildOrAuthToken();
     const site = await getSiteIdFromSlug(project.projectName, netlifyToken);
     if (!site) {
       throw new Error('Could not determine Netlify site ID');
     }
+    const existingKeys = await getCurrentNetlifyEnvironmentVariables(site, netlifyToken);
 
-    const existingKeys = await getCurrentNetlifyEnvVars(site, netlifyToken);
-
-    // 6) Delete old Netlify vars that were removed from BWS (but are not preserved/excluded)
-    for (const existingKey of existingKeys) {
-      // Always keep BWS_ACCESS_TOKEN or anything listed in preserveVars/exclusions
+    // 6) Identify keys to delete: keys that exist on Netlify but are not in requiredVars
+    //    or are not explicitly preserved/excluded.
+    const keysToDelete = existingKeys.filter((existingKey) => {
       const isPreserved = project.preserveVars?.includes(existingKey);
       const isExcluded = project.exclusions?.includes(existingKey);
       if (existingKey === 'BWS_ACCESS_TOKEN' || isPreserved || isExcluded) {
         log('debug', `Skipping deletion of ${existingKey}`);
-        continue;
+        return false;
       }
+      return true;
+    });
 
-      // Otherwise, delete it
-      await deleteNetlifyEnvVar(site, netlifyToken, existingKey);
-      log('debug', `Deleted ${existingKey} (cleanup unneeded var)`);
-    }
-
-    // 7) For each key in allKeys => if required & not excluded => do one multi-context update
+    // 7) Build an array of variable objects to update/create
+    const variablesToUpdate = [];
     for (const key of allKeys) {
-      // skip if not required
-      if (!requiredVars.has(key)) {
+      // Only process required keys
+      if (!requiredVariables.has(key)) {
         continue;
       }
-
-      // skip if excluded/preserved
       if (project.exclusions?.includes(key) || project.preserveVars?.includes(key)) {
-        log('debug', `Skipping ${key} (excluded/preserved)`);
+        log('debug', `Skipping update for ${key} (excluded/preserved)`);
         continue;
       }
 
-      // Assign values for BWS_PROJECT and BWS_ENV
-      let prodVal = prodVarsAll[key];
-      let devVal = devVarsAll[key];
+      // For BWS_PROJECT and BWS_ENV, force specific values
+      let productionValue = productionVariablesAll[key];
+      let developmentValue = developmentVariablesAll[key];
 
       if (key === 'BWS_PROJECT') {
-        prodVal = project.projectName;
-        devVal = project.projectName; // Ensure both contexts get the same project name
+        productionValue = project.projectName;
+        developmentValue = project.projectName;
       }
 
       if (key === 'BWS_ENV') {
-        prodVal = 'prod';
-        devVal = 'dev'; // Explicitly set to 'dev' for deploy-preview and branch-deploy
+        productionValue = 'prod';
+        developmentValue = 'dev';
       }
 
-      // If both are missing => skip
-      if (prodVal === undefined && devVal === undefined) {
+      // If both values are missing, skip this key
+      if (productionValue === undefined && developmentValue === undefined) {
         log('debug', `Key=${key} has no prod or dev value, skipping.`);
         continue;
       }
 
-      // Ensure BWS_ENV and BWS_PROJECT are always updated correctly
-      if (key === 'BWS_ENV' || key === 'BWS_PROJECT') {
-        log('debug', `Ensuring ${key} is correctly set: prod=${prodVal}, dev=${devVal}`);
+      // Build contexts array:
+      // - Production context uses prodVal (if available)
+      // - Dev contexts (deploy-preview, branch-deploy) use devVal (if available)
+      const contexts = [];
+      if (productionValue !== undefined) {
+        contexts.push({ context: 'production', value: productionValue });
       }
-
-      // We'll build an array of contexts
-      // If we have prodVal => push { context: 'production', value: prodVal }
-      // If we have devVal => push { context: 'branch-deploy', value: devVal } etc.
-      const allContexts = [];
-      if (prodVal !== undefined) {
-        allContexts.push({ context: 'production', value: prodVal });
-      }
-
-      // For dev contexts, check custom bwsProjectIds?
-      let devContexts = ['deploy-preview', 'branch-deploy'];
-
+      let developmentContexts = ['deploy-preview', 'branch-deploy'];
       if (project.bwsProjectIds?.deploy_preview || project.bwsProjectIds?.branch_deploy) {
-        devContexts = [];
+        developmentContexts = [];
         if (project.bwsProjectIds.deploy_preview) {
-          devContexts.push('deploy-preview');
+          developmentContexts.push('deploy-preview');
         }
         if (project.bwsProjectIds.branch_deploy) {
-          devContexts.push('branch-deploy');
+          developmentContexts.push('branch-deploy');
         }
-        if (!devContexts.length) {
-          devContexts.push('deploy-preview', 'branch-deploy');
+        if (developmentContexts.length === 0) {
+          developmentContexts = ['deploy-preview', 'branch-deploy'];
+        }
+      }
+      if (developmentValue !== undefined) {
+        for (const context of developmentContexts) {
+          contexts.push({ context, value: developmentValue });
         }
       }
 
-      if (devVal !== undefined) {
-        for (const c of devContexts) {
-          allContexts.push({ context: c, value: devVal });
-        }
-      }
-
-      // Now do a single PUT or POST
-      await updateSingleKey(
-        site,
-        netlifyToken,
-        key,
-        allContexts,
-        project.exclusions,
-        project.preserveVars
+      // Log a debug message summarizing the variable being updated,
+      // but without showing sensitive information (only context names and value lengths).
+      const contextsSummary = contexts.map((c) => ({
+        context: c.context,
+        valueLength: typeof c.value === 'string' ? c.value.length : 0
+      }));
+      log(
+        'debug',
+        `Preparing variable ${key} for update with contexts: ${JSON.stringify(contextsSummary)}`
       );
+
+      // For now, we are setting is_secret to false for all variables.
+      variablesToUpdate.push({
+        key,
+        scopes: ['builds', 'functions', 'runtime'],
+        values: contexts,
+        is_secret: false
+      });
     }
 
-    // done
-    console.log('\x1b[32m╔════════════════════════════════════════════════════════════════════╗');
+    // 8) Execute deletions in batches to avoid rate limiting
+    const batchSize = 5; // Process 5 deletions at a time
+    log('debug', `Deleting ${keysToDelete.length} unneeded env vars in batches of ${batchSize}`);
+
+    for (let i = 0; i < keysToDelete.length; i += batchSize) {
+      const batch = keysToDelete.slice(i, i + batchSize);
+      log(
+        'debug',
+        `Processing deletion batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(keysToDelete.length / batchSize)}`
+      );
+
+      // Process each batch concurrently, but batches themselves are sequential
+      await Promise.all(
+        batch.map((key) => deleteNetlifyEnvironmentVariable(site, netlifyToken, key))
+      );
+
+      // Add a small delay between batches to avoid rate limiting
+      if (i + batchSize < keysToDelete.length) {
+        log('debug', 'Adding delay between deletion batches to avoid rate limiting');
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+    }
+
+    log('debug', `Completed deletion of ${keysToDelete.length} unneeded env vars.`);
+
+    // 9) Perform a batch update for all variables (assuming Netlify API supports an array payload)
+    await batchUpdateNetlifyEnvironmentVariables(site, netlifyToken, variablesToUpdate);
+
+    // 10) Log a success message
+    console.log('\u001B[32m╔════════════════════════════════════════════════════════════════════╗');
     console.log('║                                                                    ║');
     console.log('║               Successfully updated Netlify project                 ║');
     console.log(`║                      ${project.projectName.padEnd(46)}║`);
     console.log('║                                                                    ║');
-    console.log('╚════════════════════════════════════════════════════════════════════╝\x1b[0m');
+    console.log('╚════════════════════════════════════════════════════════════════════╝\u001B[0m');
   } catch (error) {
     log('error', `Failed to update Netlify site ${project.projectName}: ${error.message}`);
     throw error;
@@ -192,116 +254,90 @@ async function updateNetlifyEnvVars(project) {
 }
 
 /**
- * updateSingleKey => does a single PUT or POST with an array of {context, value} for a given key
+ * batchUpdateNetlifyEnvVars performs a single API call to update/create multiple environment variables.
+ * For large batches, it splits them into smaller chunks to avoid rate limiting.
  */
-async function updateSingleKey(
-  site,
-  netlifyToken,
-  key,
-  contextsArray,
-  exclusions = [],
-  preserves = []
-) {
+async function batchUpdateNetlifyEnvironmentVariables(site, netlifyToken, variablesArray) {
   try {
-    // If the var exists => PUT, else => POST
-    const url = `https://api.netlify.com/api/v1/accounts/${site.account_id}/env/${key}`;
+    const url = `https://api.netlify.com/api/v1/accounts/${site.account_id}/env`;
 
-    // check if exists
-    let varExists = false;
-    try {
-      const existing = await axios.get(url, {
-        headers: { Authorization: netlifyToken },
-        params: { site_id: site.id }
+    // Split into smaller batches if the array is large
+    const maxBatchSize = 20; // Maximum number of variables to update in a single API call
+
+    if (variablesArray.length <= maxBatchSize) {
+      // Small enough batch, process normally
+      await withRateLimitRetry(async () => {
+        await axios.post(url, variablesArray, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': netlifyToken
+          },
+          params: { site_id: site.id }
+        });
       });
-      if (existing.data) {
-        varExists = true;
-      }
-    } catch (err) {
-      if (err.response?.status === 404) {
-        varExists = false;
-      } else {
-        throw err;
-      }
-    }
 
-    // Make BWS_ENV and BWS_PROJECT non-secret
-    const isSecret = !(key === 'BWS_ENV' || key === 'BWS_PROJECT');
-
-    if (!varExists) {
-      // POST
-      await axios.post(
-        `https://api.netlify.com/api/v1/accounts/${site.account_id}/env`,
-        [
-          {
-            key,
-            scopes: ['builds', 'functions', 'runtime'],
-            values: contextsArray,
-            is_secret: false
-          }
-        ],
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': netlifyToken
-          },
-          params: { site_id: site.id }
-        }
-      );
-      log('debug', `Created new var ${key} with contexts: ${contextsArray.length}`);
+      log('debug', `Batch updated ${variablesArray.length} environment variables.`);
     } else {
-      // PUT
-      await axios.put(
-        url,
-        {
-          key,
-          scopes: ['builds', 'functions', 'runtime'],
-          values: contextsArray,
-          is_secret: false
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': netlifyToken
-          },
-          params: { site_id: site.id }
-        }
+      // Large batch, split into chunks
+      log(
+        'debug',
+        `Splitting large batch of ${variablesArray.length} variables into smaller chunks of ${maxBatchSize}`
       );
-      log('debug', `Updated existing var ${key} with contexts: ${contextsArray.length}`);
+
+      for (let i = 0; i < variablesArray.length; i += maxBatchSize) {
+        const chunk = variablesArray.slice(i, i + maxBatchSize);
+        log(
+          'debug',
+          `Processing update chunk ${Math.floor(i / maxBatchSize) + 1}/${Math.ceil(
+            variablesArray.length / maxBatchSize
+          )}`
+        );
+
+        await withRateLimitRetry(async () => {
+          await axios.post(url, chunk, {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': netlifyToken
+            },
+            params: { site_id: site.id }
+          });
+        });
+
+        // Add a delay between chunks to avoid rate limiting
+        if (i + maxBatchSize < variablesArray.length) {
+          log('debug', 'Adding delay between update batches to avoid rate limiting');
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
+      }
+
+      log(
+        'debug',
+        `Completed update of all ${variablesArray.length} environment variables in chunks.`
+      );
     }
   } catch (error) {
-    log('error', `Failed to update single key=${key}: ${error.message}`);
-    if (error.response?.data) {
-      log('debug', `API Error Details: ${JSON.stringify(error.response.data)}`);
-    }
+    log('error', `Batch update failed: ${error.message}`);
     throw error;
   }
 }
 
 /**
- * Fetches the Netlify site info
+ * getSiteIdFromSlug fetches the Netlify site info by matching the project name.
  */
 async function getSiteIdFromSlug(projectName, token) {
   try {
-    // Ensure token has "Bearer " prefix
     const authToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
-
-    // Add debug logging
     log('debug', `Looking up site with name: ${projectName}`);
 
-    const response = await axios.get('https://api.netlify.com/api/v1/sites', {
-      headers: { Authorization: authToken },
-      params: { filter: 'all' }
+    const response = await withRateLimitRetry(async () => {
+      return await axios.get('https://api.netlify.com/api/v1/sites', {
+        headers: { Authorization: authToken },
+        params: { filter: 'all' }
+      });
     });
 
-    // Log found sites for debugging
-    if (process.env.DEBUG === 'true') {
-      // log('debug', `Found sites: ${response.data.map((s) => s.name).join(', ')}`);
-    }
-
-    // Try matching by name first
     let site = response.data.find((s) => s.name === projectName);
 
-    // If no match by name, try matching by site_id or custom_domain
     if (!site) {
       site = response.data.find(
         (s) =>
@@ -321,7 +357,6 @@ async function getSiteIdFromSlug(projectName, token) {
     log('debug', `Found site ID ${site.id} for ${projectName} (${site.url})`);
     return site;
   } catch (error) {
-    // Add more detailed error logging
     if (error.response?.status === 401) {
       throw new Error('Invalid or expired Netlify token');
     } else if (error.response?.status === 403) {
@@ -334,21 +369,23 @@ async function getSiteIdFromSlug(projectName, token) {
 }
 
 /**
- * Returns a list of existing env variable keys
+ * getCurrentNetlifyEnvVars returns an array of keys currently set on Netlify.
  */
-async function getCurrentNetlifyEnvVars(site, token) {
+async function getCurrentNetlifyEnvironmentVariables(site, token) {
   try {
     const url = `https://api.netlify.com/api/v1/accounts/${site.account_id}/env`;
-    const response = await axios.get(url, {
-      headers: { Authorization: token },
-      params: { site_id: site.id }
+
+    const response = await withRateLimitRetry(async () => {
+      return await axios.get(url, {
+        headers: { Authorization: token },
+        params: { site_id: site.id }
+      });
     });
 
     if (!Array.isArray(response.data)) {
       return [];
     }
-    const existingKeys = response.data.map((envVar) => envVar.key);
-    return existingKeys;
+    return response.data.map((environmentVariable) => environmentVariable.key);
   } catch (error) {
     if (error.response?.status === 404) {
       log('warn', `404 fetching env for site ${site.id}, returning []`);
@@ -359,9 +396,9 @@ async function getCurrentNetlifyEnvVars(site, token) {
 }
 
 /**
- * Deletes an environment variable from Netlify
+ * deleteNetlifyEnvVar deletes a single environment variable from Netlify.
  */
-async function deleteNetlifyEnvVar(site, token, key) {
+async function deleteNetlifyEnvironmentVariable(site, token, key) {
   try {
     const url = `https://api.netlify.com/api/v1/accounts/${site.account_id}/env/${key}`;
     const config = {
@@ -369,8 +406,11 @@ async function deleteNetlifyEnvVar(site, token, key) {
       params: { site_id: site.id }
     };
 
+    // Check if the variable exists before deletion
     try {
-      await axios.get(url, config);
+      await withRateLimitRetry(async () => {
+        await axios.get(url, config);
+      });
     } catch (error) {
       if (error.response?.status === 404) {
         log('debug', `Variable ${key} not found, skipping delete`);
@@ -379,7 +419,10 @@ async function deleteNetlifyEnvVar(site, token, key) {
       throw error;
     }
 
-    await axios.delete(url, config);
+    await withRateLimitRetry(async () => {
+      await axios.delete(url, config);
+    });
+
     log('debug', `Deleted Netlify env var: ${key} (cleanup)`);
   } catch (error) {
     if (error.response?.status === 404) {
@@ -390,20 +433,14 @@ async function deleteNetlifyEnvVar(site, token, key) {
 }
 
 /**
- * Stub readVars
+ * Stub readVars for potential future use.
  */
-async function readVars(project, token) {
-  const result = {
+async function readVariables(project, token) {
+  return {
     found: {},
     missing: [],
     excluded: []
   };
-
-  // Not heavily used
-  return result;
 }
 
-module.exports = {
-  updateNetlifyEnvVars,
-  readVars
-};
+export { readVariables as readVars, updateNetlifyEnvironmentVariables as updateNetlifyEnvVars };

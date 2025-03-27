@@ -299,3 +299,41 @@ In order to use visual testing to verify that the page has not changed you need 
 | DEFAULT_SITE_ID                 | This is the content ID of the `Site` content entry. Use this when you only have one Site                                                                                                                                    |
 | SITE_SETTINGS                   | ID of the site settings content (in Contentful)                                                                                                                                                                             |
 | DOMAIN                          | Base domain of the web app, this is to be able to build the sitemap.                                                                                                                                                        |
+
+<!-- BWS-SECURE-DOCS-START -->
+## BWS Secure Environmental Variable Integration
+
+This project uses [BWS Secure](https://github.com/last-rev-llc/bws-secure) for managing environment variables across different environments.
+
+### Creating an Access Token
+
+1. Visit the [Last Rev Bitwarden Machine Accounts](https://vault.bitwarden.com/#/sm/22479128-f194-460a-884b-b24a015686c6/machine-accounts) section
+   - **Note:** This link requires you to be a member of the Last Rev Bitwarden organization
+   - If you don't have access, please refer to the [BWS Secure documentation](https://github.com/last-rev-llc/bws-secure) or contact your team administrator
+2. After clicking the link, follow these steps:
+   - Select the appropriate Client/Set of Machine Accounts from the list
+   - Click on the "Access Tokens" tab
+   - Click "+ New Access Token" button
+   - Give the token a meaningful name (e.g., "Your Name - Local Development")
+   - Click "Save" to generate the token
+3. Copy the displayed token (you won't be able to see it again after closing)
+4. Add it to your .env file in your project root:
+   ```
+   BWS_ACCESS_TOKEN=your_token_here
+   ```
+5. Never commit this token to version control
+
+### Updating BWS Secure
+
+To update BWS Secure to the latest version, you can use the convenient script that was added to your package.json:
+
+```bash
+npm run bws-update  # Or use your project's package manager: yarn bws-update, pnpm bws-update
+```
+
+Alternatively, you can run the following command manually from your project root:
+
+```bash
+rm -rf scripts/bws-secure && git clone git@github.com:last-rev-llc/bws-secure.git scripts/bws-secure && rm -rf scripts/bws-secure/.git && bash scripts/bws-secure/install.sh
+```
+<!-- BWS-SECURE-DOCS-END -->

@@ -1,9 +1,14 @@
-const { spawnSync } = require('child_process');
-const path = require('path');
-const fs = require('fs');
-const { updateNetlifyEnvVars } = require('./update-environments/netlify.js');
-const { log, validatePlatform } = require('./update-environments/utils.js');
-const dotenv = require('dotenv');
+import { spawnSync } from 'node:child_process';
+import path from 'node:path';
+import fs from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { updateNetlifyEnvVars } from './update-environments/netlify.js';
+import { log, validateDeployment } from './update-environments/utils.js';
+import dotenv from 'dotenv';
+
+// Get the directory name in ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Load .env file if it exists
 dotenv.config();
@@ -64,4 +69,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { testNetlifyUpload };
+export { testNetlifyUpload };

@@ -20,8 +20,21 @@
  *   - pnpm scan "functions,api,my-next-app/**\/*.js"
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { promises as fsPromises } from 'node:fs';
+// Fixed ESM import - glob doesn't provide a default export in ESM
+import * as globModule from 'glob';
+import { promisify } from 'node:util';
+import logger from '../logger.js';
+
+// Get the directory name in ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Make glob available if used elsewhere
+const glob = globModule.glob;
 
 /**
  * ---------------------------------------------
@@ -90,7 +103,7 @@ function getIgnorePatterns() {
       .filter((line) => line && !line.startsWith('#'));
     patterns.push(...additionalPatterns);
   } catch (error) {
-    console.warn('No .gitignore found, using default exclusions');
+    logger.warn('No .gitignore found, using default exclusions');
   }
   return patterns;
 }
@@ -103,6 +116,24 @@ function shouldIgnorePath(filePath, ignorePatterns) {
   // Normalize Windows backslashes to forward slashes
   const normalizedPath = filePath.replace(/\\/g, '/');
 
+  // Quick check for common patterns before logging - to reduce debug noise
+  const commonPatterns = [
+    'node_modules/',
+    '.git/',
+    'dist/',
+    'build/',
+    '.next/',
+    'cms-sync/',
+    'packages/graphql-runner/cms-sync/'
+  ];
+
+  // Pre-check without logging for very common patterns
+  for (const pattern of commonPatterns) {
+    if (normalizedPath.includes(pattern)) {
+      return true;
+    }
+  }
+
   // Always ignore these patterns (more specific than before)
   const defaultIgnores = [
     'node_modules/',
@@ -113,16 +144,30 @@ function shouldIgnorePath(filePath, ignorePatterns) {
     '.cache/',
     'coverage/',
     '.turbo/',
+    'cms-sync/',
+    // Specific patterns for the cms-sync directory
+    'packages/graphql-runner/cms-sync/',
+    // Additional build output folders
+    '.nuxt/',
+    'out/',
+    'public/build/',
+    'storybook-static/',
+    '.vscode/',
+    '.idea/',
+    '.vercel/',
+    '.netlify/',
+    // Files to always ignore
     '.env',
     '.env.*',
     '*.min.js',
-    '*.bundle.js'
+    '*.bundle.js',
+    '*.map'
   ];
 
   const allPatterns = [...new Set([...defaultIgnores, ...ignorePatterns])];
 
   if (VERBOSE) {
-    console.log(`DEBUG: Checking path against ignore patterns: ${normalizedPath}`);
+    logger.debug(`Checking path against ignore patterns: ${normalizedPath}`);
   }
 
   // Add a timeout to prevent infinite loops
@@ -132,7 +177,7 @@ function shouldIgnorePath(filePath, ignorePatterns) {
   for (const pattern of allPatterns) {
     // Check for timeout
     if (Date.now() - startTime > TIMEOUT) {
-      console.warn('WARNING: Pattern matching timeout - skipping remaining patterns');
+      logger.warn('Pattern matching timeout - skipping remaining patterns');
       return true;
     }
 
@@ -141,7 +186,7 @@ function shouldIgnorePath(filePath, ignorePatterns) {
       if (pattern.endsWith('/')) {
         if (normalizedPath.includes(`/${pattern}`) || normalizedPath.startsWith(pattern)) {
           if (VERBOSE) {
-            console.log(`DEBUG: Path ${normalizedPath} matched directory pattern ${pattern}`);
+            logger.debug(`Path ${normalizedPath} matched directory pattern ${pattern}`);
           }
           return true;
         }
@@ -151,7 +196,7 @@ function shouldIgnorePath(filePath, ignorePatterns) {
       // Handle exact matches first
       if (normalizedPath === pattern || normalizedPath.endsWith(`/${pattern}`)) {
         if (VERBOSE) {
-          console.log(`DEBUG: Path ${normalizedPath} matched exact pattern ${pattern}`);
+          logger.debug(`Path ${normalizedPath} matched exact pattern ${pattern}`);
         }
         return true;
       }
@@ -166,13 +211,13 @@ function shouldIgnorePath(filePath, ignorePatterns) {
         const regex = new RegExp(`^${regexPattern}$|/${regexPattern}$`);
         if (regex.test(normalizedPath)) {
           if (VERBOSE) {
-            console.log(`DEBUG: Path ${normalizedPath} matched glob pattern ${pattern}`);
+            logger.debug(`Path ${normalizedPath} matched glob pattern ${pattern}`);
           }
           return true;
         }
       }
     } catch (error) {
-      console.warn(`WARNING: Error matching pattern ${pattern}:`, error.message);
+      logger.warn(`Warning: Error matching pattern ${pattern}: ${error.message}`);
     }
   }
 
@@ -212,7 +257,7 @@ async function getAllFiles(dir, ignorePatterns) {
   try {
     let files = [];
 
-    const entries = await fs.promises.readdir(dir, { withFileTypes: true });
+    const entries = await fsPromises.readdir(dir, { withFileTypes: true });
     for (const entry of entries) {
       const fullPath = path.join(dir, entry.name);
       const relativePath = path.relative(process.cwd(), fullPath);
@@ -220,7 +265,7 @@ async function getAllFiles(dir, ignorePatterns) {
       // Skip if .gitignore says to ignore this path
       if (shouldIgnorePath(relativePath, ignorePatterns)) {
         if (VERBOSE) {
-          console.log(`DEBUG: Ignoring path (matched .gitignore): ${relativePath}`);
+          logger.debug(`Ignoring path (matched .gitignore): ${relativePath}`);
         }
         continue;
       }
@@ -232,13 +277,13 @@ async function getAllFiles(dir, ignorePatterns) {
         // Only add files with valid extensions
         files.push(fullPath);
       } else if (VERBOSE) {
-        console.log(`DEBUG: Skipping file (invalid extension): ${relativePath}`);
+        logger.debug(`Skipping file (invalid extension): ${relativePath}`);
       }
     }
     return files;
   } catch (error) {
     if (error.code === 'ENOENT') {
-      console.log(`Directory not found: ${dir} - skipping`);
+      logger.info(`Directory not found: ${dir} - skipping`);
       return [];
     }
     throw error;
@@ -277,7 +322,7 @@ const COMMENT_PATTERNS = {
  * ---------------------------------------------
  */
 async function findEnvVarsInFile(filePath) {
-  const content = await fs.promises.readFile(filePath, 'utf-8');
+  const content = await fsPromises.readFile(filePath, 'utf-8');
   const ext = path.extname(filePath).toLowerCase();
   const commentStyle = COMMENT_PATTERNS[ext] || {
     single: '//',
@@ -408,7 +453,7 @@ function filterByPattern(files, pattern) {
  */
 async function findAllNamedDirs(dir, targetDirName, ignorePatterns) {
   const results = [];
-  const entries = await fs.promises.readdir(dir, { withFileTypes: true });
+  const entries = await fsPromises.readdir(dir, { withFileTypes: true });
 
   for (const entry of entries) {
     const fullPath = path.join(dir, entry.name);
@@ -416,7 +461,7 @@ async function findAllNamedDirs(dir, targetDirName, ignorePatterns) {
 
     if (shouldIgnorePath(relativePath, ignorePatterns)) {
       if (VERBOSE) {
-        console.log(`DEBUG: Skipping directory (matched .gitignore): ${relativePath}`);
+        logger.debug(`Skipping directory (matched .gitignore): ${relativePath}`);
       }
       continue;
     }
@@ -442,7 +487,7 @@ async function findAllNamedDirs(dir, targetDirName, ignorePatterns) {
  */
 async function findFunctionsDirs(dir, ignorePatterns) {
   const functionsDirs = [];
-  const entries = await fs.promises.readdir(dir, { withFileTypes: true });
+  const entries = await fsPromises.readdir(dir, { withFileTypes: true });
 
   for (const entry of entries) {
     const fullPath = path.join(dir, entry.name);
@@ -477,7 +522,7 @@ async function findFunctionsDirs(dir, ignorePatterns) {
  */
 async function getFunctionFiles(dir) {
   let files = [];
-  const entries = await fs.promises.readdir(dir, { withFileTypes: true });
+  const entries = await fsPromises.readdir(dir, { withFileTypes: true });
 
   for (const entry of entries) {
     const fullPath = path.join(dir, entry.name);
@@ -497,14 +542,14 @@ async function getFunctionFiles(dir) {
 const cleanupExistingReport = async () => {
   const reportPath = path.join(__dirname, '../requiredVars.env');
   try {
-    await fs.promises.unlink(reportPath);
+    await fsPromises.unlink(reportPath);
     if (VERBOSE) {
-      console.log(`DEBUG: Removed old report file at ${reportPath}`);
+      logger.debug(`Removed old report file at ${reportPath}`);
     }
   } catch (error) {
     // Ignore if file doesn't exist
     if (error.code !== 'ENOENT') {
-      console.warn(`Warning: Could not remove old report file: ${error.message}`);
+      logger.warn(`Could not remove old report file: ${error.message}`);
     }
   }
 };
@@ -519,7 +564,7 @@ function getTurboVars() {
     // If no turbo.json exists, return empty set silently
     if (!fs.existsSync(turboConfigPath)) {
       if (VERBOSE) {
-        console.log('DEBUG: No turbo.json found - skipping turbo variable scanning');
+        logger.debug('No turbo.json found - skipping turbo variable scanning');
       }
       return new Set();
     }
@@ -529,9 +574,9 @@ function getTurboVars() {
       const rawConfig = fs.readFileSync(turboConfigPath, 'utf8');
       turboConfig = JSON.parse(rawConfig);
     } catch (parseError) {
-      console.log('\n⚠️  Warning: Found turbo.json but could not parse it:');
-      console.log(`   ${parseError.message}`);
-      console.log('   Continuing scan without turbo.json variables...\n');
+      logger.warn('\n⚠️  Warning: Found turbo.json but could not parse it:');
+      logger.warn(`   ${parseError.message}`);
+      logger.info('   Continuing scan without turbo.json variables...\n');
       return new Set();
     }
 
@@ -543,17 +588,17 @@ function getTurboVars() {
 
     if (VERBOSE) {
       if (turboVars.size > 0) {
-        console.log('DEBUG: Found variables in turbo.json:', Array.from(turboVars));
+        logger.debug('Found variables in turbo.json:', Array.from(turboVars));
       } else {
-        console.log('DEBUG: No variables found in turbo.json');
+        logger.debug('No variables found in turbo.json');
       }
     }
 
     return turboVars;
   } catch (error) {
-    console.log('\n⚠️  Warning: Error accessing turbo.json:');
-    console.log(`   ${error.message}`);
-    console.log('   Continuing scan without turbo.json variables...\n');
+    logger.warn('\n⚠️  Warning: Error accessing turbo.json:');
+    logger.warn(`   ${error.message}`);
+    logger.info('   Continuing scan without turbo.json variables...\n');
     return new Set();
   }
 }
@@ -569,10 +614,10 @@ async function main() {
     await cleanupExistingReport();
   } catch (error) {
     if (error.code !== 'ENOENT') {
-      console.error('Error cleaning up report file:', error);
+      logger.error(`Error cleaning up report file: ${error}`);
     }
   }
-  console.log('Scanning for environment variables...');
+  logger.info('Scanning for environment variables...');
 
   // Get turbo.json variables before starting the scan
   const turboVars = getTurboVars();
@@ -585,7 +630,7 @@ async function main() {
 
   // If the user specified a list of directories or patterns:
   if (directoriesToCheck.length > 0) {
-    console.log('Using selected paths:', directoriesToCheck);
+    logger.info('Using selected paths:', directoriesToCheck);
 
     // Loop through each user-supplied path or pattern
     for (const userPath of directoriesToCheck) {
@@ -597,18 +642,18 @@ async function main() {
 
           // If the path is outside our repoRoot, skip
           if (!absolutePath.startsWith(repoRoot)) {
-            console.log(`Skipping ${absolutePath} - outside repo root`);
+            logger.info(`Skipping ${absolutePath} - outside repo root`);
             continue;
           }
 
           // Attempt to verify the path exists, and then gather all files
           try {
-            await fs.promises.access(absolutePath);
+            await fsPromises.access(absolutePath);
             const files = await getAllFiles(absolutePath, ignorePatterns);
             pathsToScan.push(...files);
           } catch (error) {
             if (error.code === 'ENOENT') {
-              console.log(`Directory not found: ${absolutePath} - skipping`);
+              logger.info(`Directory not found: ${absolutePath} - skipping`);
               continue;
             }
             throw error;
@@ -618,19 +663,19 @@ async function main() {
           const { baseDir, pattern } = parseGlobPath(userPath);
 
           if (!baseDir.startsWith(repoRoot)) {
-            console.log(`Skipping ${baseDir} - outside repo root`);
+            logger.info(`Skipping ${baseDir} - outside repo root`);
             continue;
           }
 
           try {
-            await fs.promises.access(baseDir);
+            await fsPromises.access(baseDir);
             const files = await getAllFiles(baseDir, ignorePatterns);
             // Filter out only the files that match the user-provided pattern
             const matched = filterByPattern(files, pattern);
             pathsToScan.push(...matched);
           } catch (error) {
             if (error.code === 'ENOENT') {
-              console.log(`Directory not found: ${baseDir} - skipping`);
+              logger.info(`Directory not found: ${baseDir} - skipping`);
               continue;
             }
             throw error;
@@ -640,7 +685,7 @@ async function main() {
         // Name-based directory search, e.g. "functions" or "api"
         const matchingDirs = await findAllNamedDirs(repoRoot, userPath, ignorePatterns);
         if (matchingDirs.length === 0) {
-          console.log(`No directories named '${userPath}' found - skipping`);
+          logger.info(`No directories named '${userPath}' found - skipping`);
           continue;
         }
         // For each matching directory, gather all files
@@ -650,7 +695,7 @@ async function main() {
             pathsToScan.push(...files);
           } catch (error) {
             if (error.code === 'ENOENT') {
-              console.log(`Directory not found: ${matchedDir} - skipping`);
+              logger.info(`Directory not found: ${matchedDir} - skipping`);
               continue;
             }
             throw error;
@@ -661,8 +706,8 @@ async function main() {
   } else {
     // If user provided no custom directories, we do a fallback search for "functions" or "api"
     const functionsDirs = await findFunctionsDirs(repoRoot, ignorePatterns);
-    console.log(`Found ${functionsDirs.length} matching directories:`);
-    functionsDirs.forEach((dir) => console.log(`- ${path.relative(repoRoot, dir)}`));
+    logger.info(`Found ${functionsDirs.length} matching directories:`);
+    functionsDirs.forEach((dir) => logger.info(`- ${path.relative(repoRoot, dir)}`));
 
     // Now gather JS/TS files from those discovered function/api directories
     for (const dir of functionsDirs) {
@@ -673,15 +718,15 @@ async function main() {
 
   // If no files ended up in pathsToScan, we let the user know and exit gracefully
   if (pathsToScan.length === 0) {
-    console.log('\nNo files found to scan. To scan specific directories, you can:');
-    console.log("1. Create a 'functions' or 'api' directory in your project");
-    console.log('2. Pass custom directories or patterns as an argument:');
-    console.log('   pnpm scan "src,pages,components"');
-    console.log('   pnpm scan "my-next-app/**/*.js"');
+    logger.info('\nNo files found to scan. To scan specific directories, you can:');
+    logger.info("1. Create a 'functions' or 'api' directory in your project");
+    logger.info('2. Pass custom directories or patterns as an argument:');
+    logger.info('   pnpm scan "src,pages,components"');
+    logger.info('   pnpm scan "my-next-app/**/*.js"');
     process.exit(0);
   }
 
-  console.log(`\nScanning ${pathsToScan.length} files...`);
+  logger.info(`\nScanning ${pathsToScan.length} files...`);
   let processedFiles = 0;
   const startTime = Date.now();
 
@@ -698,11 +743,11 @@ async function main() {
     processedFiles++;
     if (processedFiles % 100 === 0 || VERBOSE) {
       const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-      console.log(`Progress: ${processedFiles}/${pathsToScan.length} files (${elapsed}s)`);
+      logger.info(`Progress: ${processedFiles}/${pathsToScan.length} files (${elapsed}s)`);
     }
 
     if (VERBOSE) {
-      console.log(`DEBUG: Scanning file: ${path.relative(repoRoot, file)}`);
+      logger.debug(`Scanning file: ${path.relative(repoRoot, file)}`);
     }
     const vars = await findEnvVarsInFile(file);
     if (vars.length) {
@@ -747,26 +792,26 @@ async function main() {
     .filter(([_, count]) => count > 1)
     .sort((a, b) => b[1] - a[1]); // Sort by occurrence count descending
 
-  console.log('\nEnvironment Variable Statistics:');
-  console.log(`- ${allEnvVars.size} unique environment variables`);
-  console.log(`- ${totalReferences} total variable references`);
-  console.log(`- ${envVarsByDir.size} directories containing environment variables`);
-  console.log(`- ${totalFileCount} files containing environment variables`);
+  logger.info('\nEnvironment Variable Statistics:');
+  logger.info(`- ${allEnvVars.size} unique environment variables`);
+  logger.info(`- ${totalReferences} total variable references`);
+  logger.info(`- ${envVarsByDir.size} directories containing environment variables`);
+  logger.info(`- ${totalFileCount} files containing environment variables`);
 
   if (repeatedVars.length > 0) {
-    console.log('\nVariables used in multiple directories:');
+    logger.info('\nVariables used in multiple directories:');
     repeatedVars.forEach(([varName, count]) => {
       const totalRefs = varTotalReferences.get(varName);
-      console.log(`- ${varName}: used in ${count} directories (${totalRefs} total references)`);
+      logger.info(`- ${varName}: used in ${count} directories (${totalRefs} total references)`);
     });
   }
 
   // After scanning is complete, add turbo vars to allEnvVars
   if (turboVars.size > 0) {
-    console.log('\nAdding variables from turbo.json:');
+    logger.info('\nAdding variables from turbo.json:');
     for (const v of turboVars) {
       if (!allEnvVars.has(v)) {
-        console.log(`- ${v} (from turbo.json)`);
+        logger.info(`- ${v} (from turbo.json)`);
         allEnvVars.add(v);
       }
     }
@@ -834,19 +879,19 @@ async function main() {
 
   const outputDir = path.dirname(OUTPUT_PATH);
   try {
-    await fs.promises.mkdir(outputDir, { recursive: true });
+    await fsPromises.mkdir(outputDir, { recursive: true });
   } catch (error) {
     if (error.code !== 'EEXIST ') {
       throw error;
     }
   }
 
-  await fs.promises.writeFile(OUTPUT_PATH, reportLines.join('\n'), 'utf8');
-  console.log(`Environment variable report written to ${OUTPUT_PATH}`);
+  await fsPromises.writeFile(OUTPUT_PATH, reportLines.join('\n'), 'utf8');
+  logger.info(`Environment variable report written to ${OUTPUT_PATH}`);
 }
 
-// Execute the main function, and if there's an error, catch it, log it, and exit with a non-zero code.
+// Execute the main function
 main().catch((error) => {
-  console.error('Error:', error);
+  logger.error(`Error: ${error.message}`);
   process.exit(1);
 });

@@ -1,6 +1,11 @@
 // Validate the required environment variables before starting the build process.
-const fs = require('fs');
-const path = require('path');
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+// Get the directory name in ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // ANSI color codes
 const colors = {
@@ -17,7 +22,7 @@ function log(level, message) {
     {
       error: colors.red + 'ERROR:',
       warn: colors.yellow + 'WARNING:',
-      info: colors.cyan + 'INFO:',
+      info: colors.green + 'INFO:',
       success: colors.green + 'SUCCESS:'
     }[level] || '';
   console.log(`${prefix} ${message}${colors.reset}`);
@@ -43,6 +48,7 @@ const envCheckExclusions = [
   'REDIS_USERNAME',
   'SITE_SETTINGS',
   'VERCEL_URL',
+  'BWS_TEST_VAR',
   'BWS_SECRET_TEST_VAR'
 ];
 
