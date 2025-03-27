@@ -34,7 +34,10 @@ const logger = {
   },
 
   debug: function (message) {
-    console.log(`${this.colors.blue}[DEBUG] ${message}${this.colors.reset}`);
+    // Only show debug messages if DEBUG=true
+    if (process.env.DEBUG === 'true') {
+      console.log(`${this.colors.blue}[DEBUG] ${message}${this.colors.reset}`);
+    }
   },
 
   verbose: function (message) {
@@ -53,6 +56,11 @@ const logger = {
 
   // Enhanced log method that includes timestamps
   log: function (level, message) {
+    // Skip debug messages if DEBUG isn't true
+    if (level === 'debug' && process.env.DEBUG !== 'true') {
+      return;
+    }
+
     const timestamp = this.formatTimestamp();
     const color = this.levelColors[level] || 'reset';
     const formattedMessage = `[${timestamp}] ${this.colorize(
@@ -63,4 +71,4 @@ const logger = {
   }
 };
 
-module.exports = logger;
+export default logger;

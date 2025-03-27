@@ -1,7 +1,13 @@
 #!/usr/bin/env node
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import dotenv from 'dotenv';
+
+// Get the directory name in ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Configure dotenv with better path resolution
 const possibleEnvPaths = [
@@ -16,11 +22,11 @@ const envPath = possibleEnvPaths.find((path) => fs.existsSync(path));
 
 if (envPath) {
   console.log(`\x1b[36mLoading .env from:\x1b[0m ${envPath}`);
-  require('dotenv').config({ path: envPath });
+  dotenv.config({ path: envPath });
 } else {
   console.log('\x1b[33mNo .env file found in common locations. Using process.env directly.\x1b[0m');
   // Still call config() to ensure dotenv is initialized
-  require('dotenv').config();
+  dotenv.config();
 }
 
 // Log environment loading status
@@ -33,10 +39,10 @@ console.log('\x1b[32mEnvironment Status:\x1b[0m', {
 });
 
 console.log('Available Environment Variables:', Object.keys(process.env).length);
-console.log('Sample Variable:', process.env.BWS_SECRET_TEST_VAR); // To verify .env loading
+console.log('Sample Variable:', process.env.BWS_TEST_VAR || process.env.BWS_SECRET_TEST_VAR); // To verify .env loading
 
 // Array of important variables to check
-const IMPORTANT_VARS = ['BWS_SECRET_TEST_VAR'];
+const IMPORTANT_VARS = ['BWS_TEST_VAR', 'BWS_SECRET_TEST_VAR'];
 
 // Log the values of important variables
 console.log('\x1b[33mImportant Variables Values:\x1b[0m');

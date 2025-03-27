@@ -6,9 +6,14 @@
  * files, variable validation, and other common utilities.
  */
 
-const fs = require('fs');
-const crypto = require('crypto');
-const path = require('path');
+import fs from 'node:fs';
+import crypto from 'node:crypto';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+// Get the directory name in ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /**
  * Logs a message with a specific log level and timestamp.
@@ -24,8 +29,18 @@ function log(level, message) {
     return;
   }
 
+  const colors = {
+    error: '\x1b[31m', // Red
+    warn: '\x1b[33m', // Yellow
+    info: '\x1b[32m', // Green
+    debug: '\x1b[34m', // Blue
+    verbose: '\x1b[36m' // Cyan
+  };
+
+  const colorCode = colors[level] || '';
+  const resetCode = '\x1b[0m';
   const timestamp = new Date().toISOString();
-  console.log(`[${timestamp}] [${level.toUpperCase()}] ${message}`);
+  console.log(`[${timestamp}] ${colorCode}[${level.toUpperCase()}]${resetCode} ${message}`);
 }
 
 /**
@@ -274,10 +289,10 @@ function loadEnvironmentVariables(filePath, encryptionKey) {
     const envType = filePath.includes('.prod')
       ? 'prod'
       : filePath.includes('.dev')
-        ? 'dev'
-        : filePath.includes('.local')
-          ? 'local'
-          : 'unknown';
+      ? 'dev'
+      : filePath.includes('.local')
+      ? 'local'
+      : 'unknown';
 
     log('debug', `Loading ${envType} environment from: ${filePath}`);
 
@@ -465,7 +480,7 @@ function getBwsConfigPath() {
   throw new Error('Could not find bwsconfig.json in any expected location');
 }
 
-module.exports = {
+export {
   log,
   handleError,
   readEnvFile,

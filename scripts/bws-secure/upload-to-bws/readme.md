@@ -38,7 +38,7 @@ Prerequisites:
 
 ## Important Notes
 
-- Use `secure-run.js` wrapper (recommended) instead of calling upload-secrets.js directly
+- Use `secureRun.js` wrapper (recommended) instead of calling upload-secrets.js directly
 - Project IDs in examples are for illustration - use your own BWS project IDs
 - Token can be in root `.env` or local `.env` (root takes precedence)
 
@@ -56,17 +56,25 @@ NEXT_PUBLIC_API_URL=https://api.example.com
 
 ## Table of Contents
 
-- [Installation & Setup](#installation--setup)
-- [Basic Usage](#basic-usage)
-- [Advanced Features](#advanced-features)
-  - [Multiple Projects](#multiple-projects)
-  - [Clear Vars Mode](#clear-vars-mode)
-  - [Debug Mode](#debug-mode)
-- [Security & Permissions](#security--permissions)
-- [Environment Variables](#environment-variables)
-- [CI/CD Integration](#cicd-integration)
-- [Troubleshooting](#troubleshooting)
-- [Reference](#reference)
+- [BWS Secure Transfer](#bws-secure-transfer)
+  - [Quick Start](#quick-start)
+  - [Important Notes](#important-notes)
+  - [Table of Contents](#table-of-contents)
+  - [Installation \& Setup](#installation--setup)
+  - [Basic Usage](#basic-usage)
+  - [Advanced Features](#advanced-features)
+    - [Multiple Projects](#multiple-projects)
+    - [Clear Vars Mode](#clear-vars-mode)
+    - [Debug Mode](#debug-mode)
+  - [Security \& Permissions](#security--permissions)
+  - [Environment Variables](#environment-variables)
+  - [CI/CD Integration](#cicd-integration)
+  - [Troubleshooting](#troubleshooting)
+  - [Reference](#reference)
+    - [BWS CLI Commands](#bws-cli-commands)
+    - [Organization ID](#organization-id)
+    - [File Structure](#file-structure)
+  - [Related Documentation](#related-documentation)
 
 ## Installation & Setup
 
@@ -297,7 +305,7 @@ scripts/bws-secure/
 │   ├── upload-secrets.js     # Main script
 │   ├── readme.md            # This file
 │   └── .env                 # Local config
-├── secure-run.js            # Runner script
+├── secureRun.js            # Runner script
 └── README.md               # Parent docs
 ```
 

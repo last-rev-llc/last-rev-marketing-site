@@ -1,6 +1,7 @@
 # BWS Secure Environment Manager
 
-A secure environment variable manager for Vercel and Netlify deployments using Bitwarden Secrets Manager.
+A secure environment variable manager for Vercel and Netlify deployments using Bitwarden Secrets
+Manager.
 
 ## Table of Contents
 
@@ -47,6 +48,7 @@ A secure environment variable manager for Vercel and Netlify deployments using B
     - [Environment File Structure](#environment-file-structure)
   - [Secret Management](#secret-management)
     - [Upload to BWS](#upload-to-bws)
+  - [ESM Support](#esm-support)
 
 ## Quick Start
 
@@ -333,21 +335,30 @@ BWS Secure automatically scans:
 
 ## Machine Account Tokens
 
-To securely manage sensitive platform tokens (like `NETLIFY_AUTH_TOKEN` or `VERCEL_AUTH_TOKEN`), we recommend using a **Machine Account** within Bitwarden Secrets Manager (BWS). This setup allows tokens to be securely retrieved at build time, avoiding exposure in environment logs or configuration files.
+To securely manage sensitive platform tokens (like `NETLIFY_AUTH_TOKEN` or `VERCEL_AUTH_TOKEN`), we
+recommend using a **Machine Account** within Bitwarden Secrets Manager (BWS). This setup allows
+tokens to be securely retrieved at build time, avoiding exposure in environment logs or
+configuration files.
 
 1. Log in to your BWS dashboard.
 2. Open your Machine Account's vault or project scope.
 3. If the secret (`NETLIFY_AUTH_TOKEN` or `VERCEL_AUTH_TOKEN`) does not already exist:
-   - Create the secret using the appropriate token value for the specific Netlify or Vercel account/team.
-4. If the secret already exists and you're confident it works for the intended Netlify/Vercel account/team:
+   - Create the secret using the appropriate token value for the specific Netlify or Vercel
+     account/team.
+4. If the secret already exists and you're confident it works for the intended Netlify/Vercel
+   account/team:
    - Apply the existing secret to the Machine Account.
-   - This approach allows multiple repositories, clients, or projects to share the same credentials when the token scope is appropriately configured.
-5. During a build, `secure-run.js` will automatically fetch these tokens using your `BWS_ACCESS_TOKEN`, making them available for Netlify or Vercel commands.
+   - This approach allows multiple repositories, clients, or projects to share the same credentials
+     when the token scope is appropriately configured.
+5. During a build, `secureRun.js` will automatically fetch these tokens using your
+   `BWS_ACCESS_TOKEN`, making them available for Netlify or Vercel commands.
 
 By centralizing these tokens in a Machine Account:
 
-- You avoid managing them per environment (e.g., production, development, local) since the same token can be reused across relevant builds.
-- A single token can serve multiple repositories or teams, provided the token's scope supports the intended use case.
+- You avoid managing them per environment (e.g., production, development, local) since the same
+  token can be reused across relevant builds.
+- A single token can serve multiple repositories or teams, provided the token's scope supports the
+  intended use case.
 - You minimize the risk of token exposure, enhancing security and simplifying credential management.
 
 ## Directory Structure
@@ -371,7 +382,7 @@ The project structure is as follows:
 ├── install.sh
 ├── list-projects.js
 ├── logger.js
-├── secure-run.js
+├── secureRun.js
 ├── test-netlify-upload.js
 ├── test-vercel-upload.js
 ├── update-environments
@@ -398,7 +409,7 @@ For additional details, see:
 Scripts:
 
 - [bws-dotenv.js](scripts/bws-secure/bws-dotenv.js)
-- [secure-run.js](scripts/bws-secure/secure-run.js)
+- [secureRun.js](scripts/bws-secure/secureRun.js)
 - [test-netlify-upload.js](scripts/bws-secure/test-netlify-upload.js)
 - [test-vercel-upload.js](scripts/bws-secure/test-vercel-upload.js)
 
@@ -592,3 +603,24 @@ Key features:
 - CI/CD ready
 
 For detailed usage, see [Upload to BWS Documentation](./upload-to-bws/readme.md)
+
+## ESM Support
+
+As of the latest update, this package now uses ES Modules (ESM) instead of CommonJS. This means:
+
+1. All imports use the `import` syntax instead of `require()`
+2. The package has `"type": "module"` in its package.json
+3. When importing local files, you must include the `.js` extension
+4. Node.js version 14.16.0 or higher is required
+
+Example usage:
+
+```javascript
+import { loadBwsSecrets } from './bws-dotenv.js';
+```
+
+If you need to dynamically import a file:
+
+```javascript
+const module = await import('./some-file.js');
+```

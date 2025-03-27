@@ -1,10 +1,23 @@
 #!/usr/bin/env node
 
-// Required modules
-const fs = require('fs');
-const path = require('path');
-const dotenv = require('dotenv');
-const { execSync } = require('child_process');
+/**
+ * upload-secrets.js
+ *
+ * Tool for uploading secrets to Bitwarden Secrets Manager
+ */
+
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { execSync, spawnSync } from 'node:child_process';
+import readline from 'node:readline';
+import { promises as fsPromises } from 'node:fs';
+import crypto from 'node:crypto';
+import dotenv from 'dotenv';
+
+// Get the directory name in ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // 1. Attempt to load a local .env (same directory)
 const localEnvPath = path.join(__dirname, '.env');
@@ -40,9 +53,9 @@ const RATE_LIMIT_DELAYS = {
 
 function debug(message, command = '') {
   if (DEBUG) {
-    console.log('\x1b[36m[DEBUG]\x1b[0m', message);
+    console.log('\x1b[34m[DEBUG]\x1b[0m', message);
     if (command) {
-      console.log('\x1b[36m[CMD]\x1b[0m', command);
+      console.log('\x1b[34m[CMD]\x1b[0m', command);
     }
   }
 }
@@ -315,7 +328,9 @@ async function clearProjectSecrets(projectId) {
 // Move these functions to before they're used
 function warnEmptyValue(key, value, file) {
   console.log(
-    `\x1b[31mWarning: Empty or unresolved variable "${key}" in ${file}${value ? `: '${value}'` : ''}\x1b[0m`
+    `\x1b[31mWarning: Empty or unresolved variable "${key}" in ${file}${
+      value ? `: '${value}'` : ''
+    }\x1b[0m`
   );
 }
 

@@ -9,14 +9,47 @@ declare -a missing_vars=()
 # Make the script exit on errors and undefined variables
 set -Eeuo pipefail
 
-# Define colors for output
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-RED='\033[0;31m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
-BOLD='\033[1m'
+# Define paths for the JavaScript logger wrapper
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LOGGER_SCRIPT="$SCRIPT_DIR/check-vars-logger.js"
 
+# Function to log messages using the JS logger
+log() {
+  local level="$1"
+  local message="$2"
+  
+  # Check if the logger script exists
+  if [ -f "$LOGGER_SCRIPT" ] && command -v node >/dev/null 2>&1; then
+    node "$LOGGER_SCRIPT" "$level" "$message"
+  else
+    # Fallback to traditional shell logging
+    local GREEN='\033[0;32m'
+    local YELLOW='\033[1;33m'
+    local RED='\033[0;31m'
+    local BLUE='\033[0;34m'
+    local NC='\033[0m' # No Color
+    
+    case "$level" in
+      error)
+        echo -e "${RED}[ERROR] $message${NC}"
+        ;;
+      warn)
+        echo -e "${YELLOW}[WARN] $message${NC}"
+        ;;
+      info)
+        echo -e "${GREEN}[INFO] $message${NC}"
+        ;;
+      debug)
+        if [ "$VERBOSE" = true ]; then
+          echo -e "${BLUE}[DEBUG] $message${NC}"
+        fi
+        ;;
+      *)
+        echo -e "[LOG] $message"
+        ;;
+    esac
+  fi
+}
 
 # Parse flags
 TEST_MODE=false
@@ -31,18 +64,18 @@ while getopts "tvhd" opt; do
       VERBOSE=true
       ;;
     h)
-      echo -e "${BLUE}Usage: $0 [-t] [-v] [-h] [-d]"
-      echo -e "  -t: Test mode - allows testing locally"
-      echo -e "  -v: Verbose mode - shows additional information"
-      echo -e "  -h: Show this help message"
-      echo -e "  -d: Dry run - show what would happen without making changes${NC}"
+      log "info" "Usage: $0 [-t] [-v] [-h] [-d]"
+      log "info" "  -t: Test mode - allows testing locally"
+      log "info" "  -v: Verbose mode - shows additional information"
+      log "info" "  -h: Show this help message"
+      log "info" "  -d: Dry run - show what would happen without making changes"
       exit 0
       ;;
     d)
       DRY_RUN=true
       ;;
     *)
-      echo -e "${RED}Invalid option. Use -h for help.${NC}"
+      log "error" "Invalid option. Use -h for help."
       exit 1
       ;;
   esac
@@ -50,25 +83,25 @@ done
 
 # Skip checks unless running on Netlify, Vercel, or a recognized CI environment
 if [ "${NETLIFY:-}" != "true" ] && [ "${VERCEL:-}" != "1" ] && [ "${CI:-}" != "true" ] && [ "$TEST_MODE" = false ]; then
-  echo -e "${BLUE}ℹ️  Skipping required variable checks (not Netlify, Vercel, or CI environment).${NC}"
-  echo -e "${BLUE}ℹ️  You can test locally by running: ${BOLD}$0 -t${NC}${BLUE}, or by setting NETLIFY=true or VERCEL=1.${NC}"
+  log "info" "ℹ️  Skipping required variable checks (not Netlify, Vercel, or CI environment)."
+  log "info" "ℹ️  You can test locally by running: $0 -t, or by setting NETLIFY=true or VERCEL=1."
   exit 0
 fi
 
 if [ "$TEST_MODE" = true ]; then
-  echo -e "${BLUE}🔍 Test Mode Active${NC}"
+  log "info" "🔍 Test Mode Active"
   read -p "Would you like to auto-load secrets from .env into your environment? (y/n): " confirm
   if [ "$confirm" = "y" ]; then
     if [ -f .env ]; then
-      echo -e "${BLUE}📥 Loading secrets from .env...${NC}"
+      log "info" "📥 Loading secrets from .env..."
       set -o allexport
       source .env
       set +o allexport
     else
-      echo -e "${YELLOW}⚠️  No .env file found to source.${NC}"
+      log "warn" "⚠️  No .env file found to source."
     fi
   else
-    echo -e "${BLUE}ℹ️  Skipping auto-load of secrets.${NC}"
+    log "info" "ℹ️  Skipping auto-load of secrets."
   fi
 fi
 
@@ -81,18 +114,18 @@ CONFIG_FILE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/bwsconfig.json"
 # Function to get excluded vars from bwsconfig.json
 get_excluded_vars() {
   if [ -f "$CONFIG_FILE" ]; then
-    [ "$VERBOSE" = true ] && echo -e "${BLUE}📖 Reading excluded variables from bwsconfig.json...${NC}"
+    [ "$VERBOSE" = true ] && log "debug" "📖 Reading excluded variables from bwsconfig.json..."
     if command -v jq >/dev/null 2>&1; then
       local excluded_vars
       excluded_vars=$(jq -r '.projects[].preserveVars[]' "$CONFIG_FILE" 2>/dev/null | sort -u)
-      [ "$VERBOSE" = true ] && echo -e "${BLUE}🔍 Found excluded variables: $excluded_vars${NC}"
+      [ "$VERBOSE" = true ] && log "debug" "🔍 Found excluded variables: $excluded_vars"
       echo "$excluded_vars"
     else
-      echo -e "${YELLOW}⚠️  jq not found - skipping bwsconfig.json parsing${NC}"
+      log "warn" "⚠️  jq not found - skipping bwsconfig.json parsing"
       echo ""
     fi
   else
-    [ "$VERBOSE" = true ] && echo -e "${YELLOW}⚠️  No bwsconfig.json found at $CONFIG_FILE${NC}"
+    [ "$VERBOSE" = true ] && log "debug" "⚠️  No bwsconfig.json found at $CONFIG_FILE"
     echo ""
   fi
 }
@@ -101,11 +134,11 @@ get_excluded_vars() {
 EXCLUDED_VARS=$(get_excluded_vars)
 
 if [ ! -f "$ENV_FILE" ]; then
-  echo -e "${YELLOW}----------------------------------------"
-  echo -e "⚠️  Notice: No '$ENV_FILE' file found."
-  echo -e "🔍 Skipping runtime variable checks."
-  echo -e "💡 To enable checks, create '$ENV_FILE' with required variable names."
-  echo -e "----------------------------------------${NC}"
+  log "warn" "----------------------------------------"
+  log "warn" "⚠️  Notice: No '$ENV_FILE' file found."
+  log "warn" "🔍 Skipping runtime variable checks."
+  log "info" "💡 To enable checks, create '$ENV_FILE' with required variable names."
+  log "warn" "----------------------------------------"
   exit 0
 fi
 
@@ -113,7 +146,7 @@ missing_variable=false
 
 # Add file permission check before main logic
 if [ ! -r "$ENV_FILE" ]; then
-  echo -e "${RED}Error: Cannot read $ENV_FILE. Check file permissions.${NC}"
+  log "error" "Error: Cannot read $ENV_FILE. Check file permissions."
   exit 1
 fi
 
@@ -128,15 +161,15 @@ validate_env_file() {
     fi
     # Check for valid variable name format
     if ! [[ $line =~ ^[a-zA-Z_][a-zA-Z0-9_]*(:=.*)?$ ]]; then
-      echo -e "${RED}Error in $ENV_FILE line $line_number: Invalid format"
-      echo -e "Expected format: VARIABLE_NAME or VARIABLE_NAME:=default_value${NC}"
+      log "error" "Error in $ENV_FILE line $line_number: Invalid format"
+      log "error" "Expected format: VARIABLE_NAME or VARIABLE_NAME:=default_value"
       exit 1
     fi
   done < "$ENV_FILE"
 }
 
 if [ -f "$ENV_FILE" ]; then
-  [ "$VERBOSE" = true ] && echo -e "${BLUE}🔍 Validating $ENV_FILE format...${NC}"
+  [ "$VERBOSE" = true ] && log "debug" "🔍 Validating $ENV_FILE format..."
   validate_env_file
 fi
 
@@ -164,7 +197,7 @@ while IFS= read -r line; do
 
   # Check if variable is in excluded list
   if echo "$EXCLUDED_VARS" | grep -Fxq "$var_name"; then
-    [ "$VERBOSE" = true ] && echo -e "${BLUE}ℹ️  Skipping excluded variable: $var_name${NC}"
+    [ "$VERBOSE" = true ] && log "debug" "ℹ️  Skipping excluded variable: $var_name"
     continue
   fi
 
@@ -172,8 +205,8 @@ while IFS= read -r line; do
   # CHANGES: Add debug logs in verbose mode
   # ---------------------------------------
   if [ "$VERBOSE" = true ]; then
-    echo -e "${BLUE}ℹ️  Checking variable: $var_name${NC}"
-    echo -e "${BLUE}   Value in environment: ${!var_name:-<not set>} ${NC}"
+    log "debug" "ℹ️  Checking variable: $var_name"
+    log "debug" "   Value in environment: ${!var_name:-<not set>}"
   fi
 
   if [[ $line == *:=* ]]; then
@@ -181,9 +214,9 @@ while IFS= read -r line; do
     if [ -z "${!var_name:-}" ]; then
       if [ "$DRY_RUN" = false ]; then
         export "$var_name=$default_value"
-        echo -e "${YELLOW}ℹ️  Using default value for '${BOLD}$var_name${NC}${YELLOW}'${NC}"
+        log "warn" "ℹ️  Using default value for '$var_name'"
       else
-        echo -e "${BLUE}🔍 Would set $var_name to default value${NC}"
+        log "debug" "🔍 Would set $var_name to default value"
       fi
     fi
   else
@@ -201,11 +234,11 @@ done < "$ENV_FILE"
 
 # If --dry-run and variables are missing, show them
 if [ "$DRY_RUN" = true ] && [ "$missing_variable" = true ]; then
-  echo -e "${BLUE}🔍 Dry run mode - would attempt to inject these variables:${NC}"
+  log "info" "🔍 Dry run mode - would attempt to inject these variables:"
   
   if [ "${#missing_vars[@]}" -gt 0 ]; then
     for var in "${missing_vars[@]}"; do
-      echo -e "${BLUE}   • $var${NC}"
+      log "info" "   • $var"
     done
   fi
   exit 1
@@ -215,29 +248,29 @@ fi
 # CHANGES: Fallback if no missing vars
 # ---------------------------------------
 if [ "$missing_variable" = false ]; then
-  echo -e "${GREEN}✅ All required runtime function variables are available, proceeding with build steps...${NC}"
+  log "info" "✅ All required runtime function variables are available, proceeding with build steps..."
 
   # Optional: Print contents if verbose
   if [ "$VERBOSE" = true ]; then
-    echo -e "${BLUE}📖 Reading required variables from: $ENV_FILE${NC}"
-    echo -e "${BLUE}File contents:${NC}"
+    log "debug" "📖 Reading required variables from: $ENV_FILE"
+    log "debug" "File contents:"
     cat "$ENV_FILE"
-    echo -e "${BLUE}----------------------------------------${NC}"
+    log "debug" "----------------------------------------"
   fi
   exit 0
 fi
 
 # If missing variables remain, show them
-echo -e "${RED}----------------------------------------"
-echo -e "❌ Missing required variables for this build:"
+log "error" "----------------------------------------"
+log "error" "❌ Missing required variables for this build:"
 for var in "${missing_vars[@]}"; do
-  echo -e "   • ${BOLD}$var${NC}"
+  log "error" "   • $var"
 done
-echo -e "----------------------------------------${NC}"
+log "error" "----------------------------------------"
 
 # Handle Netlify environment
 if [ "${NETLIFY:-}" = "true" ]; then
-  echo -e "${BLUE}🔄 Attempting to inject required variables into Netlify project settings...${NC}"
+  log "info" "🔄 Attempting to inject required variables into Netlify project settings..."
   # Updated to use npm/yarn/pnpm agnostic command
   if [ -f "package-lock.json" ]; then
     npm run update-env -- --platform netlify
@@ -246,29 +279,29 @@ if [ "${NETLIFY:-}" = "true" ]; then
   elif [ -f "pnpm-lock.yaml" ]; then
     pnpm update-env --platform netlify
   else
-    echo -e "${YELLOW}⚠️  No lock file found, defaulting to npm...${NC}"
+    log "warn" "⚠️  No lock file found, defaulting to npm..."
     npm run update-env -- --platform netlify
   fi
   
   if [ $? -eq 0 ]; then
-    echo -e "${GREEN}✅ Variables successfully injected into Netlify project settings."
-    echo -e "🔄 Triggering new build with updated variables...${NC}"
+    log "info" "✅ Variables successfully injected into Netlify project settings."
+    log "info" "🔄 Triggering new build with updated variables..."
     # TODO: Call script to retry build
-    echo -e "${BLUE}ℹ️  Build retry initiated. Please check the latest builds in Netlify dashboard.${NC}"
+    log "info" "ℹ️  Build retry initiated. Please check the latest builds in Netlify dashboard."
     exit 1
   else
-    echo -e "${RED}----------------------------------------"
-    echo -e "❌ ERROR: Failed to inject required variables."
-    echo -e "${YELLOW}⚡ Manual action required:"
-    echo -e "1. Add the above missing variables to your Netlify Environment Variables"
-    echo -e "2. Visit: https://app.netlify.com/sites/YOUR_SITE/settings/env"
-    echo -e "3. Check the function requirements in your codebase"
-    echo -e "----------------------------------------${NC}"
+    log "error" "----------------------------------------"
+    log "error" "❌ ERROR: Failed to inject required variables."
+    log "warn" "⚡ Manual action required:"
+    log "warn" "1. Add the above missing variables to your Netlify Environment Variables"
+    log "warn" "2. Visit: https://app.netlify.com/sites/YOUR_SITE/settings/env"
+    log "warn" "3. Check the function requirements in your codebase"
+    log "error" "----------------------------------------"
     exit 1
   fi
 elif [ "${VERCEL:-}" = "1" ]; then
   # Handle Vercel environment
-  echo -e "${BLUE}🔄 Attempting to inject required variables into Vercel project settings...${NC}"
+  log "info" "🔄 Attempting to inject required variables into Vercel project settings..."
   # Updated to use npm/yarn/pnpm agnostic command
   if [ -f "package-lock.json" ]; then
     npm run update-env -- --platform vercel
@@ -277,28 +310,28 @@ elif [ "${VERCEL:-}" = "1" ]; then
   elif [ -f "pnpm-lock.yaml" ]; then
     pnpm update-env --platform vercel
   else
-    echo -e "${YELLOW}⚠️  No lock file found, defaulting to npm...${NC}"
+    log "warn" "⚠️  No lock file found, defaulting to npm..."
     npm run update-env -- --platform vercel
   fi
 
   if [ $? -eq 0 ]; then
-    echo -e "${GREEN}✅ Variables successfully injected into Vercel project settings."
-    echo -e "🔄 Triggering new build with updated variables...${NC}"
+    log "info" "✅ Variables successfully injected into Vercel project settings."
+    log "info" "🔄 Triggering new build with updated variables..."
     # TODO: Call script to retry build
-    echo -e "${BLUE}ℹ️  Build retry initiated. Please check the latest builds in Vercel dashboard.${NC}"
+    log "info" "ℹ️  Build retry initiated. Please check the latest builds in Vercel dashboard."
     exit 1
   else
-    echo -e "${RED}----------------------------------------"
-    echo -e "❌ ERROR: Failed to inject required variables."
-    echo -e "${YELLOW}⚡ Manual action required:"
-    echo -e "1. Add the above missing variables to your Vercel Environment Variables"
-    echo -e "2. Visit: https://vercel.com/dashboard/project/settings/environment-variables"
-    echo -e "3. Check the function requirements in your codebase"
-    echo -e "----------------------------------------${NC}"
+    log "error" "----------------------------------------"
+    log "error" "❌ ERROR: Failed to inject required variables."
+    log "warn" "⚡ Manual action required:"
+    log "warn" "1. Add the above missing variables to your Vercel Environment Variables"
+    log "warn" "2. Visit: https://vercel.com/dashboard/project/settings/environment-variables"
+    log "warn" "3. Check the function requirements in your codebase"
+    log "error" "----------------------------------------"
     exit 1
   fi
 else
   # Handle other environments
-  echo -e "${RED}❌ Not running in Netlify or Vercel environment. Exiting...${NC}"
+  log "error" "❌ Not running in Netlify or Vercel environment. Exiting..."
   exit 1
 fi

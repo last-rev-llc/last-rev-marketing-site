@@ -11,22 +11,28 @@
  * "vercel env add".
  */
 
-const util = require('util');
-const { exec } = require('child_process');
+import util from 'node:util';
+import { exec } from 'node:child_process';
 const execPromise = util.promisify(exec);
-const {
+import {
   log,
   handleError,
   determineEnvironmentMapping,
   loadEnvironmentVariables,
-  validateDeployment
-} = require('./utils');
-const axios = require('axios');
-const fs = require('fs');
-const path = require('path');
-const crypto = require('crypto');
+  validateDeployment,
+  shouldPreserveVar
+} from './utils.js';
+import axios from 'axios';
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import { fileURLToPath } from 'node:url';
 
-// Cache for Vercel project IDs and environment variables
+// Get the directory name in ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Cache for Vercel environment variables
 const vercelEnvCache = new Map();
 
 /**
@@ -85,20 +91,16 @@ async function getVercelProjectConfig() {
  */
 async function getProjectIdFromName(project, token) {
   const vercelToken = getVercelToken(token);
-  const teamSlug = process.env.VERCEL_TEAM_SLUG || 'cameron-last-revs-projects';
 
   try {
-    // First try to get team ID
-    let teamId = null;
+    // Get all teams the user has access to
+    let teams = [];
     try {
       const teamsResp = await axios.get('https://api.vercel.com/v2/teams', {
         headers: { Authorization: vercelToken }
       });
-      const team = teamsResp.data.teams?.find((t) => t.slug === teamSlug);
-      if (team) {
-        teamId = team.id;
-        log('debug', `Found team ID ${teamId} for slug ${teamSlug}`);
-      }
+      teams = teamsResp.data.teams || [];
+      log('debug', `Found ${teams.length} teams to search in`);
     } catch (error) {
       log('debug', `Error getting teams: ${error.message}`);
       if (error.response?.data) {
@@ -106,31 +108,66 @@ async function getProjectIdFromName(project, token) {
       }
     }
 
-    // Try to get projects (with teamId if we found one)
-    const projectsUrl = 'https://api.vercel.com/v9/projects';
-    const config = {
-      headers: { Authorization: vercelToken },
-      ...(teamId ? { params: { teamId } } : {})
-    };
+    // First try personal account (no team)
+    let projectFound = null;
+    log('debug', `Searching for project ${project.projectName} in personal account`);
 
-    const projectsResp = await axios.get(projectsUrl, config);
-    const projects = projectsResp.data.projects || [];
+    try {
+      const projectsUrl = 'https://api.vercel.com/v9/projects';
+      const config = {
+        headers: { Authorization: vercelToken }
+      };
 
-    log('debug', `Found ${projects.length} projects: ${projects.map((p) => p.name).join(', ')}`);
+      const projectsResp = await axios.get(projectsUrl, config);
+      const projects = projectsResp.data.projects || [];
+      log('debug', `Found ${projects.length} projects in personal account`);
 
-    const matched = projects.find((p) => p.name === project.projectName);
-    if (matched) {
-      log('debug', `Found project ${project.projectName} with ID ${matched.id}`);
-      vercelEnvCache.set(project.projectName, {
-        projectId: matched.id,
-        teamId,
-        teamSlug,
-        vars: {}
-      });
-      return matched.id;
+      projectFound = projects.find((p) => p.name === project.projectName);
+      if (projectFound) {
+        log(
+          'debug',
+          `Found project ${project.projectName} with ID ${projectFound.id} in personal account`
+        );
+        return {
+          projectId: projectFound.id,
+          teamId: null
+        };
+      }
+    } catch (error) {
+      log('debug', `Error searching in personal account: ${error.message}`);
     }
 
-    throw new Error(`Project ${project.projectName} not found`);
+    // Then try each team
+    for (const team of teams) {
+      try {
+        log('debug', `Searching for project in team: ${team.slug} (${team.id})`);
+        const projectsUrl = 'https://api.vercel.com/v9/projects';
+        const config = {
+          headers: { Authorization: vercelToken },
+          params: { teamId: team.id }
+        };
+
+        const projectsResp = await axios.get(projectsUrl, config);
+        const projects = projectsResp.data.projects || [];
+        log('debug', `Found ${projects.length} projects in team ${team.slug}`);
+
+        projectFound = projects.find((p) => p.name === project.projectName);
+        if (projectFound) {
+          log(
+            'debug',
+            `Found project ${project.projectName} with ID ${projectFound.id} in team ${team.slug}`
+          );
+          return {
+            projectId: projectFound.id,
+            teamId: team.id
+          };
+        }
+      } catch (error) {
+        log('debug', `Error searching in team ${team.slug}: ${error.message}`);
+      }
+    }
+
+    throw new Error(`Project ${project.projectName} not found in any team or personal account`);
   } catch (error) {
     const msg = error.response?.data?.error?.message || error.message;
     throw new Error(`Failed to get project ID: ${msg}`);
@@ -140,10 +177,8 @@ async function getProjectIdFromName(project, token) {
 /**
  * Retrieve current environment variables from the Vercel API
  */
-async function getCurrentVercelEnvVars(projectId, token) {
+async function getCurrentVercelEnvVars(projectId, token, teamId) {
   const vercelToken = getVercelToken(token);
-  const cached = vercelEnvCache.get(projectId);
-  const teamId = cached?.teamId;
 
   try {
     const url = `https://api.vercel.com/v9/projects/${projectId}/env`;
@@ -193,12 +228,13 @@ async function readVars(project, token) {
   };
 
   try {
-    const projectId = await getProjectIdFromName(project, token);
+    log('debug', `Reading variables for Vercel project: ${project.projectName}`);
+    const { projectId, teamId } = await getProjectIdFromName(project, token);
     if (!projectId) {
       throw new Error(`Could not resolve projectId for ${project.projectName}`);
     }
 
-    const platformVars = await getCurrentVercelEnvVars(projectId, token);
+    const platformVars = await getCurrentVercelEnvVars(projectId, token, teamId);
     Object.entries(platformVars).forEach(([key, value]) => {
       result.found[key] = value;
     });
@@ -212,10 +248,8 @@ async function readVars(project, token) {
 /**
  * Delete an environment variable from Vercel
  */
-async function deleteVercelEnvVar(projectId, envId, token) {
+async function deleteVercelEnvVar(projectId, envId, token, teamId) {
   const vercelToken = getVercelToken(token);
-  const cached = vercelEnvCache.get(projectId);
-  const teamId = cached?.teamId;
 
   try {
     const url = `https://api.vercel.com/v9/projects/${projectId}/env/${envId}`;
@@ -225,9 +259,8 @@ async function deleteVercelEnvVar(projectId, envId, token) {
     };
 
     await axios.delete(url, config);
-    log('debug', `Deleted env var ${envId}`);
+    return true;
   } catch (error) {
-    if (error.response?.status === 404) return;
     const msg = error.response?.data?.error?.message || error.message;
     throw new Error(`Failed to delete env var ${envId}: ${msg}`);
   }
@@ -275,10 +308,8 @@ async function createSharedSecret(key, value, token, teamId) {
 /**
  * Create a new environment variable in Vercel
  */
-async function createVercelEnvVar(projectId, key, value, token, target) {
+async function createVercelEnvVar(projectId, key, value, token, target, teamId) {
   const vercelToken = getVercelToken(token);
-  const cached = vercelEnvCache.get(projectId);
-  const teamId = cached?.teamId;
 
   try {
     const url = `https://api.vercel.com/v9/projects/${projectId}/env`;
@@ -288,8 +319,7 @@ async function createVercelEnvVar(projectId, key, value, token, target) {
       target: target,
       type: 'encrypted',
       gitBranch: null,
-      sensitive: true,
-      hashedValue: crypto.createHash('sha256').update(value).digest('hex')
+      sensitive: true
     };
 
     const config = {
@@ -374,7 +404,7 @@ async function updateVars(project, token, vars, target) {
       // Only delete if the variable is for our current target environment(s)
       const shouldDelete = envTarget.some((t) => target.includes(t));
       if (shouldDelete) {
-        await deleteVercelEnvVar(projectId, id, vercelToken);
+        await deleteVercelEnvVar(projectId, id, vercelToken, teamId);
         log('debug', `Deleted ${key} from ${envTarget.join(', ')}`);
       }
     }
@@ -391,7 +421,7 @@ async function updateVars(project, token, vars, target) {
       }
 
       try {
-        await createVercelEnvVar(projectId, key, value, vercelToken, target);
+        await createVercelEnvVar(projectId, key, value, vercelToken, target, teamId);
         log('debug', `Created ${key} for ${target.join(', ')}`);
         updated[key] = value;
       } catch (error) {
@@ -403,6 +433,86 @@ async function updateVars(project, token, vars, target) {
   } catch (error) {
     const msg = error.response?.data?.error?.message || error.message;
     throw new Error(`Failed to update environment variables: ${msg}`);
+  }
+}
+
+/**
+ * Create multiple environment variables in Vercel in a single batch request
+ */
+async function batchCreateVercelEnvVars(projectId, envVars, token, teamId) {
+  const vercelToken = getVercelToken(token);
+
+  try {
+    const url = `https://api.vercel.com/v9/projects/${projectId}/env`;
+    const payload = envVars.map((envVar) => ({
+      key: envVar.key,
+      value: envVar.value,
+      target: envVar.target,
+      type: 'encrypted',
+      gitBranch: null,
+      sensitive: true
+    }));
+
+    const config = {
+      headers: {
+        'Authorization': vercelToken,
+        'Content-Type': 'application/json'
+      },
+      ...(teamId ? { params: { teamId } } : {})
+    };
+
+    const response = await axios.post(url, payload, config);
+    const createdVars = response.data.envs || [];
+
+    // Fix the misleading log message - only log a single success message
+    if (createdVars.length > 0 || response.status === 200) {
+      log('debug', `Successfully created ${envVars.length} environment variables in batch`);
+    } else {
+      log('debug', `API returned success but no environment variables were created`);
+    }
+
+    return createdVars;
+  } catch (error) {
+    const msg = error.response?.data?.error?.message || error.message;
+    throw new Error(`Failed to create environment variables in batch: ${msg}`);
+  }
+}
+
+/**
+ * Delete multiple environment variables from Vercel in parallel batches
+ */
+async function batchDeleteVercelEnvVars(projectId, envVarsToDelete, token, teamId) {
+  const vercelToken = getVercelToken(token);
+  const results = {
+    successful: [],
+    failed: []
+  };
+
+  try {
+    // Create delete promises for all variables
+    const deletePromises = envVarsToDelete.map(({ id, key }) => {
+      return deleteVercelEnvVar(projectId, id, vercelToken, teamId)
+        .then(() => {
+          results.successful.push(key);
+          return { success: true, key };
+        })
+        .catch((error) => {
+          results.failed.push({ key, error: error.message });
+          return { success: false, key, error: error.message };
+        });
+    });
+
+    // Execute all delete operations in parallel
+    await Promise.all(deletePromises);
+
+    log(
+      'debug',
+      `Batch deletion complete: ${results.successful.length} successful, ${results.failed.length} failed`
+    );
+    return results;
+  } catch (error) {
+    log('error', `Error in batch deletion: ${error.message}`);
+    throw error;
   }
 }
 
@@ -467,17 +577,19 @@ async function updateVercelEnvVars(project) {
     filteredDevVars.BWS_PROJECT = project.projectName;
     filteredDevVars.BWS_ENV = 'dev';
 
-    // Update Vercel project
-    const projectId = project.projectId || (await getProjectIdFromName(project));
+    // Get the project ID and team ID by searching through all teams
+    log('debug', `Looking up project ${project.projectName} across all teams`);
+    const { projectId, teamId } = await getProjectIdFromName(project);
+
     if (!projectId) {
       throw new Error('Could not determine Vercel project ID');
     }
 
+    log('debug', `Found project ID: ${projectId}${teamId ? `, team ID: ${teamId}` : ''}`);
+
     // First, get all current variables to delete
     const vercelToken = getVercelToken(null);
     const url = `https://api.vercel.com/v9/projects/${projectId}/env`;
-    const cached = vercelEnvCache.get(projectId);
-    const teamId = cached?.teamId;
     const config = {
       headers: { Authorization: vercelToken },
       ...(teamId ? { params: { teamId } } : {})
@@ -486,47 +598,285 @@ async function updateVercelEnvVars(project) {
     const resp = await axios.get(url, config);
     const existingEnvs = resp.data.envs || [];
 
-    // Delete all existing variables (except excluded/preserved)
-    for (const { key, id } of existingEnvs) {
-      if (project.exclusions?.includes(key) || project.preserveVars?.includes(key)) {
-        log('debug', `Skipping ${key} (excluded/preserved)`);
+    // Gather IDs of variables to delete (excluding preserved ones)
+    const envVarsToDelete = existingEnvs.filter(({ key }) => !shouldPreserveVar(key, project));
+
+    log('debug', `Found ${envVarsToDelete.length} environment variables to delete`);
+
+    // Delete variables in batches with retry logic
+    if (envVarsToDelete.length > 0) {
+      log('debug', 'Deleting environment variables in batches');
+
+      // Process deletions in batches of 10
+      const batchSize = 10;
+
+      for (let i = 0; i < envVarsToDelete.length; i += batchSize) {
+        const batch = envVarsToDelete.slice(i, i + batchSize);
+
+        // Try up to 3 times to delete this batch
+        let attempts = 0;
+        let remainingToDelete = [...batch];
+
+        while (remainingToDelete.length > 0 && attempts < 3) {
+          attempts++;
+          try {
+            log(
+              'debug',
+              `Deleting batch ${Math.floor(i / batchSize) + 1} (${
+                remainingToDelete.length
+              } variables) (attempt ${attempts})`
+            );
+
+            // Delete in parallel
+            const results = await batchDeleteVercelEnvVars(
+              projectId,
+              remainingToDelete,
+              vercelToken,
+              teamId
+            );
+
+            // Keep track of variables that failed and need to be retried
+            if (results.failed.length === 0) {
+              log(
+                'debug',
+                `Successfully deleted all ${remainingToDelete.length} variables in batch`
+              );
+              remainingToDelete = [];
+            } else {
+              // Filter out successful ones and retry the failures
+              const failedKeys = results.failed.map((f) => f.key);
+              log(
+                'warn',
+                `${results.failed.length} variables failed to delete: ${failedKeys.join(', ')}`
+              );
+
+              // Only keep the failed ones for retry
+              remainingToDelete = remainingToDelete.filter((item) => failedKeys.includes(item.key));
+
+              // Skip retry for certain errors
+              remainingToDelete = remainingToDelete.filter((item) => {
+                const failedItem = results.failed.find((f) => f.key === item.key);
+                if (
+                  failedItem &&
+                  (failedItem.error.includes('internal error') ||
+                    failedItem.error.includes('not found'))
+                ) {
+                  log('warn', `Skipping retry for ${item.key} due to Vercel API issue`);
+                  return false;
+                }
+                return true;
+              });
+
+              log('debug', `${remainingToDelete.length} variables will be retried`);
+            }
+
+            // Add a delay between batch operations
+            if (i + batchSize < envVarsToDelete.length || remainingToDelete.length > 0) {
+              await new Promise((resolve) => setTimeout(resolve, 500));
+            }
+          } catch (error) {
+            log('warn', `Failed to process deletion batch (attempt ${attempts}): ${error.message}`);
+            // Wait longer between retries
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+          }
+        }
+
+        if (remainingToDelete.length > 0) {
+          log(
+            'warn',
+            `Could not delete ${remainingToDelete.length} variables after ${attempts} attempts. Continuing with next batch.`
+          );
+        }
+      }
+
+      log('debug', `Completed environment variable deletion process`);
+    }
+
+    // Prepare production and development variables for creation
+    const prodEnvVars = [];
+    const devEnvVars = [];
+
+    // Process production variables
+    for (const [key, value] of Object.entries(filteredProdVars)) {
+      if (shouldPreserveVar(key, project)) {
+        log('debug', `Skipping preserved variable: ${key}`);
         continue;
       }
-      await deleteVercelEnvVar(projectId, id, vercelToken);
-      log('debug', `Deleted ${key}`);
+
+      prodEnvVars.push({
+        key,
+        value,
+        target: ['production'],
+        type: 'encrypted',
+        gitBranch: null,
+        sensitive: true
+      });
     }
 
-    // Create production variables
-    if (filteredProdVars) {
-      log('info', 'Creating production environment variables...');
-      await updateVars(project, null, filteredProdVars, ['production']);
+    // Process development variables
+    for (const [key, value] of Object.entries(filteredDevVars)) {
+      if (shouldPreserveVar(key, project)) {
+        log('debug', `Skipping preserved variable: ${key}`);
+        continue;
+      }
+
+      devEnvVars.push({
+        key,
+        value,
+        target: ['preview', 'development'],
+        type: 'encrypted',
+        gitBranch: null,
+        sensitive: true
+      });
     }
 
-    // Create preview variables (not development)
-    if (filteredDevVars) {
-      log('info', 'Creating preview environment variables...');
-      await updateVars(project, null, filteredDevVars, ['preview']);
+    // Combine all variables
+    const allEnvVars = [...prodEnvVars, ...devEnvVars];
+
+    // Create variables in batches with retry logic
+    if (allEnvVars.length > 0) {
+      log('debug', `Creating ${allEnvVars.length} environment variables in batches`);
+
+      // Process variables in batches of 10
+      const batchSize = 10;
+
+      for (let i = 0; i < allEnvVars.length; i += batchSize) {
+        const batch = allEnvVars.slice(i, i + batchSize);
+
+        // Try up to 3 times to create this batch
+        let success = false;
+        let attempts = 0;
+
+        while (!success && attempts < 3) {
+          attempts++;
+          try {
+            log(
+              'debug',
+              `Creating batch ${Math.floor(i / batchSize) + 1} (${
+                batch.length
+              } variables) (attempt ${attempts})`
+            );
+
+            // If first attempt and batch size > 1, try batch creation
+            if (attempts === 1 && batch.length > 1) {
+              try {
+                await batchCreateVercelEnvVars(projectId, batch, vercelToken, teamId);
+                success = true;
+                log('debug', `Successfully created batch of ${batch.length} variables`);
+              } catch (batchError) {
+                log(
+                  'warn',
+                  `Batch creation failed: ${batchError.message}. Falling back to individual creation.`
+                );
+                // Will fall back to individual creation on next attempt
+              }
+            } else {
+              // On subsequent attempts or for single items, create individually
+              const createPromises = batch.map((envVar) => {
+                log(
+                  'debug',
+                  `Creating ${envVar.key} for ${envVar.target.join(', ')} environment(s)`
+                );
+                return createVercelEnvVar(
+                  projectId,
+                  envVar.key,
+                  envVar.value,
+                  vercelToken,
+                  envVar.target,
+                  teamId
+                );
+              });
+
+              await Promise.all(createPromises);
+              success = true;
+              log('debug', `Successfully created ${batch.length} variables individually`);
+            }
+
+            // Add a small delay between batches to avoid rate limiting
+            if (i + batchSize < allEnvVars.length) {
+              await new Promise((resolve) => setTimeout(resolve, 500));
+            }
+          } catch (error) {
+            log('warn', `Failed to create batch (attempt ${attempts}): ${error.message}`);
+
+            // Wait longer between retries
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+          }
+        }
+
+        if (!success) {
+          log(
+            'warn',
+            `Could not create variables batch after ${attempts} attempts. Skipping batch.`
+          );
+        }
+      }
+
+      log('debug', `Completed environment variable creation process`);
     }
 
-    // Replace the success log with a boxed version
-    console.log('\x1b[32m╔════════════════════════════════════════════════════════════════════╗');
-    console.log('║                                                                    ║');
-    console.log('║                Successfully updated Vercel project                 ║');
-    console.log(`║                      ${project.projectName.padEnd(46)}║`);
-    console.log('║                                                                    ║');
-    console.log('╚════════════════════════════════════════════════════════════════════╝\x1b[0m');
+    // Success message
+    log('info', `Successfully updated environment variables for project: ${project.projectName}`);
+    console.log(
+      '\x1b[32m╔════════════════════════════════════════════════════════════════════╗\x1b[0m'
+    );
+    console.log(
+      '\x1b[32m║                                                                    ║\x1b[0m'
+    );
+    console.log(
+      '\x1b[32m║                Successfully updated Vercel project                 ║\x1b[0m'
+    );
+    console.log(`\x1b[32m║                      ${project.projectName.padEnd(46)}║\x1b[0m`);
+    console.log(
+      '\x1b[32m║                                                                    ║\x1b[0m'
+    );
+    console.log(
+      '\x1b[32m╚════════════════════════════════════════════════════════════════════╝\x1b[0m'
+    );
   } catch (error) {
     log('error', `Failed to update Vercel project ${project.projectName}: ${error.message}`);
+
+    // Format error message in red box, similar to success message
+    console.log(
+      '\x1b[31m╔════════════════════════════════════════════════════════════════════╗\x1b[0m'
+    );
+    console.log(
+      '\x1b[31m║                                                                    ║\x1b[0m'
+    );
+    console.log(
+      '\x1b[31m║                   ERROR: Vercel Project Not Found                  ║\x1b[0m'
+    );
+    console.log(`\x1b[31m║                      ${project.projectName.padEnd(46)}║\x1b[0m`);
+    console.log(
+      '\x1b[31m║                                                                    ║\x1b[0m'
+    );
+    if (error.message.includes('Could not determine Vercel project ID')) {
+      console.log(
+        '\x1b[31m║  Make sure the project exists and your token has access to it     ║\x1b[0m'
+      );
+      console.log(
+        '\x1b[31m║  Run vercel-api-test to debug: pnpm run vercel-api-test           ║\x1b[0m'
+      );
+      console.log(
+        '\x1b[31m║                                                                    ║\x1b[0m'
+      );
+    }
+    console.log(
+      '\x1b[31m╚════════════════════════════════════════════════════════════════════╝\x1b[0m'
+    );
+
     throw error;
   }
 }
 
-module.exports = {
+export {
   readVars,
   updateVars,
   getProjectIdFromName,
   getCurrentVercelEnvVars,
   deleteVercelEnvVar,
   decryptEnvVar,
-  updateVercelEnvVars
+  updateVercelEnvVars,
+  batchCreateVercelEnvVars,
+  batchDeleteVercelEnvVars
 };

@@ -1,9 +1,30 @@
 #!/usr/bin/env node
 
-const fs = require('fs');
-const path = require('path');
-const crypto = require('crypto');
-const { log } = require('./utils');
+/**
+ * map-env-files.js
+ *
+ * Utility script to map environment variables between .env files
+ * This is useful when you need to create a new .env file based on a template
+ * or when you want to map variables from one format to another.
+ *
+ * Usage:
+ *   node map-env-files.js --source .env.template --target .env.local --map map.json
+ *
+ * @module map-env-files
+ */
+
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import yargs from 'yargs/yargs';
+import { hideBin } from 'yargs/helpers';
+import dotenv from 'dotenv';
+import crypto from 'node:crypto';
+import { log } from './utils.js';
+
+// Get the directory name in ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Debug logging for environment variables
 if (process.env.DEBUG === 'true') {
