@@ -47,7 +47,7 @@
     "@mui/styles": "^5.10.16",
     "@mui/system": "^5.10.17",
     "@sentry/react": "^7.47.0",
-    "next": "^13.0.6",
+    "next": "^14.2.25",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
@@ -89,7 +89,7 @@
     "faker": "^5.5.3",
     "html-webpack-plugin": "5",
     "jest-next-dynamic": "^1.0.1",
-    "next": "^13.0.6",
+    "next": "^14.2.25",
     "process": "^0.11.10",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
