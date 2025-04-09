@@ -113,8 +113,8 @@ async function updateEnvironmentBwsSection(project, environment, onlyToggleEnvir
           environment_ === 'local'
             ? '     # For local development'
             : environment_ === 'dev'
-            ? '      # For development/preview deployments'
-            : '     # For production deployments';
+              ? '      # For development/preview deployments'
+              : '     # For production deployments';
 
         if (environment_ === environment) {
           bwsSection.push(`${line}${comment}`);

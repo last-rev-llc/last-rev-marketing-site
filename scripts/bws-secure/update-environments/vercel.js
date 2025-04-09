@@ -36,6 +36,19 @@ const __dirname = path.dirname(__filename);
 const vercelEnvCache = new Map();
 
 /**
+ * Generate a random timeout between 1-15 seconds to avoid API collisions
+ * when multiple builds might be running concurrently with the same token
+ */
+function getRandomTimeout() {
+  const minSeconds = 1;
+  const maxSeconds = 15;
+  const randomSeconds = Math.floor(Math.random() * (maxSeconds - minSeconds + 1) + minSeconds);
+  const timeout = randomSeconds * 1000;
+  log('debug', `Using random timeout of ${randomSeconds} seconds`);
+  return timeout;
+}
+
+/**
  * Helper function to retrieve a properly formatted Vercel token
  */
 function getVercelToken(token) {
@@ -464,14 +477,27 @@ async function batchCreateVercelEnvVars(projectId, envVars, token, teamId) {
     const response = await axios.post(url, payload, config);
     const createdVars = response.data.envs || [];
 
-    // Fix the misleading log message - only log a single success message
-    if (createdVars.length > 0 || response.status === 200) {
-      log('debug', `Successfully created ${envVars.length} environment variables in batch`);
+    // Fix: Ensure we return a consistent array format with key properties
+    // This helps the counting logic accurately determine success/failure
+    if (createdVars.length > 0) {
+      log('debug', `Successfully created ${createdVars.length} environment variables in batch`);
+      return createdVars.map((env) => ({
+        key: env.key,
+        id: env.id,
+        created: true
+      }));
+    } else if (response.status >= 200 && response.status < 300) {
+      // API returned success but no env data - map original keys as successful
+      log('debug', `API returned success but no environment variables data`);
+      return envVars.map((env) => ({
+        key: env.key,
+        created: true
+      }));
     } else {
-      log('debug', `API returned success but no environment variables were created`);
+      // Empty result - return empty array to signal no creations
+      log('debug', `API returned empty result`);
+      return [];
     }
-
-    return createdVars;
   } catch (error) {
     const msg = error.response?.data?.error?.message || error.message;
     throw new Error(`Failed to create environment variables in batch: ${msg}`);
@@ -512,7 +538,8 @@ async function batchDeleteVercelEnvVars(projectId, envVarsToDelete, token, teamI
     return results;
   } catch (error) {
     log('error', `Error in batch deletion: ${error.message}`);
-    throw error;
+    log('error', `Critical Error: Failed to delete Vercel environment variables`);
+    process.exit(1); // Immediately exit with error code
   }
 }
 
@@ -522,10 +549,24 @@ async function updateVercelEnvVars(project) {
     throw new Error(validation.error);
   }
 
+  // Define batchSize once at the top of the function to avoid duplicate declarations
+  const batchSize = 10;
+
   try {
+    // CRITICAL: Check that SITE_NAME is set for Vercel projects
+    if (process.env.VERCEL === '1' && !process.env.SITE_NAME && !process.env.BWS_PROJECT) {
+      throw new Error(
+        'Critical Error: SITE_NAME or BWS_PROJECT environment variable must be set for Vercel deployments'
+      );
+    }
+
     // Load ALL variables into process.env first
     const prodVars = loadEnvironmentVariables('.env.secure.prod', process.env.BWS_EPHEMERAL_KEY);
     const devVars = loadEnvironmentVariables('.env.secure.dev', process.env.BWS_EPHEMERAL_KEY);
+
+    if (!prodVars || Object.keys(prodVars).length === 0) {
+      throw new Error('Critical Error: No production variables found in .env.secure.prod');
+    }
 
     // After loading all vars
     log(
@@ -607,8 +648,9 @@ async function updateVercelEnvVars(project) {
     if (envVarsToDelete.length > 0) {
       log('debug', 'Deleting environment variables in batches');
 
-      // Process deletions in batches of 10
-      const batchSize = 10;
+      // Process deletions in batches
+      let totalFailedDeletions = 0;
+      let allFailedItems = [];
 
       for (let i = 0; i < envVarsToDelete.length; i += batchSize) {
         const batch = envVarsToDelete.slice(i, i + batchSize);
@@ -627,7 +669,6 @@ async function updateVercelEnvVars(project) {
               } variables) (attempt ${attempts})`
             );
 
-            // Delete in parallel
             const results = await batchDeleteVercelEnvVars(
               projectId,
               remainingToDelete,
@@ -635,237 +676,275 @@ async function updateVercelEnvVars(project) {
               teamId
             );
 
-            // Keep track of variables that failed and need to be retried
-            if (results.failed.length === 0) {
-              log(
-                'debug',
-                `Successfully deleted all ${remainingToDelete.length} variables in batch`
-              );
-              remainingToDelete = [];
-            } else {
-              // Filter out successful ones and retry the failures
-              const failedKeys = results.failed.map((f) => f.key);
-              log(
-                'warn',
-                `${results.failed.length} variables failed to delete: ${failedKeys.join(', ')}`
-              );
+            // Update remaining items to delete with only those that failed
+            remainingToDelete = remainingToDelete.filter(({ key }) =>
+              results.failed.some((f) => f.key === key)
+            );
 
-              // Only keep the failed ones for retry
-              remainingToDelete = remainingToDelete.filter((item) => failedKeys.includes(item.key));
+            if (results.failed.length > 0) {
+              log('warn', `Failed to delete ${results.failed.length} variables in this batch`);
 
-              // Skip retry for certain errors
-              remainingToDelete = remainingToDelete.filter((item) => {
-                const failedItem = results.failed.find((f) => f.key === item.key);
-                if (
-                  failedItem &&
-                  (failedItem.error.includes('internal error') ||
-                    failedItem.error.includes('not found'))
-                ) {
-                  log('warn', `Skipping retry for ${item.key} due to Vercel API issue`);
-                  return false;
-                }
-                return true;
-              });
-
-              log('debug', `${remainingToDelete.length} variables will be retried`);
-            }
-
-            // Add a delay between batch operations
-            if (i + batchSize < envVarsToDelete.length || remainingToDelete.length > 0) {
-              await new Promise((resolve) => setTimeout(resolve, 500));
+              // Add random timeout before retry attempts to avoid concurrent API issues
+              if (remainingToDelete.length > 0 && attempts < 3) {
+                const timeout = getRandomTimeout();
+                log(
+                  'debug',
+                  `Waiting ${timeout / 1000} seconds before retry attempt ${attempts + 1}`
+                );
+                await new Promise((resolve) => setTimeout(resolve, timeout));
+              }
             }
           } catch (error) {
-            log('warn', `Failed to process deletion batch (attempt ${attempts}): ${error.message}`);
-            // Wait longer between retries
-            await new Promise((resolve) => setTimeout(resolve, 1000));
+            log('warn', `Batch deletion attempt ${attempts} failed: ${error.message}`);
+
+            // Add random timeout before retry attempts
+            if (attempts < 3) {
+              const timeout = getRandomTimeout();
+              log(
+                'debug',
+                `Waiting ${timeout / 1000} seconds before retry attempt ${attempts + 1}`
+              );
+              await new Promise((resolve) => setTimeout(resolve, timeout));
+            }
           }
         }
 
+        // If we still have items that failed to delete after 3 attempts, track them as permanent failures
         if (remainingToDelete.length > 0) {
+          totalFailedDeletions += remainingToDelete.length;
+          allFailedItems.push(...remainingToDelete.map((v) => v.key));
+
           log(
             'warn',
-            `Could not delete ${remainingToDelete.length} variables after ${attempts} attempts. Continuing with next batch.`
+            `Failed to delete ${
+              remainingToDelete.length
+            } variables after 3 attempts: ${remainingToDelete.map((v) => v.key).join(', ')}`
           );
+
+          // CRITICAL CHANGE: If ANY variables consistently fail to delete after all retry attempts, fail the build
+          log(
+            'error',
+            `Critical Error: Vercel environment update failed. Could not delete variables: ${allFailedItems.join(
+              ', '
+            )}`
+          );
+          process.exit(1);
+        }
+
+        // Add a random delay between batches
+        if (i + batchSize < envVarsToDelete.length) {
+          const timeout = getRandomTimeout();
+          log(
+            'debug',
+            `Adding delay of ${
+              timeout / 1000
+            } seconds between deletion batches to avoid rate limiting`
+          );
+          await new Promise((resolve) => setTimeout(resolve, timeout));
         }
       }
 
-      log('debug', `Completed environment variable deletion process`);
-    }
+      // After handling deletions, now create the new variables
+      // First we need to prepare the environment variables for production and preview
+      const envVarsForProduction = [];
+      const envVarsForPreview = [];
 
-    // Prepare production and development variables for creation
-    const prodEnvVars = [];
-    const devEnvVars = [];
+      log('debug', 'Preparing environment variables for Vercel deployment...');
 
-    // Process production variables
-    for (const [key, value] of Object.entries(filteredProdVars)) {
-      if (shouldPreserveVar(key, project)) {
-        log('debug', `Skipping preserved variable: ${key}`);
-        continue;
+      // Build the array of environment variables for production
+      for (const [key, value] of Object.entries(filteredProdVars)) {
+        // Skip if this variable is excluded or preserved
+        if (project.exclusions?.includes(key) || shouldPreserveVar(key, project)) {
+          log('debug', `Skipping ${key} (excluded/preserved)`);
+          continue;
+        }
+
+        envVarsForProduction.push({
+          key,
+          value,
+          target: ['production']
+        });
       }
 
-      prodEnvVars.push({
-        key,
-        value,
-        target: ['production'],
-        type: 'encrypted',
-        gitBranch: null,
-        sensitive: true
-      });
-    }
+      // Build the array of environment variables for preview/development
+      for (const [key, value] of Object.entries(filteredDevVars)) {
+        // Skip if this variable is excluded or preserved
+        if (project.exclusions?.includes(key) || shouldPreserveVar(key, project)) {
+          log('debug', `Skipping ${key} (excluded/preserved)`);
+          continue;
+        }
 
-    // Process development variables
-    for (const [key, value] of Object.entries(filteredDevVars)) {
-      if (shouldPreserveVar(key, project)) {
-        log('debug', `Skipping preserved variable: ${key}`);
-        continue;
+        envVarsForPreview.push({
+          key,
+          value,
+          target: ['preview', 'development']
+        });
       }
 
-      devEnvVars.push({
-        key,
-        value,
-        target: ['preview', 'development'],
-        type: 'encrypted',
-        gitBranch: null,
-        sensitive: true
-      });
-    }
+      log('debug', `Prepared ${envVarsForProduction.length} production variables for upload`);
+      log('debug', `Prepared ${envVarsForPreview.length} preview variables for upload`);
 
-    // Combine all variables
-    const allEnvVars = [...prodEnvVars, ...devEnvVars];
+      // Create variables in batches
+      let creationSuccessCount = 0;
+      let creationFailureCount = 0;
+      const failedCreations = [];
 
-    // Create variables in batches with retry logic
-    if (allEnvVars.length > 0) {
-      log('debug', `Creating ${allEnvVars.length} environment variables in batches`);
+      // Process production variables
+      if (envVarsForProduction.length > 0) {
+        log('debug', `Creating ${envVarsForProduction.length} production variables in batches`);
 
-      // Process variables in batches of 10
-      const batchSize = 10;
+        for (let i = 0; i < envVarsForProduction.length; i += batchSize) {
+          const batch = envVarsForProduction.slice(i, i + batchSize);
 
-      for (let i = 0; i < allEnvVars.length; i += batchSize) {
-        const batch = allEnvVars.slice(i, i + batchSize);
-
-        // Try up to 3 times to create this batch
-        let success = false;
-        let attempts = 0;
-
-        while (!success && attempts < 3) {
-          attempts++;
           try {
             log(
               'debug',
-              `Creating batch ${Math.floor(i / batchSize) + 1} (${
-                batch.length
-              } variables) (attempt ${attempts})`
+              `Processing production batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(
+                envVarsForProduction.length / batchSize
+              )}`
             );
 
-            // If first attempt and batch size > 1, try batch creation
-            if (attempts === 1 && batch.length > 1) {
-              try {
-                await batchCreateVercelEnvVars(projectId, batch, vercelToken, teamId);
-                success = true;
-                log('debug', `Successfully created batch of ${batch.length} variables`);
-              } catch (batchError) {
-                log(
-                  'warn',
-                  `Batch creation failed: ${batchError.message}. Falling back to individual creation.`
-                );
-                // Will fall back to individual creation on next attempt
+            const created = await batchCreateVercelEnvVars(projectId, batch, vercelToken, teamId);
+
+            // Fix success counting - only count variables with confirmed creation
+            if (created && Array.isArray(created)) {
+              creationSuccessCount += created.length;
+
+              // Only count failures for items that weren't in the response
+              if (created.length < batch.length) {
+                const createdKeys = created.map((item) => item.key);
+                const missingKeys = batch.filter((item) => !createdKeys.includes(item.key));
+
+                creationFailureCount += missingKeys.length;
+                missingKeys.forEach((item) => {
+                  failedCreations.push({
+                    key: item.key,
+                    error: 'Variable not included in API response'
+                  });
+                });
               }
             } else {
-              // On subsequent attempts or for single items, create individually
-              const createPromises = batch.map((envVar) => {
-                log(
-                  'debug',
-                  `Creating ${envVar.key} for ${envVar.target.join(', ')} environment(s)`
-                );
-                return createVercelEnvVar(
-                  projectId,
-                  envVar.key,
-                  envVar.value,
-                  vercelToken,
-                  envVar.target,
-                  teamId
-                );
+              // If the API returned a non-array response, count all batch items as failures
+              creationFailureCount += batch.length;
+              batch.forEach((item) => {
+                failedCreations.push({
+                  key: item.key,
+                  error: 'API response format unexpected'
+                });
               });
-
-              await Promise.all(createPromises);
-              success = true;
-              log('debug', `Successfully created ${batch.length} variables individually`);
             }
 
-            // Add a small delay between batches to avoid rate limiting
-            if (i + batchSize < allEnvVars.length) {
-              await new Promise((resolve) => setTimeout(resolve, 500));
+            // Add a random delay between batches
+            if (i + batchSize < envVarsForProduction.length) {
+              const timeout = getRandomTimeout();
+              log('debug', `Adding delay of ${timeout / 1000} seconds between production batches`);
+              await new Promise((resolve) => setTimeout(resolve, timeout));
             }
           } catch (error) {
-            log('warn', `Failed to create batch (attempt ${attempts}): ${error.message}`);
-
-            // Wait longer between retries
-            await new Promise((resolve) => setTimeout(resolve, 1000));
+            log('warn', `Failed to create batch of production variables: ${error.message}`);
+            creationFailureCount += batch.length;
+            batch.forEach((item) => {
+              failedCreations.push({
+                key: item.key,
+                error: error.message
+              });
+            });
           }
-        }
-
-        if (!success) {
-          log(
-            'warn',
-            `Could not create variables batch after ${attempts} attempts. Skipping batch.`
-          );
         }
       }
 
-      log('debug', `Completed environment variable creation process`);
-    }
+      // Process preview variables
+      if (envVarsForPreview.length > 0) {
+        log('debug', `Creating ${envVarsForPreview.length} preview variables in batches`);
 
-    // Success message
-    log('info', `Successfully updated environment variables for project: ${project.projectName}`);
-    console.log(
-      '\x1b[32m╔════════════════════════════════════════════════════════════════════╗\x1b[0m'
-    );
-    console.log(
-      '\x1b[32m║                                                                    ║\x1b[0m'
-    );
-    console.log(
-      '\x1b[32m║                Successfully updated Vercel project                 ║\x1b[0m'
-    );
-    console.log(`\x1b[32m║                      ${project.projectName.padEnd(46)}║\x1b[0m`);
-    console.log(
-      '\x1b[32m║                                                                    ║\x1b[0m'
-    );
-    console.log(
-      '\x1b[32m╚════════════════════════════════════════════════════════════════════╝\x1b[0m'
-    );
+        for (let i = 0; i < envVarsForPreview.length; i += batchSize) {
+          const batch = envVarsForPreview.slice(i, i + batchSize);
+
+          try {
+            log(
+              'debug',
+              `Processing preview batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(
+                envVarsForPreview.length / batchSize
+              )}`
+            );
+
+            const created = await batchCreateVercelEnvVars(projectId, batch, vercelToken, teamId);
+
+            // Fix success counting - only count variables with confirmed creation
+            if (created && Array.isArray(created)) {
+              creationSuccessCount += created.length;
+
+              // Only count failures for items that weren't in the response
+              if (created.length < batch.length) {
+                const createdKeys = created.map((item) => item.key);
+                const missingKeys = batch.filter((item) => !createdKeys.includes(item.key));
+
+                creationFailureCount += missingKeys.length;
+                missingKeys.forEach((item) => {
+                  failedCreations.push({
+                    key: item.key,
+                    error: 'Variable not included in API response'
+                  });
+                });
+              }
+            } else {
+              // If the API returned a non-array response, count all batch items as failures
+              creationFailureCount += batch.length;
+              batch.forEach((item) => {
+                failedCreations.push({
+                  key: item.key,
+                  error: 'API response format unexpected'
+                });
+              });
+            }
+
+            // Add a random delay between batches
+            if (i + batchSize < envVarsForPreview.length) {
+              const timeout = getRandomTimeout();
+              log('debug', `Adding delay of ${timeout / 1000} seconds between preview batches`);
+              await new Promise((resolve) => setTimeout(resolve, timeout));
+            }
+          } catch (error) {
+            log('warn', `Failed to create batch of preview variables: ${error.message}`);
+            creationFailureCount += batch.length;
+            batch.forEach((item) => {
+              failedCreations.push({
+                key: item.key,
+                error: error.message
+              });
+            });
+          }
+        }
+      }
+
+      // Calculate total variables and track results
+      const totalVariables = envVarsForProduction.length + envVarsForPreview.length;
+      log(
+        'debug',
+        `Variable creation results: ${creationSuccessCount} successful, ${creationFailureCount} failed`
+      );
+
+      // MODIFIED: Immediately fail if ANY variables fail to create
+      if (creationFailureCount > 0) {
+        const failedKeys = failedCreations.map((item) => item.key).join(', ');
+        log(
+          'error',
+          `Critical Error: Failed to create ${creationFailureCount} environment variables. Failed variables: ${failedKeys}`
+        );
+        process.exit(1);
+      }
+
+      log('info', 'Vercel environment variables updated successfully');
+      return {
+        updated: {
+          production: envVarsForProduction.length,
+          preview: envVarsForPreview.length
+        }
+      };
+    }
   } catch (error) {
-    log('error', `Failed to update Vercel project ${project.projectName}: ${error.message}`);
-
-    // Format error message in red box, similar to success message
-    console.log(
-      '\x1b[31m╔════════════════════════════════════════════════════════════════════╗\x1b[0m'
-    );
-    console.log(
-      '\x1b[31m║                                                                    ║\x1b[0m'
-    );
-    console.log(
-      '\x1b[31m║                   ERROR: Vercel Project Not Found                  ║\x1b[0m'
-    );
-    console.log(`\x1b[31m║                      ${project.projectName.padEnd(46)}║\x1b[0m`);
-    console.log(
-      '\x1b[31m║                                                                    ║\x1b[0m'
-    );
-    if (error.message.includes('Could not determine Vercel project ID')) {
-      console.log(
-        '\x1b[31m║  Make sure the project exists and your token has access to it     ║\x1b[0m'
-      );
-      console.log(
-        '\x1b[31m║  Run vercel-api-test to debug: pnpm run vercel-api-test           ║\x1b[0m'
-      );
-      console.log(
-        '\x1b[31m║                                                                    ║\x1b[0m'
-      );
-    }
-    console.log(
-      '\x1b[31m╚════════════════════════════════════════════════════════════════════╝\x1b[0m'
-    );
-
-    throw error;
+    log('error', `Failed to update Vercel environment: ${error.message}`);
+    process.exit(1);
   }
 }
 

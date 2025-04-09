@@ -54,7 +54,9 @@ async function withRateLimitRetry(apiCall, maxRetries = 3, initialDelay = 1000) 
         retries++;
         log(
           'warn',
-          `Rate limit exceeded (429). Retrying in ${waitTime / 1000}s (Attempt ${retries}/${maxRetries})`
+          `Rate limit exceeded (429). Retrying in ${
+            waitTime / 1000
+          }s (Attempt ${retries}/${maxRetries})`
         );
 
         // Wait before retrying
@@ -220,7 +222,9 @@ async function updateNetlifyEnvironmentVariables(project) {
       const batch = keysToDelete.slice(i, i + batchSize);
       log(
         'debug',
-        `Processing deletion batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(keysToDelete.length / batchSize)}`
+        `Processing deletion batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(
+          keysToDelete.length / batchSize
+        )}`
       );
 
       // Process each batch concurrently, but batches themselves are sequential
@@ -249,7 +253,7 @@ async function updateNetlifyEnvironmentVariables(project) {
     console.log('╚════════════════════════════════════════════════════════════════════╝\u001B[0m');
   } catch (error) {
     log('error', `Failed to update Netlify site ${project.projectName}: ${error.message}`);
-    throw error;
+    process.exit(1); // Immediately exit with error code instead of just throwing
   }
 }
 
@@ -317,7 +321,8 @@ async function batchUpdateNetlifyEnvironmentVariables(site, netlifyToken, variab
     }
   } catch (error) {
     log('error', `Batch update failed: ${error.message}`);
-    throw error;
+    log('error', `Critical Error: Failed to update Netlify environment variables`);
+    process.exit(1); // Immediately exit with error code
   }
 }
 
@@ -428,7 +433,8 @@ async function deleteNetlifyEnvironmentVariable(site, token, key) {
     if (error.response?.status === 404) {
       return;
     }
-    throw new Error(`Failed to delete Netlify env var ${key}: ${error.message}`);
+    log('error', `Critical Error: Failed to delete Netlify env var ${key}: ${error.message}`);
+    process.exit(1); // Immediately exit with error code for critical deletion failures
   }
 }
 

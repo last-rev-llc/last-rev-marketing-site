@@ -574,26 +574,127 @@ for README_FILE in "${README_FILES[@]}"; do
     README_FOUND=true
     echo "Found README file: $(pwd)/$README_FILE"
     
-    # Check if BWS Secure section already exists
-    if grep -q "<!-- BWS-SECURE-DOCS-START -->" "$README_FILE" && grep -q "<!-- BWS-SECURE-DOCS-END -->" "$README_FILE"; then
-      echo "BWS Secure documentation markers found in $README_FILE, updating content..."
+    # Check if any BWS Secure sections exist
+    if grep -q "<!-- BWS-SECURE-DOCS-START -->" "$README_FILE"; then
+      echo "BWS Secure documentation markers found in $README_FILE..."
       
-      # Create a temporary file
-      TMP_FILE=$(mktemp)
+      # Count how many BWS Secure sections exist
+      START_COUNT=$(grep -c "<!-- BWS-SECURE-DOCS-START -->" "$README_FILE")
+      END_COUNT=$(grep -c "<!-- BWS-SECURE-DOCS-END -->" "$README_FILE")
       
-      # Extract everything before the start marker
-      sed -n '1,/<!-- BWS-SECURE-DOCS-START -->/p' "$README_FILE" | sed '$d' > "$TMP_FILE"
+      if [ "$START_COUNT" -gt 1 ] || [ "$END_COUNT" -gt 1 ]; then
+        echo "Detected $START_COUNT start markers and $END_COUNT end markers. Removing duplicate sections..."
+        
+        # Create a temporary script to handle complex README processing
+        TMP_SCRIPT=$(mktemp)
+        cat > "$TMP_SCRIPT" << 'EOF'
+#!/usr/bin/env node
+const fs = require('fs');
+const path = process.argv[2];
+const newContent = process.argv[3];
+
+try {
+  // Read the file content
+  let content = fs.readFileSync(path, 'utf8');
+  
+  // Find all start and end positions of BWS docs sections
+  const startPattern = /<!-- BWS-SECURE-DOCS-START -->/g;
+  const endPattern = /<!-- BWS-SECURE-DOCS-END -->/g;
+  let startMatch;
+  let endMatch;
+  const sections = [];
+  
+  // Find all start positions
+  while ((startMatch = startPattern.exec(content)) !== null) {
+    sections.push({ start: startMatch.index });
+  }
+  
+  // Find all end positions
+  let i = 0;
+  while ((endMatch = endPattern.exec(content)) !== null && i < sections.length) {
+    sections[i].end = endMatch.index + "<!-- BWS-SECURE-DOCS-END -->".length;
+    i++;
+  }
+  
+  // Sort sections by start position (earliest first)
+  sections.sort((a, b) => a.start - b.start);
+  
+  // Keep only the first section, replace all others
+  if (sections.length > 0) {
+    // Build new content by keeping everything before first section
+    let newFileContent = content.substring(0, sections[0].start);
+    
+    // Add the new BWS docs content
+    newFileContent += newContent;
+    
+    // Add everything after the first section, excluding other sections
+    let currentPos = sections[0].end;
+    for (let i = 1; i < sections.length; i++) {
+      // Add content between last section end and this section start
+      if (sections[i].start > currentPos) {
+        newFileContent += content.substring(currentPos, sections[i].start);
+      }
+      // Skip this section
+      currentPos = sections[i].end;
+    }
+    
+    // Add any remaining content after the last section
+    if (currentPos < content.length) {
+      newFileContent += content.substring(currentPos);
+    }
+    
+    // Write the new content back to the file
+    fs.writeFileSync(path, newFileContent);
+    process.exit(0);
+  } else {
+    // No sections found, just append
+    fs.appendFileSync(path, "\n\n" + newContent);
+    process.exit(0);
+  }
+} catch (error) {
+  console.error('Error processing README:', error);
+  process.exit(1);
+}
+EOF
+
+        # Make the script executable
+        chmod +x "$TMP_SCRIPT"
+        
+        # Execute the script to fix the README
+        if node "$TMP_SCRIPT" "$README_FILE" "$BWS_DOC_CONTENT"; then
+          echo "Successfully cleaned up duplicate BWS Secure documentation sections in $README_FILE"
+        else
+          echo "Warning: Failed to clean up duplicate sections. Attempting standard update..."
+          # Fall back to standard update logic
+          update_standard=true
+        fi
+        
+        # Clean up temporary script
+        rm -f "$TMP_SCRIPT"
+      else
+        # Only one section, use standard update logic
+        update_standard=true
+      fi
       
-      # Add the updated BWS documentation
-      echo -e "$BWS_DOC_CONTENT" >> "$TMP_FILE"
-      
-      # Extract everything after the end marker
-      sed -n '/<!-- BWS-SECURE-DOCS-END -->/,$p' "$README_FILE" | sed '1d' >> "$TMP_FILE"
-      
-      # Replace the original file with the updated content
-      mv "$TMP_FILE" "$README_FILE"
-      
-      echo "Successfully updated BWS Secure documentation in $README_FILE"
+      # Standard update logic for single section
+      if [ "$update_standard" = true ]; then
+        # Create a temporary file
+        TMP_FILE=$(mktemp)
+        
+        # Extract everything before the start marker
+        sed -n '1,/<!-- BWS-SECURE-DOCS-START -->/p' "$README_FILE" | sed '$d' > "$TMP_FILE"
+        
+        # Add the updated BWS documentation
+        echo -e "$BWS_DOC_CONTENT" >> "$TMP_FILE"
+        
+        # Extract everything after the end marker
+        sed -n '/<!-- BWS-SECURE-DOCS-END -->/,$p' "$README_FILE" | sed '1d' >> "$TMP_FILE"
+        
+        # Replace the original file with the updated content
+        mv "$TMP_FILE" "$README_FILE"
+        
+        echo "Successfully updated BWS Secure documentation in $README_FILE"
+      fi
     else
       echo "Adding BWS Secure documentation to $README_FILE..."
       
@@ -610,7 +711,12 @@ for README_FILE in "${README_FILES[@]}"; do
     
     # Verify the changes were actually written
     if grep -q "<!-- BWS-SECURE-DOCS-START -->" "$README_FILE" && grep -q "<!-- BWS-SECURE-DOCS-END -->" "$README_FILE"; then
-      echo "Verified: BWS Secure documentation is present in $README_FILE"
+      START_COUNT=$(grep -c "<!-- BWS-SECURE-DOCS-START -->" "$README_FILE")
+      if [ "$START_COUNT" -eq 1 ]; then
+        echo "Verified: BWS Secure documentation is present in $README_FILE (single instance)"
+      else
+        echo "Warning: Multiple BWS Secure documentation sections still exist in $README_FILE"
+      fi
     else
       echo "Warning: Failed to add/update BWS Secure documentation in $README_FILE"
     fi
