@@ -169,17 +169,24 @@ function getBuildOrAuthToken() {
 }
 
 /**
- * Checks if a variable should be preserved. Usually, if it's listed in
- * project.preserveVars and it already exists in the remote environment, we skip updating it.
+ * Determines if a variable should be preserved (not deleted) based on its name
+ * and the project configuration.
  *
- * @param {string} varName - Environment variable name
- * @param {Object} project - The project config containing preserveVars
- * @returns {boolean} true if var should be preserved
+ * @param {string} variableName - The environment variable name
+ * @param {Object} project - Project configuration object
+ * @returns {boolean} True if the variable should be preserved
  */
-function shouldPreserveVar(varName, project) {
-  if (project.preserveVars && project.preserveVars.includes(varName)) {
+function shouldPreserveVar(variableName, project) {
+  // Critical variables that should always be preserved
+  if (variableName === 'BWS_ACCESS_TOKEN' || variableName === 'SITE_NAME') {
     return true;
   }
+
+  // Check project-specific preserveVars array
+  if (project && project.preserveVars && Array.isArray(project.preserveVars)) {
+    return project.preserveVars.includes(variableName);
+  }
+
   return false;
 }
 
@@ -387,61 +394,65 @@ function decryptContent(encrypted, encryptionKey) {
 }
 
 /**
- * Validates platform and context for deployment
- * @param {Object} project - Project configuration
- * @returns {Object} - { isValid: boolean, environment: string, error?: string }
+ * Validates deployment settings for platforms by checking required environment variables.
+ *
+ * @param {Object} project - Project configuration object
+ * @returns {Object} - Object with isValid flag and error message if invalid
  */
 function validateDeployment(project) {
-  if (!project || !project.platform) {
+  const isNetlify = process.env.NETLIFY === 'true';
+  const isVercel = process.env.VERCEL === '1';
+  const isPlatform = isNetlify || isVercel;
+
+  // CRITICAL: Always require SITE_NAME for platform builds
+  if (isPlatform && !process.env.SITE_NAME) {
     return {
       isValid: false,
-      error: 'Invalid project configuration - missing platform'
+      error: `Critical Error: SITE_NAME environment variable is required for platform deployments`
     };
   }
 
-  const platform = project.platform.toLowerCase();
-  let environment = 'dev'; // Default environment
-
-  // If project is specified via BWS_PROJECT, use that platform's validation
-  if (process.env.BWS_PROJECT === project.projectName) {
-    // For Netlify
-    if (process.env.NETLIFY === 'true') {
-      environment = process.env.CONTEXT === 'production' ? 'prod' : 'dev';
-      return { isValid: true, environment, platform: 'netlify' };
-    }
-    // For Vercel
-    if (process.env.VERCEL === '1') {
-      environment = process.env.VERCEL_ENV === 'production' ? 'prod' : 'dev';
-      return { isValid: true, environment, platform: 'vercel' };
-    }
+  // For Netlify projects, we need to validate the authentication token
+  if (
+    isPlatform &&
+    project.platform.toLowerCase() === 'netlify' &&
+    isNetlify &&
+    !process.env.NETLIFY_AUTH_TOKEN
+  ) {
+    return {
+      isValid: false,
+      error: 'Missing NETLIFY_AUTH_TOKEN environment variable'
+    };
   }
 
-  // Otherwise use project's default platform
-  if (platform === 'netlify') {
-    if (process.env.NETLIFY !== 'true') {
-      return {
-        isValid: false,
-        error: 'Not running on Netlify platform'
-      };
-    }
-    environment = process.env.CONTEXT === 'production' ? 'prod' : 'dev';
+  // For Vercel projects, we need to validate the authentication token
+  if (
+    isPlatform &&
+    project.platform.toLowerCase() === 'vercel' &&
+    isVercel &&
+    !process.env.VERCEL_AUTH_TOKEN
+  ) {
+    return {
+      isValid: false,
+      error: 'Missing VERCEL_AUTH_TOKEN environment variable'
+    };
   }
 
-  if (platform === 'vercel') {
-    if (process.env.VERCEL !== '1') {
-      return {
-        isValid: false,
-        error: 'Not running on Vercel platform'
-      };
-    }
-    environment = process.env.VERCEL_ENV === 'production' ? 'prod' : 'dev';
+  if (process.env.NETLIFY === 'true' && project.platform.toLowerCase() !== 'netlify') {
+    return {
+      isValid: false,
+      error: `Project ${project.projectName} is not configured for Netlify (${project.platform})`
+    };
   }
 
-  return {
-    isValid: true,
-    environment,
-    platform
-  };
+  if (process.env.VERCEL === '1' && project.platform.toLowerCase() !== 'vercel') {
+    return {
+      isValid: false,
+      error: `Project ${project.projectName} is not configured for Vercel (${project.platform})`
+    };
+  }
+
+  return { isValid: true };
 }
 
 /**

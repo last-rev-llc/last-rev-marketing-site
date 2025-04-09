@@ -176,41 +176,71 @@ async function validateBwsToken() {
 function printEnvironmentSummary() {
   const environment = process.env.BWS_ENV || 'local';
   const project = process.env.BWS_PROJECT || 'none';
-  const testVariable = process.env.BWS_TEST_VAR || process.env.BWS_SECRET_TEST_VAR || 'not set';
+  const testVariable = process.env.BWS_TEST_VAR || process.env.BWS_SECRET_TEST_VAR;
+
+  // FAIL if testVariable is not set
+  if (!testVariable) {
+    console.error(
+      '\u001B[31m╔══════════════════════════════════════════════════════════╗\u001B[0m'
+    );
+    console.error(
+      '\u001B[31m║                                                          ║\u001B[0m'
+    );
+    console.error(
+      '\u001B[31m║             CRITICAL ERROR: TEST VARIABLE                ║\u001B[0m'
+    );
+    console.error(
+      '\u001B[31m║                                                          ║\u001B[0m'
+    );
+    console.error(
+      '\u001B[31m║      BWS_TEST_VAR or BWS_SECRET_TEST_VAR must be set     ║\u001B[0m'
+    );
+    console.error(
+      '\u001B[31m║                                                          ║\u001B[0m'
+    );
+    console.error(
+      '\u001B[31m║  ERROR: Missing test variable indicates a critical issue  ║\u001B[0m'
+    );
+    console.error(
+      '\u001B[31m║  - Secrets may have failed to load properly              ║\u001B[0m'
+    );
+    console.error(
+      '\u001B[31m║  - Environment configuration may be incorrect            ║\u001B[0m'
+    );
+    console.error(
+      '\u001B[31m║  - BWS connection or authentication may have failed      ║\u001B[0m'
+    );
+    console.error(
+      '\u001B[31m║  - Project configuration may be missing or invalid       ║\u001B[0m'
+    );
+    console.error(
+      '\u001B[31m║                                                          ║\u001B[0m'
+    );
+    console.error(
+      '\u001B[31m╚══════════════════════════════════════════════════════════╝\u001B[0m'
+    );
+    process.exit(1);
+  }
+
   const projectId = process.env.BWS_PROJECT_ID || 'none';
 
-  // Increased BOX_WIDTH by 10 characters (from 80 to 90)
-  const BOX_WIDTH = 90;
-  const CONTENT_START = 25; // Position where values start
+  // Cyan color code
+  const cyan = '\x1b[36m';
+  const reset = '\x1b[0m';
 
-  // Helper to pad content
-  const padContent = (label, value) => {
-    const padding = ' '.repeat(CONTENT_START - label.length);
-    const available = BOX_WIDTH - CONTENT_START - 4; // -4 for borders and spacing
-    const truncated = value.slice(0, Math.max(0, available));
-    return `║ ${label}${padding}: ${truncated}${' '.repeat(available - truncated.length)} ║`;
-  };
-
-  const lines = [
-    `╔${'═'.repeat(BOX_WIDTH - 0)}╗`,
-    `║${' Environment Summary'.padEnd(BOX_WIDTH - 1)} ║`,
-    `╟${'─'.repeat(BOX_WIDTH - 0)}╢`,
-    padContent('Project', project),
-    `║${' '.repeat(BOX_WIDTH - 0)}║`,
-    padContent('BWS_ENV', environment),
-    `║${' '.repeat(BOX_WIDTH - 0)}║`,
-    padContent('BWS Project ID', projectId),
-    `║${' '.repeat(BOX_WIDTH - 0)}║`,
-    padContent('BWS_TEST_VAR', testVariable),
-    `╚${'═'.repeat(BOX_WIDTH - 0)}╝`
-  ];
-
-  // Add a blank line before and after the box
-  log('info', '');
-  for (const line of lines) {
-    log('info', line);
-  }
-  log('info', '');
+  // Simplified ASCII-only approach with cyan coloring
+  console.log('');
+  console.log(`${cyan}${'='.repeat(85)}${reset}`);
+  console.log(`${cyan}  CURRENT ENVIRONMENT SUMMARY${reset}`);
+  console.log(`${cyan}${'='.repeat(85)}${reset}`);
+  console.log('');
+  console.log(`${cyan}  Project           : ${reset}${project}`);
+  console.log(`${cyan}  BWS_ENV           : ${reset}${environment}`);
+  console.log(`${cyan}  BWS Project ID    : ${reset}${projectId}`);
+  console.log(`${cyan}  BWS_TEST_VAR      : ${reset}${testVariable}`);
+  console.log('');
+  console.log(`${cyan}${'='.repeat(85)}${reset}`);
+  console.log('');
 }
 
 // At the start of execution, store ALL original environment variables
@@ -273,7 +303,12 @@ async function setupEnvironment(options = { isPlatformBuild: false }) {
         process.env.BWS_PROJECT = process.env.SITE_NAME;
         log('info', `Forced BWS_PROJECT=${process.env.SITE_NAME} to match SITE_NAME`);
       } else {
-        log('warn', `No project found matching SITE_NAME: ${process.env.SITE_NAME}`);
+        // CRITICAL CHANGE: Fail immediately if SITE_NAME doesn't match any project
+        log(
+          'error',
+          `Critical Error: No project found matching SITE_NAME: ${process.env.SITE_NAME}`
+        );
+        process.exit(1);
       }
     } else if (process.env.BWS_PROJECT) {
       // When SITE_NAME is not available but BWS_PROJECT is set, use it to filter projects
@@ -288,8 +323,20 @@ async function setupEnvironment(options = { isPlatformBuild: false }) {
         // Only use this project for the rest of the process
         projectsToUse = [projectMatch];
       } else {
-        log('warn', `No project found matching BWS_PROJECT: ${process.env.BWS_PROJECT}`);
+        // CRITICAL CHANGE: Fail immediately if BWS_PROJECT doesn't match any project
+        log(
+          'error',
+          `Critical Error: No project found matching BWS_PROJECT: ${process.env.BWS_PROJECT}`
+        );
+        process.exit(1);
       }
+    } else if (isNetlify || isVercel) {
+      // CRITICAL CHANGE: Fail build immediately if neither SITE_NAME nor BWS_PROJECT is set
+      log(
+        'error',
+        `Critical Error: Neither SITE_NAME nor BWS_PROJECT environment variable is set. For platform builds, one of these must be specified.`
+      );
+      process.exit(1);
     }
 
     // Call promptForProject which will:
@@ -408,6 +455,9 @@ async function setupEnvironment(options = { isPlatformBuild: false }) {
           local: project.bwsProjectIds.local
         };
 
+        // Track if any secrets were successfully loaded
+        let secretsLoaded = false;
+
         // Only load and create environment files that don't already exist
         for (const [environment_, projectId] of Object.entries(environmentMappings)) {
           // Skip null/undefined project IDs
@@ -415,8 +465,14 @@ async function setupEnvironment(options = { isPlatformBuild: false }) {
 
           // Only load this project ID if we haven't already
           if (!loadedProjectIds.has(projectId)) {
-            await loadEnvironmentSecrets(projectId, projectId);
-            loadedProjectIds.add(projectId);
+            const success = await loadEnvironmentSecrets(projectId, projectId);
+            if (success) {
+              secretsLoaded = true;
+              loadedProjectIds.add(projectId);
+            }
+          } else {
+            // If we already loaded this ID, consider it a success
+            secretsLoaded = true;
           }
 
           // Create symlink or copy the file as needed
@@ -426,6 +482,17 @@ async function setupEnvironment(options = { isPlatformBuild: false }) {
             fs.copyFileSync(sourceFile, targetFile);
             log('debug', `Created ${targetFile} from ${sourceFile}`);
           }
+        }
+
+        // CRITICAL: If no secrets were loaded for this project, fail immediately
+        if (!secretsLoaded) {
+          log(
+            'error',
+            `Critical Error: No secrets could be loaded for project ${project.projectName}`
+          );
+          log('error', `BWS project IDs may be invalid or inaccessible`);
+          log('error', `Configuration shows: ${JSON.stringify(project.bwsProjectIds)}`);
+          process.exit(1);
         }
 
         // Set current project in environment
@@ -636,12 +703,12 @@ function encryptContent(content, encryptionKey) {
 // New function to handle environment-specific secrets
 async function loadEnvironmentSecrets(environment, projectId) {
   if (!projectId || !environment) {
-    log('warn', 'Skipping invalid environment config - missing projectId or environment name');
+    log('error', 'Critical Error: Missing projectId or environment name');
     return false;
   }
 
   if (!process.env.BWS_ACCESS_TOKEN) {
-    log('warn', 'Skipping environment - BWS_ACCESS_TOKEN not set');
+    log('error', 'Critical Error: BWS_ACCESS_TOKEN not set');
     return false;
   }
 
@@ -663,8 +730,19 @@ async function loadEnvironmentSecrets(environment, projectId) {
     let bwsSecrets;
     try {
       bwsSecrets = JSON.parse(output || '[]');
-    } catch {
-      log('warn', `No valid secrets found for ${environment}`);
+      // Validate that we actually got secrets back
+      if (!Array.isArray(bwsSecrets) || bwsSecrets.length === 0) {
+        log(
+          'error',
+          `Critical Error: No secrets found for projectId ${projectId} (${environment})`
+        );
+        return false;
+      }
+    } catch (parseError) {
+      log(
+        'error',
+        `Critical Error: Invalid secrets data for ${environment}: ${parseError.message}`
+      );
       return false;
     }
 
@@ -672,7 +750,9 @@ async function loadEnvironmentSecrets(environment, projectId) {
     const environmentContent = bwsSecrets.map(({ key, value }) => `${key}=${value}`).join('\n');
     if (process.env.BWS_EPHEMERAL_KEY && environmentContent) {
       const cipherText = encryptContent(environmentContent, process.env.BWS_EPHEMERAL_KEY);
-      fs.writeFileSync(`.env.secure.${projectId}`, cipherText, { encoding: 'utf-8' });
+      fs.writeFileSync(`.env.secure.${projectId}`, cipherText, {
+        encoding: 'utf-8'
+      });
 
       // Only show detailed counts in debug mode
       if (process.env.DEBUG === 'true') {
@@ -680,14 +760,21 @@ async function loadEnvironmentSecrets(environment, projectId) {
       }
       return true;
     }
+    log(
+      'error',
+      `Critical Error: Failed to create secure file for ${projectId} - missing encryption key or empty content`
+    );
     return false;
   } catch (error) {
     if (error?.message?.includes('404 Not Found')) {
-      log('warn', `Project ${projectId} (${environment}): no secrets found or no access`);
+      log(
+        'error',
+        `Critical Error: Project ${projectId} (${environment}): no secrets found or no access`
+      );
       return false;
     }
 
-    log('warn', `Failed to load secrets for ${environment}`);
+    log('error', `Critical Error: Failed to load secrets for ${environment}: ${error.message}`);
     if (process.env.DEBUG === 'true') {
       if (error?.stdout) {
         log('debug', 'stdout:', error.stdout.toString());
@@ -858,11 +945,29 @@ async function handleUploadCommand() {
       // 3. Try BWS enhancement if possible
       try {
         const isValidToken = await validateBwsToken();
+
+        // CRITICAL CHANGE: For platform builds, immediately exit if SITE_NAME or BWS_PROJECT not found
+        if (isValidToken && (isNetlify || isVercel)) {
+          if (!process.env.SITE_NAME && !process.env.BWS_PROJECT) {
+            log(
+              'error',
+              'Critical Error: Neither SITE_NAME nor BWS_PROJECT environment variable is set. For platform builds, one of these must be specified.'
+            );
+            process.exit(1); // Immediately exit with error code
+          }
+        }
+
         if (isValidToken) {
           // Single setupEnvironment call that handles both cases
-          await setupEnvironment({
-            isPlatformBuild: isNetlify || isVercel
-          });
+          try {
+            await setupEnvironment({
+              isPlatformBuild: isNetlify || isVercel
+            });
+          } catch (setupError) {
+            // CRITICAL CHANGE: Exit immediately for any setupEnvironment errors
+            log('error', `Failed to setup environment: ${setupError.message}`);
+            process.exit(1);
+          }
 
           // Call map-env-files.js to show decrypted contents if requested
           const mapResult = spawnSync(
@@ -882,7 +987,9 @@ async function handleUploadCommand() {
           log('info', 'No valid BWS_ACCESS_TOKEN found, continuing with .env values only');
         }
       } catch (error) {
-        log('warn', `BWS enhancement failed: ${error.message}`);
+        // CRITICAL CHANGE: Exit for any error in the BWS enhancement process
+        log('error', `BWS enhancement failed: ${error.message}`);
+        process.exit(1);
       }
 
       // 4. Run environment validation regardless

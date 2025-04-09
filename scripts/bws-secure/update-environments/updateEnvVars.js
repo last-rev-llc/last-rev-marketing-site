@@ -352,6 +352,12 @@ async function main() {
         await updateNetlifyEnvironmentVariables(currentProject);
       }
     } catch (platformError) {
+      // Check for critical errors that should fail the build
+      if (platformError.message.includes('Critical Error:')) {
+        logger.error(`BUILD FAILURE: ${platformError.message}`);
+        process.exit(1); // Critical errors should always fail the build
+      }
+
       // Handle Vercel auth errors
       if (
         currentProject.platform === 'vercel' &&
@@ -384,11 +390,23 @@ async function main() {
       }
     }
   } catch (error) {
+    // Check for critical errors that should fail the build
+    if (error.message.includes('Critical Error:')) {
+      logger.error(`BUILD FAILURE: ${error.message}`);
+      process.exit(1); // Critical errors should always fail the build
+    }
+
     logger.warn(`Unable to sync platform variables: ${error.message}`);
   }
 }
 
 // Run the main function
 main().catch((error) => {
+  // Check for critical errors that should fail the build
+  if (error.message.includes('Critical Error:')) {
+    logger.error(`BUILD FAILURE: ${error.message}`);
+    process.exit(1); // Critical errors should always fail the build
+  }
+
   handleError(error, 'An unexpected error occurred in updateEnvVars.js');
 });
