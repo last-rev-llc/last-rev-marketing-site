@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+/* eslint-disable no-console */
+
 /**
  * upload-secrets.js
  *
@@ -18,6 +20,29 @@ import dotenv from 'dotenv';
 // Get the directory name in ESM
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Helper function to get BWS organization ID with fallback
+function getBwsOrgId() {
+  return process.env.BWS_ORG_ID || 'YOUR_BWS_ORG_ID_HERE';
+}
+
+// Helper function to get BWS machine accounts URL
+function getMachineAccountsUrl() {
+  const orgId = getBwsOrgId();
+  if (orgId === 'YOUR_BWS_ORG_ID_HERE') {
+    return "\nPlease set BWS_ORG_ID environment variable to access your organization's machine accounts.\n";
+  }
+  return `\nhttps://vault.bitwarden.com/#/sm/${orgId}/machine-accounts\n`;
+}
+
+// Helper function to get BWS project secrets URL
+function getProjectSecretsUrl(projectId) {
+  const orgId = getBwsOrgId();
+  if (orgId === 'YOUR_BWS_ORG_ID_HERE') {
+    return `\nPlease set BWS_ORG_ID environment variable to access project ${projectId} secrets.\n`;
+  }
+  return `https://vault.bitwarden.com/#/sm/${orgId}/projects/${projectId}/secrets`;
+}
 
 // 1. Attempt to load a local .env (same directory)
 const localEnvPath = path.join(__dirname, '.env');
@@ -64,8 +89,9 @@ function debug(message, command = '') {
 const sanitizeValue = (value) => {
   // Remove surrounding single or double quotes if present
   const unquotedValue = value.replace(/^['"]|['"]$/g, '');
-  // Escape double quotes within the value
-  return `"${unquotedValue.replace(/"/g, '\\"')}"`;
+  // Escape backslashes first, then double quotes within the value
+  const escapedValue = unquotedValue.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+  return `"${escapedValue}"`;
 };
 
 /**
@@ -131,9 +157,7 @@ function createSuccessBox(successes, uploadResults) {
   console.log(''); // Add spacing
   successes.forEach((s) => {
     console.log(`Project ID: ${s.projectId} (${s.count} secrets)`);
-    console.log(
-      `https://vault.bitwarden.com/#/sm/22479128-f194-460a-884b-b24a015686c6/projects/${s.projectId}/secrets`
-    );
+    console.log(getProjectSecretsUrl(s.projectId));
     console.log(''); // Add spacing between projects
   });
 
@@ -304,9 +328,7 @@ async function clearProjectSecrets(projectId) {
         console.log('');
         console.log(`Verify the BWS ProjectID at the following URL: ${projectId}`);
         console.log('');
-        console.log(
-          `https://vault.bitwarden.com/#/sm/22479128-f194-460a-884b-b24a015686c6/projects/${projectId}/secrets`
-        );
+        console.log(getProjectSecretsUrl(projectId));
         console.log('');
         console.log('Will continue with upload in 10 seconds...');
         console.log('Press Ctrl+C to cancel if something looks wrong.');
@@ -454,11 +476,7 @@ Need help? Visit: https://bitwarden.com/help/secrets-manager-overview/
         console.log('=========================================================');
         console.log('Secrets have been cleared. Pausing for verification...');
         console.log('You can verify deletion by checking the Bitwarden vault.');
-        console.log(`Verify the BWS Project ID at the following URL: ${projectId}`);
-        console.log('');
-        console.log(
-          `https://vault.bitwarden.com/#/sm/22479128-f194-460a-884b-b24a015686c6/projects/${projectId}/secrets`
-        );
+        console.log(getProjectSecretsUrl(projectId));
         console.log('');
         console.log('Will continue with upload in 10 seconds...');
         console.log('Press Ctrl+C to cancel if something looks wrong.');
@@ -621,7 +639,7 @@ if (!process.env.BWS_ACCESS_TOKEN) {
     console.error('\x1b[33m╚════════════════════════════════════════════════════════╝\x1b[0m');
     console.error(
       '\nVisit the link below to create your token: \n' +
-        '\nhttps://vault.bitwarden.com/#/sm/22479128-f194-460a-884b-b24a015686c6/machine-accounts\n'
+        getMachineAccountsUrl()
     );
   }
   process.exit(1);
@@ -653,7 +671,7 @@ try {
     console.error('\x1b[31m╚════════════════════════════════════════════════════════╝\x1b[0m');
     console.error(
       '\nVisit the link below to check or regenerate your token: \n' +
-        '\nhttps://vault.bitwarden.com/#/sm/22479128-f194-460a-884b-b24a015686c6/machine-accounts\n'
+        getMachineAccountsUrl()
     );
   }
   process.exit(1);

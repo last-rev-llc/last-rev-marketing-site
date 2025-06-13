@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { updateVercelEnvVars } from '../update-environments/vercel.js';
 import { log } from '../update-environments/utils.js';
 

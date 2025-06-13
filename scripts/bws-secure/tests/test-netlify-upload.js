@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import fs from 'node:fs';

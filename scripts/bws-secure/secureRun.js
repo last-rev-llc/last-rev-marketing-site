@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+/* eslint-disable no-console */
+
 import { spawnSync, execSync } from 'node:child_process';
 import crypto from 'node:crypto';
 import fs, { promises as fsPromises } from 'node:fs';
@@ -22,6 +24,82 @@ import { validateDeployment } from './update-environments/utils.js';
 // Get the directory name in ESM
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
+
+// Helper function to get BWS organization ID with fallback
+function getBwsOrgId() {
+  return process.env.BWS_ORG_ID || 'YOUR_BWS_ORG_ID_HERE';
+}
+
+// Helper function to get BWS machine accounts URL
+function getMachineAccountsUrl() {
+  const orgId = getBwsOrgId();
+  if (orgId === 'YOUR_BWS_ORG_ID_HERE') {
+    return "\nPlease set BWS_ORG_ID environment variable to access your organization's machine accounts.\n";
+  }
+  return `\nhttps://vault.bitwarden.com/#/sm/${orgId}/machine-accounts\n`;
+}
+
+// Add wrapper function to handle environment variable fallback
+async function readConfigFileWithFallback() {
+  try {
+    // First try the normal readConfigFile
+    return await readConfigFile();
+  } catch (error) {
+    log('debug', `readConfigFile failed with error: ${error.message}`);
+
+    // If it fails and the error is about missing bwsconfig.json, check for _bwsconfig_json in BWS secrets
+    if (error.message.includes('bwsconfig.json not found')) {
+      log('debug', 'bwsconfig.json not found, checking for _bwsconfig_json in BWS secrets');
+
+      const hasToken = process.env.BWS_ACCESS_TOKEN;
+
+      log('debug', `BWS_ACCESS_TOKEN exists: ${!!hasToken}`);
+
+      if (hasToken) {
+        try {
+          log('debug', 'Fetching secrets from BWS to look for _bwsconfig_json...');
+          // Get all secrets using BWS
+          const output = execSync(
+            `${getBwsCommand()} secret list -t ${process.env.BWS_ACCESS_TOKEN} --output json`,
+            {
+              encoding: 'utf8',
+              env: { ...process.env, NO_COLOR: '1', FORCE_COLOR: '0' }
+            }
+          );
+
+          // Clean output of any ANSI codes
+          const cleanOutput = output.replace(/\u001B\[\d+m/g, '').trim();
+          const secrets = JSON.parse(cleanOutput);
+
+          // Look for _bwsconfig_json secret
+          const configSecret = secrets.find((secret) => secret.key === '_bwsconfig_json');
+
+          if (configSecret) {
+            log('debug', 'Found _bwsconfig_json secret, parsing content...');
+            // Parse the secret value as JSON
+            const configContent = JSON.parse(configSecret.value);
+
+            // Create the file locally
+            const configPath = path.join(process.cwd(), 'bwsconfig.json');
+            await fsPromises.writeFile(configPath, JSON.stringify(configContent, null, 2));
+            log('info', `✓ Created bwsconfig.json from BWS secret _bwsconfig_json`);
+
+            return configContent;
+          } else {
+            log('debug', '_bwsconfig_json secret not found in BWS');
+          }
+        } catch (bwsError) {
+          log('error', `Failed to retrieve _bwsconfig_json from BWS: ${bwsError.message}`);
+        }
+      } else {
+        log('debug', 'BWS_ACCESS_TOKEN not set');
+      }
+    }
+
+    // Re-throw the original error if we can't handle it
+    throw error;
+  }
+}
 
 // Add flag to detect nested execution
 const isNestedExecution = process.env.BWS_SECURE_RUN_ACTIVE === 'true';
@@ -134,7 +212,7 @@ async function validateBwsToken() {
       console.warn('\u001B[33m╚════════════════════════════════════════════════════════╝\u001B[0m');
       console.warn(
         '\nVisit the link below to create your token: \n' +
-          '\nhttps://vault.bitwarden.com/#/sm/22479128-f194-460a-884b-b24a015686c6/machine-accounts\n'
+          getMachineAccountsUrl()
       );
     }
     return false;
@@ -165,7 +243,7 @@ async function validateBwsToken() {
       console.error('\u001B[31m╚════════════════════════════════════════════════════════╝\u001B[0m');
       console.error(
         '\nVisit the link below to check or regenerate your token: \n' +
-          '\nhttps://vault.bitwarden.com/#/sm/22479128-f194-460a-884b-b24a015686c6/machine-accounts\n'
+          getMachineAccountsUrl()
       );
     }
     return false;
@@ -273,7 +351,7 @@ async function setupEnvironment(options = { isPlatformBuild: false }) {
   }
 
   try {
-    const config = await readConfigFile();
+    const config = await readConfigFileWithFallback();
     if (!config || !config.projects) {
       throw new Error('Invalid configuration file');
     }
@@ -652,7 +730,7 @@ async function setupEnvironment(options = { isPlatformBuild: false }) {
     if (process.env.ORIGINAL_BWS_ENV) {
       log('debug', `Restoring original BWS_ENV value: ${process.env.ORIGINAL_BWS_ENV}`);
       // Find the project
-      const config = await readConfigFile();
+      const config = await readConfigFileWithFallback();
       const project = config.projects.find((p) => p.projectName === process.env.BWS_PROJECT);
       if (project) {
         // Update the .env file with the original environment

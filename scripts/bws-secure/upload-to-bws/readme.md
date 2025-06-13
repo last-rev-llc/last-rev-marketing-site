@@ -193,11 +193,11 @@ Security Features:
 Required:
 
 - `BWS_ACCESS_TOKEN`: BWS access token
+- `BWS_ORG_ID`: Your Bitwarden organization ID
 
 Optional:
 
 - `DEBUG`: Enable detailed logging
-- `BWS_ORG_ID`: Organization ID
 - `NO_COLOR`: Disable colors
 - `FORCE_COLOR`: Force disable colors
 
@@ -285,17 +285,13 @@ bws secret delete <secret-id>
 
 ### Organization ID
 
-Default org ID (Last Rev):
-
-```
-22479128-f194-460a-884b-b24a015686c6
-```
-
-Override:
+Set your organization ID:
 
 ```env
-BWS_ORG_ID=your-org-id
+BWS_ORG_ID=your-org-id-here
 ```
+
+If not set, you'll see placeholder messages prompting you to configure BWS_ORG_ID.
 
 ### File Structure
 

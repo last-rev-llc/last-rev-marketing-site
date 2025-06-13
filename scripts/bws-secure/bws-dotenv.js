@@ -1,9 +1,25 @@
+/* eslint-disable no-console */
+
 import { execSync } from 'node:child_process';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import dotenv from 'dotenv';
 import logger from './logger.js';
+
+// Helper function to get BWS organization ID with fallback
+function getBwsOrgId() {
+  return process.env.BWS_ORG_ID || 'YOUR_BWS_ORG_ID_HERE';
+}
+
+// Helper function to get BWS machine accounts URL
+function getMachineAccountsUrl() {
+  const orgId = getBwsOrgId();
+  if (orgId === 'YOUR_BWS_ORG_ID_HERE') {
+    return "\nPlease set BWS_ORG_ID environment variable to access your organization's machine accounts.\n";
+  }
+  return `\nhttps://vault.bitwarden.com/#/sm/${orgId}/machine-accounts\n`;
+}
 
 function ensureBwsInstalled() {
   const bwsPath = './node_modules/.bin/bws';
@@ -65,6 +81,7 @@ function loadBwsSecrets(encryptionKey) {
 
   if (!process.env.BWS_ACCESS_TOKEN) {
     // prettier-ignore
+    /* eslint-disable no-console */
     {
       console.warn('\u001B[33m╔════════════════════════════════════════════════════════╗\u001B[0m');
       console.warn('\u001B[33m║                                                        ║\u001B[0m');
@@ -80,10 +97,10 @@ function loadBwsSecrets(encryptionKey) {
       console.warn('\u001B[33m║                                                        ║\u001B[0m');
       console.warn('\u001B[33m╚════════════════════════════════════════════════════════╝\u001B[0m');
       console.warn(
-        '\nVisit the link below to create your token: \n' +
-          '\nhttps://vault.bitwarden.com/#/sm/22479128-f194-460a-884b-b24a015686c6/machine-accounts\n'
+        '\nVisit the link below to create your token: ' + getMachineAccountsUrl()
       );
     }
+    /* eslint-enable no-console */
     return '';
   }
 
@@ -185,6 +202,7 @@ function loadBwsSecrets(encryptionKey) {
   } catch {
     if (process.env.BWS_ACCESS_TOKEN) {
       // prettier-ignore
+      /* eslint-disable no-console */
       {
         console.error('\u001B[31m╔════════════════════════════════════════════════════════╗\u001B[0m');
         console.error('\u001B[31m║                                                        ║\u001B[0m');
@@ -200,10 +218,10 @@ function loadBwsSecrets(encryptionKey) {
         console.error('\u001B[31m║                                                        ║\u001B[0m');
         console.error('\u001B[31m╚════════════════════════════════════════════════════════╝\u001B[0m');
         console.error(
-          '\nVisit the link below to check or regenerate your token: \n' +
-            '\nhttps://vault.bitwarden.com/#/sm/22479128-f194-460a-884b-b24a015686c6/machine-accounts\n'
+          '\nVisit the link below to check or regenerate your token: ' + getMachineAccountsUrl()
         );
       }
+      /* eslint-enable no-console */
     }
     return '';
   }

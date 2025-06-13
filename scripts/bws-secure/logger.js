@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const logger = {
   // ANSI color codes
   colors: {

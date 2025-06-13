@@ -307,7 +307,7 @@ This project uses [BWS Secure](https://github.com/last-rev-llc/bws-secure) for m
 
 ### Creating an Access Token
 
-1. Visit the [Last Rev Bitwarden Machine Accounts](https://vault.bitwarden.com/#/sm/22479128-f194-460a-884b-b24a015686c6/machine-accounts) section
+1. Visit your [Bitwarden Machine Accounts](https://vault.bitwarden.com/#/sm/${BWS_ORG_ID:-YOUR_BWS_ORG_ID_HERE}/machine-accounts) section
    - **Note:** This link requires you to be a member of the Last Rev Bitwarden organization
    - If you don't have access, please refer to the [BWS Secure documentation](https://github.com/last-rev-llc/bws-secure) or contact your team administrator
 2. After clicking the link, follow these steps:

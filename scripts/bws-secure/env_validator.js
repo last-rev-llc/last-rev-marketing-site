@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 // Validate the required environment variables before starting the build process.
 import fs from 'node:fs';
 import path from 'node:path';
