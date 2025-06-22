@@ -31857,9 +31857,9 @@ system-architecture@^0.1.0:
   integrity sha512-ulAk51I9UVUyJgxlv9M6lFot2WP3e7t8Kz9+IS6D4rVba1tR9kON+Ey69f+1R4Q8cd45Lod6a4IcJIxnzGc/zA==
 
 systeminformation@^5.7:
-  version "5.11.1"
-  resolved "https://registry.yarnpkg.com/systeminformation/-/systeminformation-5.11.1.tgz#3fc7f20d7fcbe189d10e9ea372257b1df3734e02"
-  integrity sha512-E8ZGcnW4Pj4boATSdajw0neHh1B+f+3IqL2iAcT9t1DMgc8mdI0NRT04XPrL6oxrpvMzk0A/bSHT9eKd05tQag==
+  version "5.25.11"
+  resolved "https://registry.yarnpkg.com/systeminformation/-/systeminformation-5.25.11.tgz#7d47a14dafbc9cf6c21bc02d19a2121a8c770d88"
+  integrity sha512-jI01fn/t47rrLTQB0FTlMCC+5dYx8o0RRF+R4BPiUNsvg5OdY0s9DKMFmJGrx5SwMZQ4cag0Gl6v8oycso9b/g==
 
 table-layout@^1.0.1, table-layout@~1.0.0:
   version "1.0.2"
