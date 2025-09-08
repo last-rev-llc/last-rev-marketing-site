@@ -7,6 +7,7 @@ import contentMapping from '@last-rev-marketing-site/components/src/contentMappi
 import useSWR from 'swr';
 import { ContentModuleProvider } from '@last-rev/component-library/dist/components/ContentModule/ContentModuleContext';
 import { Box } from '@mui/material';
+import { GetServerSideProps } from 'next';
 
 const fetchPreview = async (id: string, locale: string, environment: string) => {
   const previewGqlClient = new GraphQLClient(`/api/graphql?env=${environment}`);
@@ -32,7 +33,11 @@ export default function Preview({}: any) {
     locale?: string;
   };
 
-  const { data, error, mutate } = useSWR(id ? [id, locale, environment, 'preview', spaceId] : null, fetchPreview, {});
+  const { data, error, mutate } = useSWR(
+    id ? [id, locale, environment, 'preview', spaceId] : null,
+    fetchPreview,
+    {}
+  );
   const content = data?.data?.content;
   const isLoadingInitialData = !data && !error;
 
@@ -74,3 +79,10 @@ export default function Preview({}: any) {
     </Box>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  // This page should only be server-side rendered, not statically generated
+  return {
+    props: {}
+  };
+};
