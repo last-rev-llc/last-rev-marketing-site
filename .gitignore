@@ -31,3 +31,4 @@ daisy/preview
 .env.secure.*
 requiredVars.env
 .env-debug.html
+.bwsconfig.cache

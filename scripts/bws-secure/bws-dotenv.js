@@ -6,6 +6,40 @@ import fs from 'node:fs';
 import path from 'node:path';
 import dotenv from 'dotenv';
 import logger from './logger.js';
+import { execBwsCommandWithRetrySync } from './bws-retry-utils.js';
+
+// Helper function to properly parse multiline environment variables from BWS output
+function parseEnvironmentOutput(output) {
+  const result = {};
+  const lines = output.split('\n');
+  let currentKey = null;
+  let currentValue = '';
+
+  for (const line of lines) {
+    // Check if this line starts a new variable (has = and doesn't start with whitespace)
+    if (line.includes('=') && !line.startsWith(' ') && !line.startsWith('\t')) {
+      // Save previous variable if exists
+      if (currentKey !== null) {
+        result[currentKey] = currentValue;
+      }
+
+      // Start new variable
+      const equalIndex = line.indexOf('=');
+      currentKey = line.substring(0, equalIndex).trim();
+      currentValue = line.substring(equalIndex + 1);
+    } else if (currentKey !== null) {
+      // This is a continuation line for the current variable (preserve empty lines too)
+      currentValue += '\n' + line;
+    }
+  }
+
+  // Don't forget the last variable
+  if (currentKey !== null) {
+    result[currentKey] = currentValue;
+  }
+
+  return result;
+}
 
 // Helper function to get BWS organization ID with fallback
 function getBwsOrgId() {
@@ -112,26 +146,18 @@ function loadBwsSecrets(encryptionKey) {
     try {
       console.log('Debug: Loading global secrets...');
 
-      const output = execSync(
+      const output = execBwsCommandWithRetrySync(
         `./node_modules/.bin/bws secret list -t ${process.env.BWS_ACCESS_TOKEN} -o env`,
-        {
-          encoding: 'utf-8',
-          env: { ...process.env, NO_COLOR: '1', FORCE_COLOR: '0' }
-        }
+        { encoding: 'utf-8' },
+        'Loading global secrets'
       );
 
       // These are data processing operations, not command executions
       const cleanOutput = output.replaceAll(/\u001B\[\d+m/g, '').trim();
-      const globalSecrets = cleanOutput.split('\n').reduce((accumulator, line) => {
-        const [key, value] = line.split('=');
-        if (key && value) {
-          accumulator[key] = value;
-        }
-        return accumulator;
-      }, {});
+      const globalSecrets = parseEnvironmentOutput(cleanOutput);
 
       // Also just data processing
-      for (const { key, value } of globalSecrets) {
+      for (const [key, value] of Object.entries(globalSecrets)) {
         if (key === 'NETLIFY_AUTH_TOKEN' || key === 'VERCEL_AUTH_TOKEN') {
           mergedVariables[key] = value;
           console.log('Debug: Found auth token:', key);
@@ -147,24 +173,16 @@ function loadBwsSecrets(encryptionKey) {
         console.log('Debug: Loading project secrets for:', process.env.BWS_PROJECT_ID);
         // NOSONAR: BWS CLI execution with system-controlled variables - no user input
         /* sonar-disable-next-line sonar:S4721 */
-        const projectOutput = execSync(
+        const projectOutput = execBwsCommandWithRetrySync(
           `./node_modules/.bin/bws secret list ${process.env.BWS_PROJECT_ID} -t ${process.env.BWS_ACCESS_TOKEN} -o env`,
-          {
-            encoding: 'utf-8',
-            env: { ...process.env, NO_COLOR: '1', FORCE_COLOR: '0' }
-          }
+          { encoding: 'utf-8' },
+          `Loading project secrets for ${process.env.BWS_PROJECT_ID}`
         );
 
-        const projectSecrets = projectOutput.split('\n').reduce((accumulator, line) => {
-          const [key, value] = line.split('=');
-          if (key && value) {
-            accumulator[key] = value;
-          }
-          return accumulator;
-        }, {});
+        const projectSecrets = parseEnvironmentOutput(projectOutput);
 
         // More data processing
-        for (const { key, value } of projectSecrets) {
+        for (const [key, value] of Object.entries(projectSecrets)) {
           if (key && value) {
             mergedVariables[key] = value;
           }
