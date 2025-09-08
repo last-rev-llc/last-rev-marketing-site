@@ -28,12 +28,16 @@ interface MyAppProps extends AppProps {
 function MyApp({ Component, emotionCache = clientSideEmotionCache, pageProps }: MyAppProps) {
   return (
     <CacheProvider value={emotionCache}>
-      {pageProps.pageData?.page?.seo ? <SEO seo={pageProps.pageData.page.seo} /> : null}
+      {pageProps.pageData?.page?.seo ? <SEO seo={pageProps.pageData?.page?.seo} /> : null}
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        {!!pageProps.pageData?.page?.seo?.title ? <title>{pageProps.pageData.page.seo.title.value}</title> : null}
+        {!!pageProps.pageData?.page?.seo?.title ? (
+          <title>{pageProps.pageData?.page?.seo?.title?.value}</title>
+        ) : null}
         <meta name="contentful_space" content={process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID} />
         <meta name="contentful_environment" content={process.env.NEXT_PUBLIC_CONTENTFUL_ENV} />
+
+        <meta name="pageId" content={pageProps.pageData?.page?.id} />
         <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png" />
@@ -45,6 +49,7 @@ function MyApp({ Component, emotionCache = clientSideEmotionCache, pageProps }: 
           <Head>
             <link rel="preconnect" href="https://www.googletagmanager.com" />
           </Head>
+
           <Script
             id="GTM_TAG"
             type="text/javascript"
@@ -59,7 +64,11 @@ function MyApp({ Component, emotionCache = clientSideEmotionCache, pageProps }: 
             }}
           />
 
-          <Script type="text/javascript" id="hs-script-loader" src="//js-na1.hs-scripts.com/24052454.js" />
+          <Script
+            type="text/javascript"
+            id="hs-script-loader"
+            src="//js-na1.hs-scripts.com/24052454.js"
+          />
 
           <noscript>
             <iframe
