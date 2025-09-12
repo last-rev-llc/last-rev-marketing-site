@@ -364,7 +364,7 @@ try {
     packageJson.devDependencies['glob'] = '^10.3.10';
   }
   
-  packageJson.devDependencies['axios'] = packageJson.devDependencies['axios'] || '^1.12.0';
+  packageJson.devDependencies['axios'] = packageJson.devDependencies['axios'] || '^1.12.1';
 
   // Detect existing indentation or use prettier config
   const originalContent = fs.readFileSync(packageJsonPath, 'utf8');

@@ -67,7 +67,7 @@
     "dotenv-cli": "^8.0.0",
     "yargs": "^17.7.2",
     "glob": "^10.3.10",
-    "axios": "^1.7.9"
+    "axios": "^1.12.1"
   },
   "dependencies": {
     "@last-rev/app-config": "^0.5.1",
