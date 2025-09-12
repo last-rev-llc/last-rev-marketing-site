@@ -294,7 +294,7 @@ const showSecureRunProgress = (phase, current, total, message = '') => {
   let shortMessage = '';
   if (message) {
     if (message.includes('environments')) {
-      const match = message.match(/(\d+\/\d+)/);
+      const match = message.match(/(\d{1,3}\/\d{1,3})/);
       shortMessage = match ? ` ${match[1]}` : '';
     } else if (message.includes('Connecting')) {
       shortMessage = ' connecting...';
